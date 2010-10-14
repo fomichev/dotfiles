@@ -13,9 +13,6 @@ set ffs=unix
 " default width (+fold column)
 set co=86
 
-" For all text files set 'textwidth' to 78 characters.
-autocmd FileType text setlocal textwidth=78
-
 " place a $ mark at the end of change
 set cpoptions+=$
 
@@ -52,12 +49,6 @@ else
 	endif
 endif
 
-" enable syntax coloring
-syntax on
-set background=dark
-"colorscheme molokai
-colorscheme ir_black
-
 " show the cursor position all the time
 set ruler
 
@@ -69,9 +60,6 @@ set incsearch
 
 " don't wrap screen on search
 "set nowrapscan
-
-" enable filetype plugins
-filetype plugin on
 
 " 1, 2, 3, 4, etc
 "set foldcolumn=1
@@ -104,14 +92,15 @@ endif
 set list
 set listchars=tab:»~,trail:·
 
-" cache more lines
-let c_minlines = 100
+if has('spell')
+	" enable spell check
+	setlocal spell spelllang=en_us
+endif
 
-" enable spell check
-setlocal spell spelllang=en_us
-
-" make russian keys work in normal mode
-set langmap=ФИСВУАПРШОЛДЬТЩЗЙКЫЕГМЦЧНЯ;ABCDEFGHIJKLMNOPQRSTUVWXYZ,фисвуапршолдьтщзйкыегмцчня;abcdefghijklmnopqrstuvwxyz
+if has('langmap')
+	" make russian keys work in normal mode
+	set langmap=ФИСВУАПРШОЛДЬТЩЗЙКЫЕГМЦЧНЯ;ABCDEFGHIJKLMNOPQRSTUVWXYZ,фисвуапршолдьтщзйкыегмцчня;abcdefghijklmnopqrstuvwxyz
+endif
 
 if version >= 703
 	" color 80 column
@@ -129,73 +118,84 @@ if version >= 703
 	endif
 endif
 
-" ifx style setup
-function! StyleIfx()
-	set sw=3
-	set sts=3
-	set ts=3
-	set et
-	set cinoptions=>s,e0,n0,f0,{0,}0,^0,:s,=s,l0,b0,gs,hs,ps,t0,is,+s,c3,C0,(0
-endfunction
-map <F5> :call StyleIfx()<CR>
+if has('syntax')
+	" enable syntax coloring
+	syntax on
+	set background=dark
+	"colorscheme molokai
+	colorscheme ir_black
+endif
 
-" linux style setup
-function! StyleLinux()
-	set sw=8
-	set sts=8
-	set ts=8
-	set noet
-	set cinoptions=>s,e0,n0,f0,{0,}0,^0,:s,=s,l0,b0,gs,hs,ps,t0,is,+s,c3,C0,(0
-endfunction
-map <F6> :call StyleLinux()<CR>
+if has('autocmd')
+	" cache more lines
+	let c_minlines = 100
 
-" python style setup
-function! StylePython()
-	set sw=4
-	set sts=4
-	set ts=4
-	set et
-endfunction
-map <F7> :call StylePython()<CR>
+	" enable filetype plugins
+	filetype plugin on
 
-function! FileC()
-	" show additional errors for C files
-	set filetype=c
-	let c_space_errors=1
-	let c_curly_error=1
-	let c_bracket_error=1
+	" For all text files set 'textwidth' to 78 characters.
+	autocmd FileType text setlocal textwidth=78
 
-	" use auto c indentation
-	set cindent
+	" ifx style setup
+	function! StyleIfx()
+		set sw=3
+		set sts=3
+		set ts=3
+		set et
+		set cinoptions=>s,e0,n0,f0,{0,}0,^0,:s,=s,l0,b0,gs,hs,ps,t0,is,+s,c3,C0,(0
+	endfunction
+	map <F5> :call StyleIfx()<CR>
 
-	call StyleLinux()
-endfunction
-au BufNewFile,BufRead *.c,*.h,*.cpp,*.hpp,*.C call FileC()
+	" linux style setup
+	function! StyleLinux()
+		set sw=8
+		set sts=8
+		set ts=8
+		set noet
+		set cinoptions=>s,e0,n0,f0,{0,}0,^0,:s,=s,l0,b0,gs,hs,ps,t0,is,+s,c3,C0,(0
+	endfunction
+	map <F6> :call StyleLinux()<CR>
 
-function! FilePy()
-	" use auto indentation
-	set ai
+	" python style setup
+	function! StylePython()
+		set sw=4
+		set sts=4
+		set ts=4
+		set et
+	endfunction
+	map <F7> :call StylePython()<CR>
 
-	call StylePython()
-endfunction
-au BufNewFile,BufRead *.py call FilePy()
+	function! FileC()
+		" show additional errors for C files
+		set filetype=c
+		let c_space_errors=1
+		let c_curly_error=1
+		let c_bracket_error=1
 
-" map <F8> to taglist
-nnoremap <silent> <F8> :TlistToggle<CR>
+		" use auto c indentation
+		set cindent
 
-" update tags
-"map <F8> :!ctags -R --c++-kinds=+p --fields=+iaS --extra=+q include src<CR>
-map <F9> :!ctags -R --c++-kinds=+p --fields=+iaS --extra=+q .<CR>
+		call StyleLinux()
+	endfunction
+	au BufNewFile,BufRead *.c,*.h,*.cpp,*.hpp,*.C call FileC()
 
-" change word under cursor in each buffer
-function! BufChange()
-	let from = expand("<cword>")
+	function! FilePy()
+		" use auto indentation
+		set ai
 
-	let to = input("Change " . from . " to: ")
+		call StylePython()
+	endfunction
+	au BufNewFile,BufRead *.py call FilePy()
 
-	if strlen(to) > 0
-		exe "bufdo! %s/\\<" . from . "\\>/" . to . "/g | update"
-	endif
-endfunction
+	" change word under cursor in each buffer
+	function! BufChange()
+		let from = expand("<cword>")
 
-nnoremap <silent> <F2> :call BufChange()<CR>
+		let to = input("Change " . from . " to: ")
+
+		if strlen(to) > 0
+			exe "bufdo! %s/\\<" . from . "\\>/" . to . "/g | update"
+		endif
+	endfunction
+	nnoremap <silent> <F2> :call BufChange()<CR>
+endif
