@@ -11,6 +11,8 @@
 /nfs
 /bin
 
+.vim/projects
+
 #unnecessary files
 mail
 localhost@screenrc
