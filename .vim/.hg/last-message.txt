@@ -1,1 +1,0 @@
-add simple project management script

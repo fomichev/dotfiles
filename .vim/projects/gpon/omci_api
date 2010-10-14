@@ -1,6 +1,0 @@
-y:/repo/my/gponsw_trunk/gpon_omci_api:
-include/*.h
-include/me/*.h
-src/*.c
-src/*.h
-src/me/*.c
