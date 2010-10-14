@@ -1,0 +1,26 @@
+# unnecessary directories
+/.hg
+/.mc
+/.ssh
+/.subversion
+/.texmf-var
+/tmp
+/tftp
+/share
+/repo
+/nfs
+/bin
+
+#unnecessary files
+mail
+localhost@screenrc
+
+.bash_history
+.bash_logout
+.fs
+.gdbtkinit
+.hgrc
+.lesshst
+
+.viminfo
+*.swp
