@@ -1,0 +1,8 @@
+[user]
+	name = Stanislav Fomichev
+	email = s@fomichev.me
+
+[alias]
+	st = status
+	ci = commit
+	co = checkout
