@@ -12,6 +12,30 @@
 /bin
 /.VirtualBox
 /.vim/.VirtualBox
+/src
+/Fonts
+/.thumbnails
+/.pulse
+/.pki
+/.openoffice.org
+/.mozilla
+/.local
+/.gnome2
+/.gconfd
+/.gconf
+/.fonts
+/.fontconfig
+/.config
+/.compiz
+/.cache
+/.dbus
+/Видео
+/Документы
+/Картинки
+/Музыка
+/Общедоступные
+/Рабочий\ стол
+/Шаблоны
 
 .vim/projects
 
@@ -29,3 +53,14 @@ localhost@screenrc
 .viminfo
 _viminfo
 *.swp
+
+.xsession*
+.sudo_as_admin_successful
+.recently-used.xbel
+.pulse-cookie
+.profile
+.gtk-bookmarks
+.gksu.lock
+.esd_auth
+.dmrc
+.ICEauthority
