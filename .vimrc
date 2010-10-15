@@ -24,7 +24,7 @@ set lz
 
 " load plugins on win32
 if has('win32')
-	set runtimepath+=$HOME
+	set runtimepath+=$HOME/.vim
 endif
 
 " set aux files directory
