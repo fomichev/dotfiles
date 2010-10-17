@@ -7,3 +7,4 @@
 	ci = commit
 	co = checkout
 	pom = push origin master
+	plom = pull origin master

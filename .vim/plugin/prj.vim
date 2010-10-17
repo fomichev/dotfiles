@@ -27,7 +27,7 @@ else
 	endif
 
 	" project search directories
-	let s:prj_dirs = $HOME . '/projects/'
+	let s:prj_dirs = $HOME . '/.vim/projects/'
 	" project search directories separator
 	let s:prj_dirs_sep = ','
 	" active project
@@ -47,7 +47,7 @@ else
 	ca prjg PrjGrep
 endif
 
-" return project file location
+" return project file
 function! s:PrjFind(name)
 	for l:line in split(s:prj_dirs, s:prj_dirs_sep)
 		if filereadable(l:line . '/' . a:name)
