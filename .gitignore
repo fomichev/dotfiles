@@ -40,6 +40,8 @@
 /.macromedia
 /.chmsee
 /Downloads
+/.gstreamer-0.10
+/socrates
 
 .vim/projects
 
@@ -57,6 +59,8 @@ localhost@screenrc
 .viminfo
 _viminfo
 *.swp
+*.swo
+*.swn
 
 .xsession*
 .sudo_as_admin_successful
@@ -68,3 +72,4 @@ _viminfo
 .esd_auth
 .dmrc
 .ICEauthority
+.selected_editor
