@@ -199,3 +199,8 @@ if has('autocmd')
 	endfunction
 	nnoremap <silent> <F2> :call BufChange()<CR>
 endif
+
+" don't show help window when I miss ESC key
+inoremap <F1> <nop>
+nnoremap <F1> <nop>
+vnoremap <F1> <nop>

@@ -36,6 +36,7 @@
 /Общедоступные
 /Рабочий\ стол
 /Шаблоны
+/.Trash-1000
 
 .vim/projects
 
@@ -64,3 +65,4 @@ _viminfo
 .esd_auth
 .dmrc
 .ICEauthority
+mbox
