@@ -37,6 +37,12 @@
 /Рабочий\ стол
 /Шаблоны
 /.Trash-1000
+/.shotwell
+/.macromedia
+/.chmsee
+/Downloads
+/.gstreamer-0.10
+/socrates
 
 .vim/projects
 
@@ -54,6 +60,8 @@ localhost@screenrc
 .viminfo
 _viminfo
 *.swp
+*.swo
+*.swn
 
 .xsession*
 .sudo_as_admin_successful
@@ -66,3 +74,4 @@ _viminfo
 .dmrc
 .ICEauthority
 mbox
+.selected_editor
