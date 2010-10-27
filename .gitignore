@@ -45,6 +45,7 @@
 /socrates
 
 .vim/projects
+.vim/.netrwhist
 
 #unnecessary files
 mail
