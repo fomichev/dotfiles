@@ -80,3 +80,11 @@ mbox
 .selected_editor
 .imsettings.log
 .printer-groups.xml
+
+# gnome-shell
+.jhbuildrc
+.jhbuildrc-custom
+.setroubleshoot
+Source/
+gnome-shell-build-setup.sh
+gnome-shell/
