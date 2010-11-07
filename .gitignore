@@ -45,6 +45,10 @@
 /.gstreamer-0.10
 /socrates
 /Desktop
+/Documents
+/Music
+/Pictures
+/Videos
 
 .vim/projects
 .vim/.netrwhist
