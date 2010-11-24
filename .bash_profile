@@ -1,3 +1,3 @@
 . ~/.bashrc
 
-screen -R
+#screen -R

@@ -49,6 +49,11 @@
 /Music
 /Pictures
 /Videos
+/.Skype
+/.gEDA
+/.gconf.bak
+/.mission-control
+/.texlive2007
 
 .vim/projects
 .vim/.netrwhist
