@@ -29,8 +29,8 @@ endif
 
 " set aux files directory
 if has('win32')
-	set directory=c:/vim
-	set backupdir=c:/vim
+	set directory=$HOME/tmp
+	set backupdir=$HOME/tmp
 
 	if has('gui_running')
 		" use the following font
