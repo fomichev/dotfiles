@@ -4,6 +4,7 @@
 /.ssh
 /.subversion
 /.texmf-var
+/.evolution
 /tmp
 /tftp
 /share
@@ -43,8 +44,19 @@
 /Downloads
 /.gstreamer-0.10
 /socrates
+/Desktop
+/Documents
+/Music
+/Pictures
+/Videos
+/.Skype
+/.gEDA
+/.gconf.bak
+/.mission-control
+/.texlive2007
 
 .vim/projects
+.vim/.netrwhist
 
 #unnecessary files
 mail
@@ -75,3 +87,13 @@ _viminfo
 .ICEauthority
 mbox
 .selected_editor
+.imsettings.log
+.printer-groups.xml
+
+# gnome-shell
+.jhbuildrc
+.jhbuildrc-custom
+.setroubleshoot
+Source/
+gnome-shell-build-setup.sh
+gnome-shell/
