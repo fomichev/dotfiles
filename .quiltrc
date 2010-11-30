@@ -1,0 +1,3 @@
+opt_strip_level=ab
+QUILT_NO_DIFF_INDEX=1
+QUILT_NO_DIFF_TIMESTAMPS=1
