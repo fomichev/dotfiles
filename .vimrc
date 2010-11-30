@@ -167,13 +167,22 @@ if has('autocmd')
 
 	" update tags in the current directory and add them to the tags
 	" variable
-	function! UpdateTags()
+	function! UpdateTags(path)
 		let l:ctags_opts = '--format=2 --excmd=pattern --fields=+iaS'
 
-		exec system('ctags -R -f ./tags ' . l:ctags_opts . ' .')
+		exec system('ctags -R -f ' . a:path . ' ' . l:ctags_opts . ' .')
 		exec 'set tags+=./tags'
 	endfunction
-	map <F8> :call UpdateTags()<CR>
+	map <F8> :call UpdateTags('./tags')<CR>
+
+	function! UpdateSystemTags()
+		let l:ctags_opts = '--format=2 --excmd=pattern --fields=+iaS'
+		let l:paths = '/usr/include'
+
+		exec system('ctags -R -f $HOME/.vim/tmp/system_tags ' . l:ctags_opts . ' ' . l:paths)
+	endfunction
+	map <F9> :call UpdateSystemTags()<CR>
+	exec 'set tags+=$HOME/.vim/tmp/system_tags'
 
 	function! FileC()
 		" show additional errors for C files
