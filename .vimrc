@@ -218,6 +218,14 @@ if has('autocmd')
 	endfunction
 	nnoremap <silent> <F2> :call BufChange()<CR>
 
+	function! UpdateLinuxTags(path)
+		let l:ctags_opts = '--format=2 --excmd=pattern --fields=+iaS'
+		let l:paths = a:path . '/arch/x86 ' . a:path .'/block ' . a:path . '/crypto ' . a:path . '/fs ' . a:path . '/include ' . a:path . '/init ' . a:path . '/ipc ' . a:path . '/kernel ' . a:path . '/lib ' . a:path . '/mm ' . a:path . '/net ' . a:path . '/security ' . a:path . '/virt'
+
+		exec system('ctags -R -f $HOME/.vim/tmp/linux_tags ' . l:ctags_opts . ' ' . l:paths)
+	endfunction
+	exec 'set tags+=$HOME/.vim/tmp/linux_tags'
+
 	" map switching between header and source
 	nnoremap <silent> <F12> :A<CR>
 endif
