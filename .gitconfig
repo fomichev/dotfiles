@@ -8,3 +8,8 @@
 	co = checkout
 	pom = push origin master
 	plom = pull origin master
+
+[color]
+	diff = auto
+	status = auto
+	branch = auto
