@@ -54,6 +54,7 @@
 /.gconf.bak
 /.mission-control
 /.texlive2007
+/.kdiff3rc
 
 .vim/projects
 .vim/.netrwhist
