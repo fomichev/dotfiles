@@ -7,7 +7,7 @@ set imap_user = "s@fomichev.me"
 set folder = "imaps://imap.gmail.com:993"
 set spoolfile = "+INBOX"
 set postponed = "+[Gmail]/Черновики"
-set trash = "imaps://imap.gmail.com/[Gmail]/Trash"
+set trash = "imaps://imap.gmail.com/[Gmail]/Корзина"
 
 # keep internal data in home dir
 set header_cache = ~/.mutt/cache/headers
@@ -17,9 +17,20 @@ set certificate_file = ~/.mutt/certificates
 # use vi-like bindings
 bind index \Cd half-down
 bind index \Cu half-up
+bind index G last-entry
+bind index gg first-entry
 
-# index shift-g - end
-# index gg - home
+bind pager j next-line
+bind pager k previous-line
+bind pager \Cd half-down
+bind pager \Cu half-up
+bind pager G bottom
+bind pager gg top
+
+# pgp settings
+#set pgp_autosign = yes
+#set pgp_autoencrypt = yes
+#set pgp_replysignencrypted = yes
 
 # don't send messages with empty subject
 set abort_nosubject = yes
@@ -36,3 +47,6 @@ set beep_new = yes
 # no help
 #set help = no
 set help = yes
+
+# don't make new messages old upon mutt exit
+set mark_old = no
