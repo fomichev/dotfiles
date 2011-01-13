@@ -6,8 +6,15 @@
 !.gitignore
 !.quiltrc
 !.screenrc
+!.inputrc
 !/.vim
 /.vim/.netrwhist
 /.vim/tmp
 !.vimrc
 !/Fonts
+
+# some brain damaged stuff on virtual machine
+/.vim/.VirtualBox/
+/.vim/.hgrc
+/.vim/_viminfo
+/.vim/projects/
