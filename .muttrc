@@ -3,11 +3,13 @@ set realname = "Stanislav Fomichev"
 
 # imap setup
 set imap_user = "s@fomichev.me"
+#set imap_force_ssl = yes
 
-set folder = "imaps://imap.gmail.com:993"
+set folder = "imaps://imap.gmail.com:993/"
 set spoolfile = "+INBOX"
 set postponed = "+[Gmail]/Черновики"
-set trash = "imaps://imap.gmail.com/[Gmail]/Корзина"
+
+mailboxes =INBOX =etc =linux
 
 # keep internal data in home dir
 set header_cache = ~/.mutt/cache/headers
