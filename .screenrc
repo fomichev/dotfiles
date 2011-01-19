@@ -2,3 +2,4 @@ hardstatus string "%{= kw}%?%-Lw%?%{B}(%{W}%n*%f %t%?(%u)%?%{B})%{w}%?%+Lw%?%?%=
 hardstatus alwayslastline
 defscrollback 10000
 #vbell on
+maptimeout 5

@@ -21,3 +21,6 @@ QoS
 config
 tarballs
 qemu
+I2C
+pls
+Mbps

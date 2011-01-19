@@ -2,6 +2,10 @@
 
 export PATH=~/bin:$PATH
 
+if [ -d /opt/vim ]; then
+	export PATH=/opt/vim/bin:~/bin:$PATH
+fi
+
 PS1='$ '
 
 export EDITOR=vim
