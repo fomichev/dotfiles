@@ -5,4 +5,4 @@ alias j='jobs -l'
 
 alias install='sudo apt-get install'
 alias search='apt-cache search'
-alias mutt='imapfilter && mutt -y'
+alias wutt='imapfilter && mutt -y -F ~/.work_muttrc'
