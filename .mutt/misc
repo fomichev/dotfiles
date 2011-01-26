@@ -1,0 +1,34 @@
+set realname = "Stanislav Fomichev"
+set signature = ~/.mutt/signature
+
+# check regulary
+set timeout = 15
+set mail_check = 60
+
+# keep internal data in home dir
+set header_cache = ~/.mutt/cache/headers
+set message_cachedir = ~/.mutt/cache/bodies
+set certificate_file = ~/.mutt/certificates
+
+# edit headers with mail
+set edit_headers = yes
+
+# don't send messages with empty subject
+set abort_nosubject = yes
+
+# ask for CCs
+set askcc = yes
+
+# be quiet please
+set beep = no
+
+# but beep about incoming messages
+set beep_new = yes
+
+# no help
+#set help = no
+set help = yes
+
+# don't make new messages old upon mutt exit
+set mark_old = no
+
