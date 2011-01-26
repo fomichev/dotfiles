@@ -235,8 +235,8 @@ inoremap <F1> <nop>
 nnoremap <F1> <nop>
 vnoremap <F1> <nop>
 
+" using PuTTY with GNU Screen makes Vim crazy
 if &term == "screen"
 	set term=xterm
 	set t_Co=256
-	set background=dark
 endif

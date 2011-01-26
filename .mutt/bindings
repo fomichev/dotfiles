@@ -1,0 +1,24 @@
+# use vi-like bindings
+bind index \Cd half-down
+bind index \Cu half-up
+bind index G last-entry
+bind index gg first-entry
+
+bind pager j next-line
+bind pager k previous-line
+bind pager \Cd half-down
+bind pager \Cu half-up
+bind pager G bottom
+bind pager gg top
+
+bind pager gt next-undeleted
+bind pager gT previous-undeleted
+
+bind pager a group-reply
+bind index a group-reply
+
+bind index "^" imap-fetch-mail
+bind pager "^" imap-fetch-mail
+
+macro index c "<change-folder>?<toggle-mailboxes>" "open a different folder"
+macro pager c "<change-folder>?<toggle-mailboxes>" "open a different folder"

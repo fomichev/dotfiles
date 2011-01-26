@@ -13,6 +13,9 @@
 /.vim/tmp
 !.vimrc
 !/Fonts
+!/.mutt
+/.mutt/work_aliases
+/.mutt/cache
 
 # some brain damaged stuff on virtual machine
 /.vim/.VirtualBox/

@@ -1,5 +1,4 @@
 set from = "kernel@fomichev.me"
-set realname = "Stanislav Fomichev"
 
 # imap setup
 set imap_user = "kernel@fomichev.me"
@@ -12,47 +11,9 @@ set postponed = "+[Gmail]/Черновики"
 
 mailboxes =INBOX
 
-# keep internal data in home dir
-set header_cache = ~/.mutt/cache/headers
-set message_cachedir = ~/.mutt/cache/bodies
-set certificate_file = ~/.mutt/certificates
+set alias_file = "~/.mutt/aliases"
+source $alias_file
 
-# use vi-like bindings
-bind index \Cd half-down
-bind index \Cu half-up
-bind index G last-entry
-bind index gg first-entry
+source ~/.mutt/bindings
 
-bind pager j next-line
-bind pager k previous-line
-bind pager \Cd half-down
-bind pager \Cu half-up
-bind pager G bottom
-bind pager gg top
-
-# pgp settings
-#set pgp_autosign = yes
-#set pgp_autoencrypt = yes
-#set pgp_replysignencrypted = yes
-
-# don't send messages with empty subject
-set abort_nosubject = yes
-
-# ask for CCs
-set askcc = yes
-
-# be quiet please
-set beep = no
-
-# but beep about incoming messages
-set beep_new = yes
-
-# no help
-#set help = no
-set help = yes
-
-# don't make new messages old upon mutt exit
-set mark_old = no
-
-# aliases
-alias netdev netdev@vger.kernel.org
+source ~/.mutt/misc
