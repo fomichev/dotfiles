@@ -8,6 +8,7 @@
 	co = checkout
 	pom = push origin master
 	plom = pull origin master
+	tip = log -1
 
 [color]
 	diff = auto
