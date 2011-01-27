@@ -17,3 +17,5 @@ source $alias_file
 source ~/.mutt/bindings
 
 source ~/.mutt/misc
+
+source ~/.mutt/lists
