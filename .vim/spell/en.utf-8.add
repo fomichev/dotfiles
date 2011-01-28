@@ -30,3 +30,13 @@ minicom
 vt100
 fifo
 linux
+jffs2
+ok
+mtd
+SPI
+menuconfig
+rootfs
+m25p80
+spi
+uimage
+rc2

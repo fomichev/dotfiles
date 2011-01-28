@@ -136,6 +136,11 @@ if has('autocmd')
 	" For all text files set 'textwidth' to 78 characters.
 	autocmd FileType text setlocal textwidth=78
 
+	" mutt's mails
+	augroup filetypedetect
+	  autocmd BufRead,BufNewFile *mutt-*              setfiletype mail
+	augroup END
+
 	" ifx style setup
 	function! StyleIfx()
 		set sw=3
