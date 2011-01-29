@@ -243,5 +243,7 @@ vnoremap <F1> <nop>
 " using PuTTY with GNU Screen makes Vim crazy
 if &term == "screen"
 	set term=xterm
-	set t_Co=256
+	set t_Co=16
+	" this one works good on linux/xterm
+	colorscheme molokai
 endif
