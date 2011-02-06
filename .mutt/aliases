@@ -1,3 +1,4 @@
 alias netdev netdev@vger.kernel.org
 alias majordomo majordomo@vger.kernel.org
-alias janitors kernel-janitors@vger.kernel.org
+alias kernel-janitors kernel-janitors@vger.kernel.org
+alias linux-kernel linux-kernel@vger.kernel.org

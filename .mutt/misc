@@ -13,8 +13,8 @@ set certificate_file = ~/.mutt/certificates
 # edit headers with mail
 set edit_headers = yes
 
-# don't send messages with empty subject
-set abort_nosubject = yes
+# sliently create messages with empty subject
+set abort_nosubject = no
 
 # ask for CCs
 set askcc = yes
