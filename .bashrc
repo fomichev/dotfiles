@@ -2,8 +2,14 @@
 
 export PATH=~/bin:$PATH
 
+# use extra Vim
 if [ -d /opt/vim ]; then
 	export PATH=/opt/vim/bin:~/bin:$PATH
+fi
+
+# use extra bash settings
+if [ -e ~/.work_bashrc ]; then
+	source ~/.work_bashrc
 fi
 
 PS1='$ '
