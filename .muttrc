@@ -2,14 +2,13 @@ set from = "kernel@fomichev.me"
 
 # imap setup
 set imap_user = "kernel@fomichev.me"
-#set imap_force_ssl = yes
 
 set smtp_url = "smtp://kernel@fomichev.me@smtp.gmail.com:587/"
 set folder = "imaps://imap.gmail.com:993/"
 set spoolfile = "+INBOX"
 set postponed = "+[Gmail]/Черновики"
 
-mailboxes =INBOX
+mailboxes =INBOX =[Gmail]/Отправленные
 
 set alias_file = "~/.mutt/aliases"
 source $alias_file
@@ -19,3 +18,5 @@ source ~/.mutt/bindings
 source ~/.mutt/misc
 
 source ~/.mutt/lists
+
+source ~/.mutt/pwd

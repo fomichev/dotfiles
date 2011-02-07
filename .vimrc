@@ -127,6 +127,9 @@ if has('syntax')
 endif
 
 if has('autocmd')
+	" show non-ASCII
+	set isprint=
+
 	" cache more lines
 	let c_minlines = 100
 
@@ -140,16 +143,6 @@ if has('autocmd')
 	augroup filetypedetect
 	  autocmd BufRead,BufNewFile *mutt-*              setfiletype mail
 	augroup END
-
-	" ifx style setup
-	function! StyleIfx()
-		set sw=3
-		set sts=3
-		set ts=3
-		set et
-		set cinoptions=>s,e0,n0,f0,{0,}0,^0,:s,=s,l0,b0,gs,hs,ps,t0,is,+s,c3,C0,(0
-	endfunction
-	map <F5> :call StyleIfx()<CR>
 
 	" linux style setup
 	function! StyleLinux()
@@ -187,7 +180,45 @@ if has('autocmd')
 		exec system('ctags -R -f $HOME/.vim/tmp/system_tags ' . l:ctags_opts . ' ' . l:paths)
 	endfunction
 	map <F9> :call UpdateSystemTags()<CR>
-	exec 'set tags+=$HOME/.vim/tmp/system_tags'
+	set tags+=$HOME/.vim/tmp/system_tags
+
+
+	function! UpdateLinuxTags(path)
+		let l:ctags_opts =
+			\ '-I __initdata,__exitdata,__acquires,__releases ' .
+			\ '-I __read_mostly,____cacheline_aligned ' .
+			\ '-I ____cacheline_aligned_in_smp ' .
+			\ '-I ____cacheline_internodealigned_in_smp ' .
+			\ '-I DEFINE_TRACE,EXPORT_TRACEPOINT_SYMBOL ' .
+			\ '-I EXPORT_TRACEPOINT_SYMBOL_GPL ' .
+			\ '-I EXPORT_SYMBOL,EXPORT_SYMBOL_GPL ' .
+			\ '--regex-asm=''/^ENTRY\(([^)]*)\).*/\1/'' ' .
+			\ '--regex-c=''/^SYSCALL_DEFINE[[:digit:]]?\(([^,)]*).*/sys_\1/'' ' .
+			\ '--regex-c++=''/^TRACE_EVENT\(([^,)]*).*/trace_\1/'' ' .
+			\ '--regex-c++=''/^DEFINE_EVENT\(([^,)]*).*/trace_\1/'' ' .
+			\ '--c-kinds=-m+px --format=2 ' .
+			\ '--excmd=pattern --fields=+S'
+
+		let l:paths =
+			\ a:path . '/arch/x86 ' .
+			\ a:path . '/block ' .
+			\ a:path . '/crypto ' .
+			\ a:path . '/fs ' .
+			\ a:path . '/include ' .
+			\ a:path . '/init ' .
+			\ a:path . '/ipc ' .
+			\ a:path . '/kernel ' .
+			\ a:path . '/lib ' .
+			\ a:path . '/mm ' .
+			\ a:path . '/net ' .
+			\ a:path . '/security ' .
+			\ a:path . '/virt'
+
+		exec system('ctags -R -f $HOME/.vim/tmp/linux_tags ' . l:ctags_opts . ' ' . l:paths)
+	endfunction
+	set tags+=$HOME/.vim/tmp/linux_tags
+
+"	set tags+=~/src/linux-2.6/tags
 
 	function! FileC()
 		" show additional errors for C files
@@ -223,14 +254,6 @@ if has('autocmd')
 	endfunction
 	nnoremap <silent> <F2> :call BufChange()<CR>
 
-	function! UpdateLinuxTags(path)
-		let l:ctags_opts = '--c-kinds=-m --format=2 --excmd=pattern --fields=+S'
-		let l:paths = a:path . '/arch/x86 ' . a:path .'/block ' . a:path . '/crypto ' . a:path . '/fs ' . a:path . '/include ' . a:path . '/init ' . a:path . '/ipc ' . a:path . '/kernel ' . a:path . '/lib ' . a:path . '/mm ' . a:path . '/net ' . a:path . '/security ' . a:path . '/virt'
-
-		exec system('ctags -R -f $HOME/.vim/tmp/linux_tags ' . l:ctags_opts . ' ' . l:paths)
-	endfunction
-	exec 'set tags+=$HOME/.vim/tmp/linux_tags'
-
 	" map switching between header and source
 	nnoremap <silent> <F12> :A<CR>
 endif
@@ -243,5 +266,7 @@ vnoremap <F1> <nop>
 " using PuTTY with GNU Screen makes Vim crazy
 if &term == "screen"
 	set term=xterm
-	set t_Co=256
+	set t_Co=16
+	" this one works good on linux/xterm
+	colorscheme molokai
 endif
