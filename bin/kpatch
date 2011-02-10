@@ -1,0 +1,13 @@
+#!/bin/sh
+
+patches_dir=~/src/linux-patches/
+src_dir=~/src/linux-2.6/
+
+if [ "x$1" = "x-r" ]; then
+	reverse=-R
+fi
+
+for file in $(find $patches_dir -name *.patch | sort); do
+	echo "Apply $file:"
+	(cd $src_dir && patch -p1 $reverse < $file)
+done

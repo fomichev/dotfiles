@@ -1,0 +1,13 @@
+#!/bin/sh
+
+curdir=$(cd $(dirname $0) && pwd)
+version=`cat include/config/kernel.release`
+
+if [ -e /boot/vmlinuz-$version ]; then
+	$curdir/kremove -n
+fi
+
+sudo make install && \
+sudo make modules_install && \
+sudo update-initramfs -c -k $version && \
+sudo update-grub

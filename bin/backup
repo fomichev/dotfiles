@@ -1,0 +1,43 @@
+#!/bin/sh
+
+curdir=$(cd $(dirname $0) && pwd)
+
+. $curdir/backup.cfg
+
+if [ ! -e "$remote" ]; then
+	mkdir -p "$remote"
+fi
+
+if [ "$1" = "-h" ] || [ "$1" = "--help" ]; then
+	echo "Usage: `basename $0` [-r]"
+	echo
+	echo "Options:"
+	echo -e "\t-r,--restore\trestore backup"
+	echo -e "\t-h,--help\tprint help information"
+
+	exit
+fi
+
+if [ "$1" = "-r" ] || [ "$1" = "--restore" ]; then
+	restore=1
+else
+	restore=0
+fi
+
+if [ $restore -eq 1 ]; then
+	rsync \
+		-arP \
+		--exclude-from "$exclude_file" \
+		--files-from "$include_file" \
+		"$remote" \
+		"$local"
+else
+	rsync \
+		-arP \
+		--delete \
+		--delete-excluded \
+		--exclude-from "$exclude_file" \
+		--files-from "$include_file" \
+		"$local" \
+		"$remote"
+fi

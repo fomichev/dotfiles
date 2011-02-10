@@ -1,0 +1,19 @@
+#!/bin/sh
+
+prefix=$(cd ~ && pwd)/src
+
+c='1'
+tool='smatch'
+
+for arg in $*; do
+	case $arg in
+		-a) c='2' ;;
+		-s) tool='sparse' ;;
+	esac
+done
+
+if [ "$tool" = "smatch" ]; then
+	tool_args=-p=kernel
+fi
+
+make CHECK="$prefix/$tool/$tool $tool_args" C=$c 2>&1 | tee $tool.log
