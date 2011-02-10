@@ -7,7 +7,14 @@ if [ -e /boot/vmlinuz-$version ]; then
 	$curdir/kremove -n
 fi
 
-sudo make install && \
-sudo make modules_install && \
-sudo update-initramfs -c -k $version && \
-sudo update-grub
+if [ "x$1" = "x-m" ]; then
+	#install only modules
+	sudo make modules_install && \
+	sudo update-initramfs -c -k $version && \
+	sudo update-grub
+else
+	sudo make install && \
+	sudo make modules_install && \
+	sudo update-initramfs -c -k $version && \
+	sudo update-grub
+fi

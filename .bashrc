@@ -4,7 +4,10 @@ export PATH=~/bin:$PATH
 
 # use extra Vim
 if [ -d /opt/vim ]; then
-	export PATH=/opt/vim/bin:~/bin:$PATH
+	export PATH=/opt/vim/bin:$PATH
+fi
+if [ -d ~/opt/vim ]; then
+	export PATH=~/opt/vim/bin:$PATH
 fi
 
 # use extra bash settings
