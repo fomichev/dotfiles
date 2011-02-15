@@ -255,7 +255,7 @@ if has('autocmd')
 	nnoremap <silent> <F2> :call BufChange()<CR>
 
 	" map switching between header and source
-	nnoremap <silent> <F12> :A<CR>
+	nnoremap <silent> <C-s> :A<CR>
 endif
 
 " don't show help window when I miss ESC key

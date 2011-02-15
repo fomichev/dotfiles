@@ -1,0 +1,3 @@
+#!/bin/sh
+
+make -j8 && sudo rmmod brcmsmac && kinstall && sudo modprobe brcmsmac
