@@ -226,6 +226,7 @@ if has('autocmd')
 		let c_space_errors=1
 		let c_curly_error=1
 		let c_bracket_error=1
+		let c_gnu=1
 
 		" use auto c indentation
 		set cindent

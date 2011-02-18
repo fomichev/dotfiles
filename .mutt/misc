@@ -32,3 +32,8 @@ set help = yes
 # don't make new messages old upon mutt exit
 set mark_old = no
 
+# save attachments into home dir
+macro attach s <save-entry><bol>~/
+
+source ~/.mutt/bindings
+source ~/.mutt/lists

@@ -13,10 +13,6 @@ mailboxes =INBOX =[Gmail]/Отправленные
 set alias_file = "~/.mutt/aliases"
 source $alias_file
 
-source ~/.mutt/bindings
-
 source ~/.mutt/misc
-
-source ~/.mutt/lists
 
 source ~/.mutt/pwd
