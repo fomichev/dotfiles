@@ -1,0 +1,5 @@
+#!/bin/sh
+
+src_dir=~/src/linux-2.6
+
+make -C$src_dir tags

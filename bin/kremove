@@ -1,0 +1,15 @@
+#!/bin/sh
+
+version=`cat include/config/kernel.release`
+
+sudo rm -rf \
+	/boot/initrd.img-$version \
+	/boot/config-$version \
+	/boot/System.map-$version \
+	/boot/vmlinuz-$version \
+	/lib/modules/$version
+
+if [ ! "x$1" = "x-n" ]; then
+	sudo update-grub
+fi
+

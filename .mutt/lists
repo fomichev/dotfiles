@@ -1,2 +1,2 @@
-subscribe kernel-janitors
-lists netdev, linux-kernel
+subscribe kernel-janitors, devel
+lists netdev, linux-kernel, linux-wireless

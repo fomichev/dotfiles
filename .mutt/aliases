@@ -2,3 +2,7 @@ alias netdev netdev@vger.kernel.org
 alias majordomo majordomo@vger.kernel.org
 alias kernel-janitors kernel-janitors@vger.kernel.org
 alias linux-kernel linux-kernel@vger.kernel.org
+alias linux-wireless linux-wireless@vger.kernel.org
+alias linuxdriverproject devel@linuxdriverproject.org
+
+alias brcm80211 arend@broadcom.com, brudley@broadcom.com, rvossen@broadcom.com
