@@ -1,5 +1,8 @@
 /*
 !/bin
+/bin/hg-clone-prepare
+/bin/lq-ssh
+/bin/shg
 !.bash_aliases
 !.bash_profile
 !.bashrc

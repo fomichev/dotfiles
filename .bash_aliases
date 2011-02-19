@@ -10,3 +10,5 @@ alias rwutt='mutt -y -R -F ~/.work_muttrc'
 alias rmutt='mutt -R'
 
 alias nake='nice -10 make'
+alias jake='make -j8'
+alias decrypt='gpg --decrypt'

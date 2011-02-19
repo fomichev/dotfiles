@@ -226,6 +226,7 @@ if has('autocmd')
 		let c_space_errors=1
 		let c_curly_error=1
 		let c_bracket_error=1
+		let c_gnu=1
 
 		" use auto c indentation
 		set cindent
@@ -255,7 +256,7 @@ if has('autocmd')
 	nnoremap <silent> <F2> :call BufChange()<CR>
 
 	" map switching between header and source
-	nnoremap <silent> <F12> :A<CR>
+	nnoremap <silent> <C-s> :A<CR>
 endif
 
 " don't show help window when I miss ESC key

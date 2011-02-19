@@ -14,3 +14,12 @@
 	diff = auto
 	status = auto
 	branch = auto
+
+[sendemail]
+	aliasesfile = /home/sdf/.mutt/aliases
+	aliasfiletype = mutt
+	chainreplyto = false
+	smtpserver = smtp.gmail.com:587
+	smtpuser = kernel@fomichev.me
+	smtpencryption = tls
+	suppresscc = self
