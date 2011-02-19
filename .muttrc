@@ -9,7 +9,7 @@ set spoolfile = "+INBOX"
 set postponed = "+[Gmail]/Черновики"
 set record="=INBOX"
 
-mailboxes =INBOX
+mailboxes =INBOX =[Gmail]/Отправленные
 
 set alias_file = "~/.mutt/aliases"
 source $alias_file

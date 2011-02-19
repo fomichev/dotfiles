@@ -9,6 +9,7 @@
 	pom = push origin master
 	plom = pull origin master
 	tip = log -1
+	br = branch
 
 [color]
 	diff = auto

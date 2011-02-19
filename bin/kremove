@@ -1,6 +1,10 @@
 #!/bin/sh
 
-version=`cat include/config/kernel.release`
+if [ "x$1" = "x" ]; then
+	version=`cat include/config/kernel.release`
+else
+	version=$1
+fi
 
 sudo rm -rf \
 	/boot/initrd.img-$version \
