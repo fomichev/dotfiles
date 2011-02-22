@@ -1,6 +1,9 @@
 set realname = "Stanislav Fomichev"
 set signature = ~/.mutt/signature
 
+# threaded sort
+set sort = threads
+
 # check regulary
 set timeout = 15
 set mail_check = 60
