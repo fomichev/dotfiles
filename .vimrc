@@ -47,7 +47,7 @@ else
 endif
 
 " use ack for grep
-set grepprg=ack\ -a
+set grepprg=ack
 
 " show the cursor position all the time
 set ruler
