@@ -9,6 +9,8 @@
 	pom = push origin master
 	plom = pull origin master
 	tip = log -1
+	br = branch
+	glog = log --graph
 
 [color]
 	diff = auto
@@ -23,3 +25,5 @@
 	smtpuser = kernel@fomichev.me
 	smtpencryption = tls
 	suppresscc = self
+	bcc = kernel@fomichev.me
+	confirm = always

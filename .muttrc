@@ -7,6 +7,7 @@ set smtp_url = "smtp://kernel@fomichev.me@smtp.gmail.com:587/"
 set folder = "imaps://imap.gmail.com:993/"
 set spoolfile = "+INBOX"
 set postponed = "+[Gmail]/Черновики"
+set record="=INBOX"
 
 mailboxes =INBOX =[Gmail]/Отправленные
 
