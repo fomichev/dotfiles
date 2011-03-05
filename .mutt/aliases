@@ -6,3 +6,4 @@ alias linux-wireless linux-wireless@vger.kernel.org
 alias linuxdriverproject devel@linuxdriverproject.org
 
 alias brcm80211 arend@broadcom.com, brudley@broadcom.com, rvossen@broadcom.com
+alias greg greg@kroah.com

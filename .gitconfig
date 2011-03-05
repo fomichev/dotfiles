@@ -27,3 +27,6 @@
 	suppresscc = self
 	bcc = kernel@fomichev.me
 	confirm = always
+
+[merge]
+	renamelimit = 0

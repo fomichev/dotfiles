@@ -8,6 +8,7 @@
 !.bashrc
 !.gitconfig
 !.gitignore
+!.gitmodules
 !.quiltrc
 !.screenrc
 !.inputrc
