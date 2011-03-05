@@ -11,6 +11,7 @@
 	tip = log -1
 	br = branch
 	glog = log --graph
+	sm = submodule
 
 [color]
 	diff = auto

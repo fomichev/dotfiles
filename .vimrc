@@ -108,7 +108,7 @@ if version >= 703
 
 	" use persistent undo
 	set undofile
-	set undolevels=100
+	set undolevels=1000
 
 	" set undo directory
 	if has('win32')
@@ -127,11 +127,16 @@ if has('syntax')
 endif
 
 if has('autocmd')
+	" pathogen
+	filetype off
+	call pathogen#helptags()
+	call pathogen#runtime_append_all_bundles()
+
 	" show non-ASCII
 	set isprint=
 
 	" cache more lines
-	let c_minlines = 100
+	let c_minlines=100
 
 	" enable filetype plugins
 	filetype plugin on
@@ -152,7 +157,6 @@ if has('autocmd')
 		set noet
 		set cinoptions=>s,e0,n0,f0,{0,}0,^0,:s,=s,l0,b0,gs,hs,ps,t0,is,+s,c3,C0,(0
 	endfunction
-	map <F6> :call StyleLinux()<CR>
 
 	" python style setup
 	function! StylePython()
@@ -161,25 +165,22 @@ if has('autocmd')
 		set ts=4
 		set et
 	endfunction
-	map <F7> :call StylePython()<CR>
 
 	" update tags in the current directory and add them to the tags
 	" variable
 	function! UpdateTags(path)
-		let l:ctags_opts = '--format=2 --excmd=pattern --fields=+iaS'
+		let l:ctags_opts='--format=2 --excmd=pattern --fields=+iaS'
 
 		exec system('ctags -R -f ' . a:path . ' ' . l:ctags_opts . ' .')
 		exec 'set tags+=./tags'
 	endfunction
-	map <F8> :call UpdateTags('./tags')<CR>
 
 	function! UpdateSystemTags()
-		let l:ctags_opts = '--format=2 --excmd=pattern --fields=+iaS'
-		let l:paths = '/usr/include'
+		let l:ctags_opts='--format=2 --excmd=pattern --fields=+iaS'
+		let l:paths='/usr/include'
 
 		exec system('ctags -R -f $HOME/.vim/tmp/system_tags ' . l:ctags_opts . ' ' . l:paths)
 	endfunction
-	map <F9> :call UpdateSystemTags()<CR>
 	set tags+=$HOME/.vim/tmp/system_tags
 
 
@@ -245,24 +246,35 @@ if has('autocmd')
 
 	" change word under cursor in each buffer
 	function! BufChange()
-		let from = expand("<cword>")
+		let from=expand("<cword>")
 
-		let to = input("Change " . from . " to: ")
+		let to=input("Change " . from . " to: ")
 
 		if strlen(to) > 0
 			exe "bufdo! %s/\\<" . from . "\\>/" . to . "/g | update"
 		endif
 	endfunction
-	nnoremap <silent> <F2> :call BufChange()<CR>
 
-	" map switching between header and source
-	nnoremap <silent> <C-s> :A<CR>
+	" mappings
+	map <M-s> :call UpdateSystemTags()<CR>
+	map <M-t> :call UpdateTags('./tags')<CR>
+	nnoremap <silent> <M-c> :call BufChange()<CR>
+	nnoremap <silent> <M-a> :A<CR>
+	nnoremap <silent> <M-u> :GundoToggle<CR>
+	nnoremap <silent> <M-l> :TlistToggle<CR>
+
+	" don't show help window when I miss ESC key
+	inoremap <F1> <ESC>
+	nnoremap <F1> <ESC>
+	vnoremap <F1> <ESC>
+
+	let g:gundo_help=0
+	let Tlist_Compact_Format=1
+	let NERDTreeBookmarksFile=expand('$HOME') . '/.vim/bookmarks'
+	let NERDTreeShowBookmarks=1
+	let NERDTreeShowHidden=0
+	let NERDTreeMinimalUI=1
 endif
-
-" don't show help window when I miss ESC key
-inoremap <F1> <nop>
-nnoremap <F1> <nop>
-vnoremap <F1> <nop>
 
 " using PuTTY with GNU Screen makes Vim crazy
 if &term == "screen"
