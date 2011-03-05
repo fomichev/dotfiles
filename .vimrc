@@ -36,9 +36,6 @@ if has('win32')
 		" use the following font
 		set guifont=Lucida_Console:h10
 	endif
-
-	" use external grep
-	set grepprg=grep\ -n
 else
 	set directory=~/.vim/tmp
 	set backupdir=~/.vim/tmp
@@ -48,6 +45,9 @@ else
 		set guifont=Monaco
 	endif
 endif
+
+" use ack for grep
+set grepprg=ack
 
 " show the cursor position all the time
 set ruler

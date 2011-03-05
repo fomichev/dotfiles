@@ -38,5 +38,9 @@ set mark_old = no
 # save attachments into home dir
 macro attach s <save-entry><bol>~/
 
+set move = no
+
+source $alias_file
 source ~/.mutt/bindings
 source ~/.mutt/lists
+source ~/.mutt/pwd

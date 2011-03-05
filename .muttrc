@@ -12,8 +12,5 @@ set record="=INBOX"
 mailboxes =INBOX =[Gmail]/Отправленные
 
 set alias_file = "~/.mutt/aliases"
-source $alias_file
 
 source ~/.mutt/misc
-
-source ~/.mutt/pwd

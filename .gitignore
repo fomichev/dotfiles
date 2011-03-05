@@ -3,6 +3,7 @@
 /bin/hg-clone-prepare
 /bin/lq-ssh
 /bin/shg
+!README
 !.bash_aliases
 !.bash_profile
 !.bashrc
