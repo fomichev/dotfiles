@@ -17,6 +17,7 @@
 !/.vim
 /.vim/.netrwhist
 /.vim/tmp
+!/.vim/tmp/placeholder
 !.vimrc
 !/Fonts
 !/.mutt
