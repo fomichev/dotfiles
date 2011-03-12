@@ -24,6 +24,7 @@
 /.mutt/work_aliases
 /.mutt/cache
 /.mutt/pwd
+!/.bundle
 
 # some brain damaged stuff on virtual machine
 /.vim/.VirtualBox/
