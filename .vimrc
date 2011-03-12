@@ -262,6 +262,7 @@ if has('autocmd')
 	nnoremap <silent> <M-a> :A<CR>
 	nnoremap <silent> <M-u> :GundoToggle<CR>
 	nnoremap <silent> <M-l> :TlistToggle<CR>
+	nnoremap <silent> <M-b> :BufExplorer<CR>
 
 	" don't show help window when I miss ESC key
 	inoremap <F1> <ESC>
@@ -270,6 +271,8 @@ if has('autocmd')
 
 	let g:gundo_help=0
 	let Tlist_Compact_Format=1
+	let g:bufExplorerDefaultHelp=0
+	let g:bufExplorerDetailedHelp=0
 	let NERDTreeBookmarksFile=expand('$HOME') . '/.vim/bookmarks'
 	let NERDTreeShowBookmarks=1
 	let NERDTreeShowHidden=0
