@@ -278,6 +278,10 @@ if has('autocmd')
 	let NERDTreeShowHidden=0
 	let NERDTreeMinimalUI=1
 	let NERDTreeIgnore=['\~$', '\.o$', '\.a$', 'Makefile.in']
+
+	if !has('python')
+		let g:gundo_disable=1
+	endif
 endif
 
 " using PuTTY with GNU Screen makes Vim crazy
