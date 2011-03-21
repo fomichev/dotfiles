@@ -89,8 +89,10 @@ if has('gui_running')
 endif
 
 " show tabs and trailing spaces
-set list
-set listchars=tab:»~,trail:·
+if has('multi_byte')
+	set list
+	set listchars=tab:»~,trail:·
+endif
 
 if has('spell')
 	" enable spell check
@@ -120,10 +122,10 @@ endif
 
 if has('syntax')
 	" enable syntax coloring
-	syntax on
 	set background=dark
 	"colorscheme molokai
 	colorscheme ir_black
+	syntax on
 endif
 
 if has('autocmd')
