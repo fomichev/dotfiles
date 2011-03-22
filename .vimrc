@@ -277,7 +277,7 @@ if has('autocmd')
 	let NERDTreeShowBookmarks=1
 	let NERDTreeShowHidden=0
 	let NERDTreeMinimalUI=1
-	let NERDTreeIgnore=['\~$', '\.o$', '\.a$', 'Makefile.in']
+	let NERDTreeIgnore=['\~$', '\.o$', '\.a$', 'Makefile.in', '\.ko$', 'modules.order', 'built-in.mod.c', '\.mod.c', '\.c.orig']
 endif
 
 " using PuTTY with GNU Screen makes Vim crazy
