@@ -21,7 +21,7 @@
 !.vimrc
 !/Fonts
 !/.mutt
-/.mutt/work_aliases
+/.mutt/aliases_local
 /.mutt/cache
 /.mutt/pwd
 !/.bundle

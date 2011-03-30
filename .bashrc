@@ -17,6 +17,6 @@ export BROWSER=w3m
 shopt -s cmdhist # keep the same history entries in one entry
 shopt -s histappend # don't overwrite history
 
-if [ -e ~/.extra_bashrc ]; then
-	source ~/.extra_bashrc
+if [ -e ~/.bashrc_local ]; then
+	source ~/.bashrc_local
 fi
