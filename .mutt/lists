@@ -1,2 +1,2 @@
-subscribe kernel-janitors, devel
-lists netdev, linux-kernel, linux-wireless
+subscribe kernel-janitors@vger.kernel.org, devel@linuxdriverproject.org, linux-next@vger.kernel.org
+lists netdev@vger.kernel.org, linux-kernel@vger.kernel.org, linux-wireless@vger.kernel.org
