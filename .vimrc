@@ -157,7 +157,7 @@ if has('autocmd')
 		set sts=8
 		set ts=8
 		set noet
-		set cinoptions=>s,e0,n0,f0,{0,}0,^0,:s,=s,l0,b0,gs,hs,ps,t0,is,+s,c3,C0,(0
+		set cinoptions=>s,e0,n0,f0,{0,}0,^0,:0,=s,l0,b0,gs,hs,ps,t0,is,+s,c3,C0,(0
 	endfunction
 
 	" python style setup
