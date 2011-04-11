@@ -3,3 +3,6 @@
 text/x-readme=gvim.desktop;
 text/x-log=gvim.desktop;
 text/plain=gvim.desktop;
+text/x-csrc=gvim.desktop;
+text/x-chdr=gvim.desktop;
+text/x-sql=gvim.desktop;
