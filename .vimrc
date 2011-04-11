@@ -114,7 +114,7 @@ if version >= 703
 
 	" set undo directory
 	if has('win32')
-		set undodir=c:/vim
+		set undodir=$HOME/tmp
 	else
 		set undodir=~/.vim/tmp
 	endif
