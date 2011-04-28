@@ -96,7 +96,8 @@ endif
 
 if has('spell')
 	" enable spell check
-	setlocal spell spelllang=en_us
+	set spelllang=en_us
+	set spell
 endif
 
 if has('langmap')
@@ -275,6 +276,7 @@ if has('autocmd')
 	let Tlist_Compact_Format=1
 	let g:bufExplorerDefaultHelp=0
 	let g:bufExplorerDetailedHelp=0
+
 	let NERDTreeBookmarksFile=expand('$HOME') . '/.vim/bookmarks'
 	let NERDTreeShowBookmarks=1
 	let NERDTreeShowHidden=0

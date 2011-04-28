@@ -15,6 +15,7 @@
 !.inputrc
 !/.vim
 /.vim/.netrwhist
+/.vim/bookmarks
 /.vim/tmp
 !/.vim/tmp/placeholder
 !.vimrc
