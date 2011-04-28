@@ -6,3 +6,4 @@ text/plain=gvim.desktop;
 text/x-csrc=gvim.desktop;
 text/x-chdr=gvim.desktop;
 text/x-sql=gvim.desktop;
+application/x-genesis-rom=gvim.desktop;
