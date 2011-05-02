@@ -1,19 +1,26 @@
 #!/bin/sh
 
-if [ "x$1" = "x" ]; then
+if [ -z $1 ]; then
 	version=`cat include/config/kernel.release`
 else
 	version=$1
 fi
 
+echo "Remove kernel ($version)..."
 sudo rm -rf \
 	/boot/initrd.img-$version \
+	/boot/initramfs-$version.img \
 	/boot/config-$version \
 	/boot/System.map-$version \
 	/boot/vmlinuz-$version \
 	/lib/modules/$version
 
-if [ ! "x$1" = "x-n" ]; then
+echo "Update grub..."
+if [ -e /sbin/grubby ]; then
+	sudo grubby --remove-kernel=/boot/vmlinux-$version \
+		--title="Linux Kernel $version" \
+		--initrd=/boot/initramfs-$version.img \
+		--args="ro root=/dev/sda6"
+else
 	sudo update-grub
 fi
-
