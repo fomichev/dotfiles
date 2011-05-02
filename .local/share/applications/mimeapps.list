@@ -7,3 +7,13 @@ text/x-csrc=gvim.desktop;
 text/x-chdr=gvim.desktop;
 text/x-sql=gvim.desktop;
 application/x-genesis-rom=gvim.desktop;
+x-scheme-handler/http=mozilla-firefox.desktop;
+x-scheme-handler/mailto=evolution.desktop;
+text/calendar=evolution.desktop;
+audio/x-vorbis+ogg=totem.desktop;
+video/x-ogm+ogg=totem.desktop;
+image/jpeg=gnome-eog.desktop;
+
+[Default Applications]
+audio/x-vorbis+ogg=rhythmbox.desktop
+image/jpeg=gthumb.desktop
