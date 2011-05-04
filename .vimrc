@@ -22,6 +22,12 @@ set nu
 " speedup macros
 set lz
 
+" show partial command on the last line
+set showcmd
+
+" key word definition
+set iskeyword=a-z,A-Z,48-57,_,.,-,>
+
 " load plugins on win32
 if has('win32')
 	set runtimepath+=$HOME/.vim
@@ -124,8 +130,7 @@ endif
 if has('syntax')
 	" enable syntax coloring
 	set background=dark
-	"colorscheme molokai
-	colorscheme ir_black
+	colorscheme molokai
 	syntax on
 endif
 
@@ -149,7 +154,7 @@ if has('autocmd')
 
 	" mutt's mails
 	augroup filetypedetect
-	  autocmd BufRead,BufNewFile *mutt-*              setfiletype mail
+	autocmd BufRead,BufNewFile *mutt-*              setfiletype mail
 	augroup END
 
 	" linux style setup
@@ -171,7 +176,7 @@ if has('autocmd')
 
 	" update tags in the current directory and add them to the tags
 	" variable
-	function! UpdateTags(path)
+	function! UpdatePwdTags(path)
 		let l:ctags_opts='--format=2 --excmd=pattern --fields=+iaS'
 
 		exec system('ctags -R -f ' . a:path . ' ' . l:ctags_opts . ' .')
@@ -185,7 +190,6 @@ if has('autocmd')
 		exec system('ctags -R -f $HOME/.vim/tmp/system_tags ' . l:ctags_opts . ' ' . l:paths)
 	endfunction
 	set tags+=$HOME/.vim/tmp/system_tags
-
 
 	function! UpdateLinuxTags(path)
 		let l:ctags_opts =
@@ -221,8 +225,6 @@ if has('autocmd')
 		exec system('ctags -R -f $HOME/.vim/tmp/linux_tags ' . l:ctags_opts . ' ' . l:paths)
 	endfunction
 	set tags+=$HOME/.vim/tmp/linux_tags
-
-"	set tags+=~/src/linux-2.6/tags
 
 	function! FileC()
 		" show additional errors for C files
@@ -260,11 +262,13 @@ if has('autocmd')
 
 	" mappings
 	map <M-s> :call UpdateSystemTags()<CR>
-	map <M-t> :call UpdateTags('./tags')<CR>
+	map <M-l> :call UpdateLinuxTags(fnamemodify(".",":ph"))<CR>
+	map <M-p> :call UpdatePwdTags('./tags')<CR>
+
 	nnoremap <silent> <M-c> :call BufChange()<CR>
 	nnoremap <silent> <M-a> :A<CR>
 	nnoremap <silent> <M-u> :GundoToggle<CR>
-	nnoremap <silent> <M-l> :TlistToggle<CR>
+	nnoremap <silent> <M-t> :TlistToggle<CR>
 	nnoremap <silent> <M-b> :BufExplorer<CR>
 
 	" don't show help window when I miss ESC key
@@ -292,6 +296,4 @@ endif
 if &term == "screen"
 	set term=xterm
 	set t_Co=16
-	" this one works good on linux/xterm
-	colorscheme molokai
 endif
