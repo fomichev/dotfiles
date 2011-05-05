@@ -5,7 +5,7 @@ alias j='jobs -l'
 
 if [ -e /usr/bin/yum ]; then
 	alias install='sudo yum install'
-	alias search='sudo yum list'
+	alias search='yum list -C'
 	alias remove='sudo yum erase'
 else
 	alias install='sudo apt-get install'
