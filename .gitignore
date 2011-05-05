@@ -24,6 +24,7 @@
 /.mutt/aliases_local
 /.mutt/cache
 /.mutt/pwd
+/.mutt/certificates
 !/.bundle
 
 # some brain damaged stuff on virtual machine
