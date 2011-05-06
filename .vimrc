@@ -8,19 +8,19 @@ set encoding=utf-8
 set backspace=indent,eol,start
 
 " suppose all files in Unix format (\n only)
-set ffs=unix
+set fileformats=unix
 
 " default width (+fold column)
-set co=86
+set columns=86
 
 " place a $ mark at the end of change
 set cpoptions+=$
 
 " enable line numbers
-set nu
+set number
 
 " speedup macros
-set lz
+set lazyredraw
 
 " show partial command on the last line
 set showcmd
@@ -243,7 +243,7 @@ if has('autocmd')
 
 	function! FilePy()
 		" use auto indentation
-		set ai
+		set autoindent
 
 		call StylePython()
 	endfunction
