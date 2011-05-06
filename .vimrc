@@ -260,15 +260,6 @@ if has('autocmd')
 		endif
 	endfunction
 
-	" grep word under cursor
-	function! GrepWord()
-		let from=expand("<cword>")
-
-		if strlen(from)
-			exe "grep " . from
-		endif
-	endfunction
-
 	" mappings
 	map <M-s> :call UpdateSystemTags()<CR>
 	map <M-l> :call UpdateLinuxTags(fnamemodify(".",":ph"))<CR>
@@ -279,7 +270,6 @@ if has('autocmd')
 	nnoremap <silent> <M-u> :GundoToggle<CR>
 	nnoremap <silent> <M-t> :TlistToggle<CR>
 	nnoremap <silent> <M-b> :BufExplorer<CR>
-	nnoremap <silent> <M-g> :call GrepWord()<CR>
 
 	" don't show help window when I miss ESC key
 	inoremap <F1> <ESC>
