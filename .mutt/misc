@@ -40,6 +40,11 @@ macro attach s <save-entry><bol>~/
 
 set move = no
 
+# printer setup
+set print = yes
+set print_command="muttprint --printer TO_FILE:$HOME/mutt.ps"
+set print_split = yes
+
 source $alias_file
 source ~/.mutt/bindings
 source ~/.mutt/lists
