@@ -20,6 +20,6 @@ alias jake='make -j8'
 
 alias decrypt='gpg --decrypt'
 
-alias w='w -sh'
+alias w='w -sh | sort'
 
 alias nack='ack -n'
