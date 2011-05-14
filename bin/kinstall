@@ -11,7 +11,7 @@ if [ ! "x$1" = "x-m" ]; then
 	echo "Install kernel ($version)..."
 	sudo mkdir -p /lib/modules/$version
 	sudo make install
-	cp .config /boot/config-$version
+	sudo cp .config /boot/config-$version
 fi
 
 echo "Install modules..."
@@ -33,10 +33,7 @@ fi
 
 echo "Update grub..."
 if [ -e /sbin/grubby ]; then
-	sudo grubby --add-kernel=/boot/vmlinux-$version \
-		--title="Linux Kernel $version" \
-		--initrd=/boot/initramfs-$version.img \
-		--args="ro root=/dev/sda6"
+	sudo grubby --make-default
 else
 	sudo update-grub
 fi
