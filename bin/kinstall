@@ -33,7 +33,7 @@ fi
 
 echo "Update grub..."
 if [ -e /sbin/grubby ]; then
-	sudo grubby --make-default
+	sudo grubby --set-default=/boot/vmlinuz-$version
 else
 	sudo update-grub
 fi
