@@ -2,7 +2,7 @@
 [Added Associations]
 text/x-readme=gvim.desktop;
 text/x-log=gvim.desktop;
-text/plain=gvim.desktop;
+text/plain=fedora-gvim.desktop;gvim.desktop;
 text/x-csrc=gvim.desktop;
 text/x-chdr=gvim.desktop;
 text/x-sql=fedora-gvim.desktop;gvim.desktop;
@@ -20,3 +20,7 @@ application/x-shellscript=fedora-gvim.desktop;
 audio/x-vorbis+ogg=rhythmbox.desktop
 image/jpeg=gthumb.desktop
 image/svg+xml=gnome-eog.desktop
+text/plain=gedit.desktop
+
+[Removed Associations]
+text/plain=gedit.desktop;
