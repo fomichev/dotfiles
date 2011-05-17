@@ -11,7 +11,7 @@ fi
 
 PS1='$ '
 
-export EDITOR=vi
+export EDITOR=vim
 export BROWSER=w3m
 
 shopt -s cmdhist # keep the same history entries in one entry
