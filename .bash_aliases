@@ -2,6 +2,7 @@ alias g='gvim --remote-silent'
 alias ls='ls --color=auto'
 alias la='ls -lah'
 alias j='jobs -l'
+alias vim='vi'
 
 if [ -e /usr/bin/yum ]; then
 	alias install='sudo yum install'
