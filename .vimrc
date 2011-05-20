@@ -270,6 +270,7 @@ if has('autocmd')
 	nnoremap <silent> <M-u> :GundoToggle<CR>
 	nnoremap <silent> <M-t> :TlistToggle<CR>
 	nnoremap <silent> <M-b> :BufExplorer<CR>
+	nnoremap <silent> <M-n> :NERDTreeToggle<CR>
 
 	" don't show help window when I miss ESC key
 	inoremap <F1> <ESC>
@@ -285,7 +286,7 @@ if has('autocmd')
 	let NERDTreeShowBookmarks=1
 	let NERDTreeShowHidden=0
 	let NERDTreeMinimalUI=1
-	let NERDTreeIgnore=['\~$', '\.o$', '\.a$', 'Makefile.in', '\.ko$', 'modules.order', 'built-in.mod.c', '\.mod.c', '\.c.orig']
+	let NERDTreeIgnore=['\~$', '\.o$', '\.a$', 'Makefile.in', '\.ko$', 'modules.order', 'built-in.mod.c', '\.mod.c', '\.c.orig', 'autom4te.cache', 'aclocal.m4']
 
 	if !has('python')
 		let g:gundo_disable=1
