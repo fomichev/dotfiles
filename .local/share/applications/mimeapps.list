@@ -2,7 +2,7 @@
 [Added Associations]
 text/x-readme=gvim.desktop;
 text/x-log=gvim.desktop;
-text/plain=gvim.desktop;
+text/plain=fedora-gvim.desktop;gvim.desktop;
 text/x-csrc=gvim.desktop;
 text/x-chdr=gvim.desktop;
 text/x-sql=fedora-gvim.desktop;gvim.desktop;
@@ -10,10 +10,17 @@ application/x-genesis-rom=fedora-gvim.desktop;gvim.desktop;
 x-scheme-handler/http=mozilla-firefox.desktop;
 x-scheme-handler/mailto=evolution.desktop;
 text/calendar=evolution.desktop;
-audio/x-vorbis+ogg=totem.desktop;
+audio/x-vorbis+ogg=rhythmbox.desktop;totem.desktop;
 video/x-ogm+ogg=totem.desktop;
 image/jpeg=gnome-eog.desktop;
+image/svg+xml=fedora-inkscape.desktop;
+application/x-shellscript=fedora-gvim.desktop;
 
 [Default Applications]
 audio/x-vorbis+ogg=rhythmbox.desktop
 image/jpeg=gthumb.desktop
+image/svg+xml=gnome-eog.desktop
+text/plain=fedora-gvim.desktop
+
+[Removed Associations]
+text/plain=gedit.desktop;

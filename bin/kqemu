@@ -1,5 +1,0 @@
-#!/bin/sh
-
-img=~/src/linux-2.6/arch/x86/boot/bzImage
-
-qemu -kernel $img

@@ -9,8 +9,8 @@ set timeout = 15
 set mail_check = 60
 
 # keep internal data in home dir
-set header_cache = ~/.mutt/cache/headers
-set message_cachedir = ~/.mutt/cache/bodies
+set header_cache = ~/.mutt/cache/
+set message_cachedir = ~/.mutt/cache/
 set certificate_file = ~/.mutt/certificates
 
 # edit headers with mail

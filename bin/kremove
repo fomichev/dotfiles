@@ -1,10 +1,13 @@
 #!/bin/sh
 
 if [ -z $1 ]; then
-	version=`cat include/config/kernel.release`
+	ver=`cat include/config/kernel.release`
 else
-	version=$1
+	ver=$1
 fi
+
+path=$(find /boot -name vmlinuz-$ver | head -1)
+version=$(echo $path | sed 's@/boot/vmlinuz-@@')
 
 echo "Remove kernel ($version)..."
 sudo rm -rf \
@@ -17,10 +20,7 @@ sudo rm -rf \
 
 echo "Update grub..."
 if [ -e /sbin/grubby ]; then
-	sudo grubby --remove-kernel=/boot/vmlinux-$version \
-		--title="Linux Kernel $version" \
-		--initrd=/boot/initramfs-$version.img \
-		--args="ro root=/dev/sda6"
+	sudo grubby --remove-kernel=$path
 else
 	sudo update-grub
 fi
