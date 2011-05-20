@@ -16,6 +16,3 @@
 [submodule ".bundle/ack"]
 	path = .bundle/ack
 	url = git://github.com/petdance/ack.git
-[submodule ".vim/bundle/bufexplorer"]
-	path = .vim/bundle/bufexplorer
-	url = git://github.com/vim-scripts/bufexplorer.zip.git

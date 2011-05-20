@@ -269,7 +269,6 @@ if has('autocmd')
 	nnoremap <silent> <M-a> :A<CR>
 	nnoremap <silent> <M-u> :GundoToggle<CR>
 	nnoremap <silent> <M-t> :TlistToggle<CR>
-	nnoremap <silent> <M-b> :BufExplorer<CR>
 	nnoremap <silent> <M-n> :NERDTreeToggle<CR>
 
 	" don't show help window when I miss ESC key
