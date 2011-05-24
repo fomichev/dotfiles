@@ -52,9 +52,6 @@ else
 	endif
 endif
 
-" use ack for grep
-set grepprg=ack
-
 " show the cursor position all the time
 set ruler
 
