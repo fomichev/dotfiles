@@ -39,7 +39,6 @@ if has('win32')
 	set backupdir=$HOME/tmp
 
 	if has('gui_running')
-		" use the following font
 		set guifont=Lucida_Console:h10
 	endif
 else
@@ -47,8 +46,7 @@ else
 	set backupdir=~/.vim/tmp
 
 	if has('gui_running')
-		" use the following font
-		set guifont=Monaco
+		set guifont=DejaVuSansMono
 	endif
 endif
 
@@ -245,6 +243,9 @@ if has('autocmd')
 		call StylePython()
 	endfunction
 	au BufNewFile,BufRead *.py call FilePy()
+
+	au BufNewFile,BufRead *.xml call FilePy()
+	au BufNewFile,BufRead *.java call FilePy()
 
 	" change word under cursor in each buffer
 	function! BufChange()
