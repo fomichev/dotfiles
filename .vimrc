@@ -46,7 +46,8 @@ else
 	set backupdir=~/.vim/tmp
 
 	if has('gui_running')
-		set guifont=DejaVuSansMono
+"		set guifont=DejaVuSansMono
+		set guifont=Monofur\ 12
 	endif
 endif
 
@@ -131,7 +132,8 @@ if has('autocmd')
 	if has('syntax')
 		" enable syntax coloring
 		set background=dark
-		colorscheme molokai
+"		colorscheme molokai
+		colorscheme solarized
 		syntax on
 	endif
 

@@ -21,6 +21,7 @@
 !/.vim/tmp/placeholder
 !.vimrc
 !/Fonts
+!/.fonts
 !/.mutt
 /.mutt/aliases_local
 /.mutt/cache
