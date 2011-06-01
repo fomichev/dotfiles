@@ -122,18 +122,18 @@ if version >= 703
 	endif
 endif
 
-if has('syntax')
-	" enable syntax coloring
-	set background=dark
-	colorscheme molokai
-	syntax on
-endif
-
 if has('autocmd')
 	" pathogen
 	filetype off
 	call pathogen#helptags()
 	call pathogen#runtime_append_all_bundles()
+
+	if has('syntax')
+		" enable syntax coloring
+		set background=dark
+		colorscheme molokai
+		syntax on
+	endif
 
 	" show non-ASCII
 	set isprint=
@@ -149,7 +149,7 @@ if has('autocmd')
 
 	" mutt's mails
 	augroup filetypedetect
-	autocmd BufRead,BufNewFile *mutt-*              setfiletype mail
+	autocmd BufRead,BufNewFile *mutt-* setfiletype mail
 	augroup END
 
 	" linux style setup
