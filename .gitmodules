@@ -31,3 +31,6 @@
 [submodule ".bundle/dircolors-solarized"]
 	path = .bundle/dircolors-solarized
 	url = git://github.com/seebi/dircolors-solarized.git
+[submodule ".bundle/gnome-terminal-colors-solarized"]
+	path = .bundle/gnome-terminal-colors-solarized
+	url = git://github.com/sigurdga/gnome-terminal-colors-solarized.git
