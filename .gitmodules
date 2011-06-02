@@ -28,3 +28,6 @@
 [submodule ".mutt/mutt-colors-solarized"]
 	path = .mutt/mutt-colors-solarized
 	url = git://github.com/altercation/mutt-colors-solarized.git
+[submodule ".bundle/dircolors-solarized"]
+	path = .bundle/dircolors-solarized
+	url = git://github.com/seebi/dircolors-solarized.git

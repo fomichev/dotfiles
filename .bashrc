@@ -13,6 +13,7 @@ PS1='$ '
 
 export EDITOR=vim
 export BROWSER=w3m
+# export TERM=xterm
 
 shopt -s cmdhist # keep the same history entries in one entry
 shopt -s histappend # don't overwrite history
@@ -20,3 +21,5 @@ shopt -s histappend # don't overwrite history
 if [ -e ~/.bashrc_local ]; then
 	source ~/.bashrc_local
 fi
+
+eval `dircolors ~/.dir_colors`
