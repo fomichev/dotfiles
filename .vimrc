@@ -93,7 +93,8 @@ endif
 " show tabs and trailing spaces
 if has('multi_byte')
 	set list
-	set listchars=tab:»~,trail:·
+	set listchars=tab:»·,trail:·
+"	set listchars=tab:»~,trail:·,eol:¶
 endif
 
 if has('spell')

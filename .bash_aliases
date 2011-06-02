@@ -1,4 +1,6 @@
 alias g='gvim --remote-silent'
+alias v='vim --remote-silent'
+alias vimserve='vim --servername VIM'
 alias ls='ls --color=auto'
 alias la='ls -lah'
 alias j='jobs -l'
