@@ -13,6 +13,10 @@ set fileformats=unix
 " default width (+fold column)
 set columns=86
 
+" 1, 2, 3, 4, etc
+"set foldcolumn=1
+"set foldmethod=syntax
+
 " place a $ mark at the end of change
 set cpoptions+=$
 
@@ -20,7 +24,7 @@ set cpoptions+=$
 set number
 
 " speedup macros
-set lazyredraw
+"set lazyredraw
 
 " show partial command on the last line
 set showcmd
@@ -28,15 +32,22 @@ set showcmd
 " key word definition
 set iskeyword=a-z,A-Z,48-57,_
 
-" load plugins on win32
+" show the cursor position all the time
+set ruler
+
+" set highlighting search mode
+set hlsearch
+
+" find the next match as we type
+set incsearch
+
+" terminal has 256 colors
+set t_Co=256
+
 if has('win32')
 	set runtimepath+=$HOME/.vim
-endif
-
-" set aux files directory
-if has('win32')
-	set directory=$HOME/tmp
-	set backupdir=$HOME/tmp
+	set directory=$HOME/.vim/tmp
+	set backupdir=$HOME/.vim/tmp
 
 	if has('gui_running')
 		set guifont=Lucida_Console:h10
@@ -50,25 +61,6 @@ else
 		set guifont=Monofur\ 12
 	endif
 endif
-
-" show the cursor position all the time
-set ruler
-
-" set highlighting search mode
-set hlsearch
-
-" find the next match as we type
-set incsearch
-
-" don't wrap screen on search
-"set nowrapscan
-
-" 1, 2, 3, 4, etc
-"set foldcolumn=1
-"set foldmethod=syntax
-
-" terminal has 256 colors
-set t_Co=256
 
 if has('gui_running')
 	" remove toolbar
@@ -118,7 +110,7 @@ if version >= 703
 
 	" set undo directory
 	if has('win32')
-		set undodir=$HOME/tmp
+		set undodir=$HOME/.vim/tmp
 	else
 		set undodir=~/.vim/tmp
 	endif
@@ -133,7 +125,6 @@ if has('autocmd')
 	if has('syntax')
 		" enable syntax coloring
 		set background=dark
-"		colorscheme molokai
 		colorscheme solarized
 		syntax on
 	endif
@@ -144,8 +135,8 @@ if has('autocmd')
 	" cache more lines
 	let c_minlines=100
 
-	" enable filetype plugins
-	filetype plugin on
+	" enable filetype & indent plugins
+	filetype plugin indent on
 
 	" For all text files set 'textwidth' to 78 characters.
 	autocmd FileType text setlocal textwidth=78
@@ -232,17 +223,11 @@ if has('autocmd')
 		let c_bracket_error=1
 		let c_gnu=1
 
-		" use auto c indentation
-		set cindent
-
 		call StyleLinux()
 	endfunction
 	au BufNewFile,BufRead *.c,*.h,*.cpp,*.hpp,*.C call FileC()
 
 	function! FilePy()
-		" use auto indentation
-		set autoindent
-
 		call StylePython()
 	endfunction
 	au BufNewFile,BufRead *.py call FilePy()
