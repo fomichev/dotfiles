@@ -26,3 +26,5 @@ alias decrypt='gpg --decrypt'
 alias w='w -sh | sort'
 
 alias nack='ack -n'
+
+alias ..='cd ..'
