@@ -20,7 +20,7 @@ set cpoptions+=$
 set number
 
 " speedup macros
-set lazyredraw
+set nolazyredraw
 
 " show partial command on the last line
 set showcmd
@@ -35,8 +35,8 @@ endif
 
 " set aux files directory
 if has('win32')
-	set directory=$HOME/tmp
-	set backupdir=$HOME/tmp
+	set directory=$HOME/.vim/tmp
+	set backupdir=$HOME/.vim/tmp
 
 	if has('gui_running')
 		set guifont=Lucida_Console:h10
@@ -118,7 +118,7 @@ if version >= 703
 
 	" set undo directory
 	if has('win32')
-		set undodir=$HOME/tmp
+		set undodir=$HOME/.vim/tmp
 	else
 		set undodir=~/.vim/tmp
 	endif
@@ -155,116 +155,20 @@ if has('autocmd')
 	autocmd BufRead,BufNewFile *mutt-* setfiletype mail
 	augroup END
 
-	" linux style setup
-	function! StyleLinux()
-		set sw=8
-		set sts=8
-		set ts=8
-		set noet
-		set cinoptions=>s,e0,n0,f0,{0,}0,^0,:0,=s,l0,b0,gs,hs,ps,t0,is,+s,c3,C0,(0
-	endfunction
-
-	" python style setup
-	function! StylePython()
-		set sw=4
-		set sts=4
-		set ts=4
-		set et
-	endfunction
-
-	" update tags in the current directory and add them to the tags
-	" variable
-	function! UpdatePwdTags(path)
-		let l:ctags_opts='--format=2 --excmd=pattern --fields=+iaS'
-
-		exec system('ctags -R -f ' . a:path . ' ' . l:ctags_opts . ' .')
-		exec 'set tags+=./tags'
-	endfunction
-
-	function! UpdateSystemTags()
-		let l:ctags_opts='--format=2 --excmd=pattern --fields=+iaS'
-		let l:paths='/usr/include'
-
-		exec system('ctags -R -f $HOME/.vim/tmp/system_tags ' . l:ctags_opts . ' ' . l:paths)
-	endfunction
-	set tags+=$HOME/.vim/tmp/system_tags
-
-	function! UpdateLinuxTags(path)
-		let l:ctags_opts =
-			\ '-I __initdata,__exitdata,__acquires,__releases ' .
-			\ '-I __read_mostly,____cacheline_aligned ' .
-			\ '-I ____cacheline_aligned_in_smp ' .
-			\ '-I ____cacheline_internodealigned_in_smp ' .
-			\ '-I DEFINE_TRACE,EXPORT_TRACEPOINT_SYMBOL ' .
-			\ '-I EXPORT_TRACEPOINT_SYMBOL_GPL ' .
-			\ '-I EXPORT_SYMBOL,EXPORT_SYMBOL_GPL ' .
-			\ '--regex-asm=''/^ENTRY\(([^)]*)\).*/\1/'' ' .
-			\ '--regex-c=''/^SYSCALL_DEFINE[[:digit:]]?\(([^,)]*).*/sys_\1/'' ' .
-			\ '--regex-c++=''/^TRACE_EVENT\(([^,)]*).*/trace_\1/'' ' .
-			\ '--regex-c++=''/^DEFINE_EVENT\(([^,)]*).*/trace_\1/'' ' .
-			\ '--c-kinds=-m+px --format=2 ' .
-			\ '--excmd=pattern --fields=+S'
-
-		let l:paths =
-			\ a:path . '/arch/x86 ' .
-			\ a:path . '/block ' .
-			\ a:path . '/crypto ' .
-			\ a:path . '/fs ' .
-			\ a:path . '/include ' .
-			\ a:path . '/init ' .
-			\ a:path . '/ipc ' .
-			\ a:path . '/kernel ' .
-			\ a:path . '/lib ' .
-			\ a:path . '/mm ' .
-			\ a:path . '/net ' .
-			\ a:path . '/security ' .
-			\ a:path . '/virt'
-
-		exec system('ctags -R -f $HOME/.vim/tmp/linux_tags ' . l:ctags_opts . ' ' . l:paths)
-	endfunction
-	set tags+=$HOME/.vim/tmp/linux_tags
-
-	function! FileC()
-		" show additional errors for C files
-		set filetype=c
-		let c_space_errors=1
-		let c_curly_error=1
-		let c_bracket_error=1
-		let c_gnu=1
-
-		" use auto c indentation
-		set cindent
-
-		call StyleLinux()
-	endfunction
-	au BufNewFile,BufRead *.c,*.h,*.cpp,*.hpp,*.C call FileC()
-
-	function! FilePy()
-		" use auto indentation
-		set autoindent
-
-		call StylePython()
-	endfunction
-	au BufNewFile,BufRead *.py call FilePy()
-
-	au BufNewFile,BufRead *.xml call FilePy()
-	au BufNewFile,BufRead *.java call FilePy()
-
-	" change word under cursor in each buffer
-	function! BufChange()
-		let from=expand("<cword>")
-
-		let to=input("Change " . from . " to: ")
-
-		if strlen(to) > 0
-			exe "bufdo! %s/\\<" . from . "\\>/" . to . "/g | update"
-		endif
-	endfunction
+	source $HOME/.vim/tags.vim
+	source $HOME/.vim/indent.vim
 
 	" mappings
-	map <M-s> :call UpdateSystemTags()<CR>
-	map <M-l> :call UpdateLinuxTags(fnamemodify(".",":ph"))<CR>
-	map <M-p> :call UpdatePwdTags('./tags')<CR>
+
+	" don't show help window when I miss ESC key
+	inoremap <F1> <ESC>
+	nnoremap <F1> <ESC>
+	vnoremap <F1> <ESC>
+
+	" tags related
+	map <F2> :call UpdateTags('')<CR>
+	map <F3> :call UpdateLinuxTags('')<CR>
+	map <F4> :call UpdateSystemTags('')<CR>
 
 	nnoremap <silent> <M-c> :call BufChange()<CR>
 	nnoremap <silent> <M-a> :A<CR>
@@ -272,17 +176,13 @@ if has('autocmd')
 	nnoremap <silent> <M-t> :TlistToggle<CR>
 	nnoremap <silent> <M-n> :NERDTreeToggle<CR>
 
-	" don't show help window when I miss ESC key
-	inoremap <F1> <ESC>
-	nnoremap <F1> <ESC>
-	vnoremap <F1> <ESC>
-
+	" plugins setup
 	let g:gundo_help=0
 	let Tlist_Compact_Format=1
 	let g:bufExplorerDefaultHelp=0
 	let g:bufExplorerDetailedHelp=0
 
-	let NERDTreeBookmarksFile=expand('$HOME') . '/.vim/bookmarks'
+	let NERDTreeBookmarksFile=expand('$HOME') . '/local/.vim/bookmarks'
 	let NERDTreeShowBookmarks=1
 	let NERDTreeShowHidden=0
 	let NERDTreeMinimalUI=1
@@ -291,10 +191,21 @@ if has('autocmd')
 	if !has('python')
 		let g:gundo_disable=1
 	endif
+
+	if filereadable(expand($HOME) . '/local/.vimrc')
+		source $HOME/local/.vimrc
+	endif
 endif
 
 " using PuTTY with GNU Screen makes Vim crazy
 if &term == "screen"
 	set term=xterm
 	set t_Co=16
+
+	" http://vim.wikia.com/wiki/Fix_meta-keys_that_break_out_of_Insert_mode
+	let c = 'a'
+	while c <= 'z'
+		exec "map " . c . " <M-" . c . ">"
+		let c = nr2char(1 + char2nr(c))
+	endw
 endif

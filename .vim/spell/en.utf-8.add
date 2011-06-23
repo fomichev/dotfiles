@@ -80,3 +80,4 @@ TPID
 PHY
 init
 squashfs
+readline

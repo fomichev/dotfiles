@@ -1,6 +1,6 @@
  . ~/.bash_aliases
 
-export PATH=~/bin:$PATH
+export PATH=~/bin:~/local/bin:$PATH
 
 if [ -d /opt/vim ]; then
 	export PATH=/opt/vim/bin:$PATH
@@ -18,8 +18,8 @@ export BROWSER=w3m
 shopt -s cmdhist # keep the same history entries in one entry
 shopt -s histappend # don't overwrite history
 
-if [ -e ~/.bashrc_local ]; then
-	source ~/.bashrc_local
+if [ -e ~/local/.bashrc ]; then
+	source ~/local/.bashrc
 fi
 
 eval `dircolors ~/.dir_colors`
