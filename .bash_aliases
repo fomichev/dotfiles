@@ -8,7 +8,7 @@ alias vi='vim'
 
 if [ -e /usr/bin/yum ]; then
 	alias install='sudo yum install'
-	alias search='yum list -C'
+	alias search='yum list -C | grep '
 	alias remove='sudo yum erase'
 else
 	alias install='sudo apt-get install'
