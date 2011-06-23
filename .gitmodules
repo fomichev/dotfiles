@@ -19,9 +19,6 @@
 [submodule ".vim/bundle/ack"]
 	path = .vim/bundle/ack
 	url = git://github.com/mileszs/ack.vim.git
-[submodule ".vim/bundle/molokai"]
-	path = .vim/bundle/molokai
-	url = git://github.com/tomasr/molokai.git
 [submodule ".vim/bundle/vim-colors-solarized"]
 	path = .vim/bundle/vim-colors-solarized
 	url = https://github.com/altercation/vim-colors-solarized
@@ -31,3 +28,6 @@
 [submodule ".bundle/dircolors-solarized"]
 	path = .bundle/dircolors-solarized
 	url = git://github.com/seebi/dircolors-solarized.git
+[submodule ".bundle/gnome-terminal-colors-solarized"]
+	path = .bundle/gnome-terminal-colors-solarized
+	url = git://github.com/sigurdga/gnome-terminal-colors-solarized.git
