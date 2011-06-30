@@ -169,15 +169,16 @@ if has('autocmd')
 
 	" plugins setup
 	let g:gundo_help=0
+
 	let Tlist_Compact_Format=1
+
 	let g:bufExplorerDefaultHelp=0
 	let g:bufExplorerDetailedHelp=0
 
-	let NERDTreeBookmarksFile=expand('$HOME') . '/local/.vim/bookmarks'
-	let NERDTreeShowBookmarks=1
-	let NERDTreeShowHidden=0
-	let NERDTreeMinimalUI=1
-	let NERDTreeIgnore=['\~$', '\.o$', '\.a$', 'Makefile.in', '\.ko$', 'modules.order', 'built-in.mod.c', '\.mod.c', '\.c.orig', 'autom4te.cache', 'aclocal.m4']
+	let g:netrw_fastbrowse=2
+	let g:netrw_banner=0
+	let g:netrw_home=expand($HOME) . '/local/.vim'
+	let g:netrw_special_syntax=1
 
 	if !has('python')
 		let g:gundo_disable=1
