@@ -166,10 +166,6 @@ if has('autocmd')
 	nnoremap <silent> <M-u> :GundoToggle<CR>
 	nnoremap <silent> <M-t> :TagbarToggle<CR>
 
-	" redraw window so search terms are centered
-	nnoremap n nzz
-	nnoremap N Nzz
-
 	" plugins setup
 	let g:gundo_help=0
 
