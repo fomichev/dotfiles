@@ -164,7 +164,7 @@ if has('autocmd')
 	nnoremap <silent> <M-c> :call BufChange()<CR>
 	nnoremap <silent> <M-a> :A<CR>
 	nnoremap <silent> <M-u> :GundoToggle<CR>
-	nnoremap <silent> <M-t> :TlistToggle<CR>
+	nnoremap <silent> <M-t> :TagbarToggle<CR>
 
 	" redraw window so search terms are centered
 	nnoremap n nzz

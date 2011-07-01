@@ -31,3 +31,6 @@
 [submodule ".bundle/gnome-terminal-colors-solarized"]
 	path = .bundle/gnome-terminal-colors-solarized
 	url = git://github.com/sigurdga/gnome-terminal-colors-solarized.git
+[submodule ".vim/bundle/tagbar"]
+	path = .vim/bundle/tagbar
+	url = git://github.com/majutsushi/tagbar.git
