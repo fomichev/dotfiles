@@ -41,8 +41,8 @@ set hlsearch
 " find the next match as we type
 set incsearch
 
-" terminal has 256 colors
-set t_Co=256
+" don't wait to much for mappings/key codes
+set timeoutlen=100
 
 if has('win32')
 	set runtimepath+=$HOME/.vim
@@ -165,7 +165,10 @@ if has('autocmd')
 	nnoremap <silent> <M-a> :A<CR>
 	nnoremap <silent> <M-u> :GundoToggle<CR>
 	nnoremap <silent> <M-t> :TlistToggle<CR>
-	nnoremap <silent> <M-n> :NERDTreeToggle<CR>
+
+	" redraw window so search terms are centered
+	nnoremap n nzz
+	nnoremap N Nzz
 
 	" plugins setup
 	let g:gundo_help=0
@@ -180,9 +183,10 @@ if has('autocmd')
 	let g:netrw_home=expand($HOME) . '/local/.vim'
 	let g:netrw_special_syntax=1
 
-	if !has('python')
-		let g:gundo_disable=1
-	endif
+	let g:gundo_disable=1
+"	if !has('python')
+"		let g:gundo_disable=1
+"	endif
 
 	if filereadable(expand($HOME) . '/local/.vimrc')
 		source $HOME/local/.vimrc

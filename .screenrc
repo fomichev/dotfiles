@@ -2,7 +2,7 @@
 hardstatus string "%{= kw}%?%-Lw%?%{B}(%{W}%n*%f %t%?(%u)%?%{B})%{w}%?%+Lw%?%?%= %{K}%{B} %{w}%c%{K}"
 hardstatus alwayslastline
 
-#maptimeout 5
+maptimeout 5
 
 # no startup message
 startup_message off
