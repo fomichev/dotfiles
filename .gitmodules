@@ -34,3 +34,6 @@
 [submodule ".vim/bundle/tagbar"]
 	path = .vim/bundle/tagbar
 	url = git://github.com/majutsushi/tagbar.git
+[submodule ".vim/bundle/OmniCppComplete"]
+	path = .vim/bundle/OmniCppComplete
+	url = git://github.com/vim-scripts/OmniCppComplete.git
