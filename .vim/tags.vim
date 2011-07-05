@@ -9,7 +9,7 @@ function! UpdateTags(path)
 		let l:include = 'n'
 	endif
 
-	let l:ctags_opts='--format=2 --excmd=pattern --fields=+iaS'
+	let l:ctags_opts='--format=2 --excmd=pattern --fields=+iaS --extra=+q'
 
 	exec system('ctags -R -f ' . l:path . 'tags ' . l:ctags_opts . ' ' . l:path)
 
@@ -25,7 +25,7 @@ function! UpdateSystemTags(path)
 		let l:path = a:path . '/'
 	endif
 
-	let l:ctags_opts='--format=2 --excmd=pattern --fields=+iaS'
+	let l:ctags_opts='--format=2 --excmd=pattern --fields=+iaS --extra=+q'
 
 	exec system('ctags -R -f $HOME/.vim/tmp/system_tags ' . l:ctags_opts . ' ' . l:path)
 endfunction
@@ -49,7 +49,7 @@ function! UpdateLinuxTags(tags)
 		\ '--regex-c=''/^SYSCALL_DEFINE[[:digit:]]?\(([^,)]*).*/sys_\1/'' ' .
 		\ '--regex-c++=''/^TRACE_EVENT\(([^,)]*).*/trace_\1/'' ' .
 		\ '--regex-c++=''/^DEFINE_EVENT\(([^,)]*).*/trace_\1/'' ' .
-		\ '--c-kinds=-m+px --format=2 ' .
+		\ '--c-kinds=-m+px --format=2 --extra=+q ' .
 		\ '--excmd=pattern --fields=+S'
 
 	let l:path_dirs =

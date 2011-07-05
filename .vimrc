@@ -167,22 +167,21 @@ if has('autocmd')
 	nnoremap <silent> <M-t> :TagbarToggle<CR>
 
 	" plugins setup
-	let g:gundo_help=0
-
-	let Tlist_Compact_Format=1
-
-	let g:bufExplorerDefaultHelp=0
-	let g:bufExplorerDetailedHelp=0
-
 	let g:netrw_fastbrowse=2
 	let g:netrw_banner=0
 	let g:netrw_home=expand($HOME) . '/local/.vim'
 	let g:netrw_special_syntax=1
 
-	let g:gundo_disable=1
-"	if !has('python')
-"		let g:gundo_disable=1
-"	endif
+	let g:gundo_help=0
+	if !has('python')
+		let g:gundo_disable=1
+	endif
+
+	let OmniCpp_MayCompleteDot = 0
+	let OmniCpp_MayCompleteArrow = 0
+	let OmniCpp_MayCompleteScope = 0
+	autocmd CursorMovedI * if pumvisible() == 0|pclose|endif
+	autocmd InsertLeave * if pumvisible() == 0|pclose|endif
 
 	if filereadable(expand($HOME) . '/local/.vimrc')
 		source $HOME/local/.vimrc
