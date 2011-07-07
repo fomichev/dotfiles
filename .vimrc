@@ -151,6 +151,12 @@ if has('autocmd')
 
 	" mappings
 
+	" switching between tabs and buffers
+	nnoremap <silent> <C-h> gT
+	nnoremap <silent> <C-k> :bprev<CR>
+	nnoremap <silent> <C-j> :bnext<CR>
+	nnoremap <silent> <C-l> gt
+
 	" don't show help window when I miss ESC key
 	inoremap <F1> <ESC>
 	nnoremap <F1> <ESC>
@@ -161,22 +167,32 @@ if has('autocmd')
 	map <F3> :call UpdateLinuxTags('')<CR>
 	map <F4> :call UpdateSystemTags('')<CR>
 
-	nnoremap <silent> <M-c> :call BufChange()<CR>
+	" alternative
 	nnoremap <silent> <M-a> :A<CR>
-	nnoremap <silent> <M-u> :GundoToggle<CR>
+
+	" tagbar
 	nnoremap <silent> <M-t> :TagbarToggle<CR>
 
-	" plugins setup
+	" netrw
 	let g:netrw_fastbrowse=2
 	let g:netrw_banner=0
 	let g:netrw_home=expand($HOME) . '/local/.vim'
 	let g:netrw_special_syntax=1
 
+	" mini buffer explorer
+	let g:miniBufExplCloseOnSelect = 1
+	let g:miniBufExplorerMoreThanOne = 9999
+	let g:miniBufExplVSplit = 50
+	nnoremap <silent> <M-b> :TMiniBufExplorer<CR>
+
+	" gundo
 	let g:gundo_help=0
 	if !has('python')
 		let g:gundo_disable=1
 	endif
+	nnoremap <silent> <M-u> :GundoToggle<CR>
 
+	" omci cpp completion
 	let OmniCpp_MayCompleteDot = 0
 	let OmniCpp_MayCompleteArrow = 0
 	let OmniCpp_MayCompleteScope = 0
