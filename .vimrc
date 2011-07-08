@@ -41,6 +41,9 @@ set hlsearch
 " find the next match as we type
 set incsearch
 
+" don't force me to save file
+set hidden
+
 " don't wait to much for mappings/key codes
 set timeoutlen=100
 
@@ -181,7 +184,6 @@ if has('autocmd')
 
 	" mini buffer explorer
 	let g:miniBufExplCloseOnSelect = 1
-	let g:miniBufExplorerMoreThanOne = 9999
 	let g:miniBufExplVSplit = 50
 	nnoremap <silent> <M-b> :TMiniBufExplorer<CR>
 
