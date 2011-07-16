@@ -1,21 +1,20 @@
 " update tags in the current directory and add them to the tags
 " variable
-function! UpdateTags(path)
-	if a:path == ''
-		let l:path = fnamemodify(".",":ph")
-		let l:include = 'y'
-	else
-		let l:path = a:path . '/'
-		let l:include = 'n'
-	endif
+function! UpdateTags()
+	let l:path = fnamemodify(".",":ph")
 
-	let l:ctags_opts='--format=2 --excmd=pattern --fields=+iaS'
+	let l:ctags_opts='--format=2 --excmd=pattern --fields=+iaS --extra=+q'
 
 	exec system('ctags -R -f ' . l:path . 'tags ' . l:ctags_opts . ' ' . l:path)
 
-	if l:include == 'y'
-		exec 'set tags+=' . l:path . 'tags'
-	endif
+	set tags+=' . l:path . 'tags
+endfunction
+
+function! UpdateCustomTags(path)
+	let l:path = a:path . '/'
+	let l:ctags_opts='--format=2 --excmd=pattern --fields=+iaS --extra=+q'
+
+	exec system('ctags --exclude=build_linux -R -f ' . l:path . 'tags ' . l:ctags_opts . ' ' . l:path)
 endfunction
 
 function! UpdateSystemTags(path)
@@ -25,7 +24,7 @@ function! UpdateSystemTags(path)
 		let l:path = a:path . '/'
 	endif
 
-	let l:ctags_opts='--format=2 --excmd=pattern --fields=+iaS'
+	let l:ctags_opts='--format=2 --excmd=pattern --fields=+iaS --extra=+q'
 
 	exec system('ctags -R -f $HOME/.vim/tmp/system_tags ' . l:ctags_opts . ' ' . l:path)
 endfunction
@@ -49,7 +48,7 @@ function! UpdateLinuxTags(path)
 		\ '--regex-c=''/^SYSCALL_DEFINE[[:digit:]]?\(([^,)]*).*/sys_\1/'' ' .
 		\ '--regex-c++=''/^TRACE_EVENT\(([^,)]*).*/trace_\1/'' ' .
 		\ '--regex-c++=''/^DEFINE_EVENT\(([^,)]*).*/trace_\1/'' ' .
-		\ '--c-kinds=-m+px --format=2 ' .
+		\ '--c-kinds=-m+px --format=2 --extra=+q ' .
 		\ '--excmd=pattern --fields=+S'
 
 	let l:path_dirs =
