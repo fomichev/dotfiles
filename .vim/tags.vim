@@ -30,7 +30,7 @@ function! UpdateSystemTags(path)
 	exec system('ctags -R -f $HOME/.vim/tmp/system_tags ' . l:ctags_opts . ' ' . l:path)
 endfunction
 
-function! UpdateLinuxTags(tags)
+function! UpdateLinuxTags(path)
 	if a:path == ''
 		let l:path = fnamemodify(".",":ph")
 	else
