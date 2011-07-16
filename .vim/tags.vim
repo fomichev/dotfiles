@@ -7,7 +7,9 @@ function! UpdateTags()
 
 	exec system('ctags -R -f ' . l:path . 'tags ' . l:ctags_opts . ' ' . l:path)
 
-	set tags+=' . l:path . 'tags
+	let l:tags_path = l:path . 'tags'
+
+	set tags+=l:tags_path
 endfunction
 
 function! UpdateCustomTags(path)
