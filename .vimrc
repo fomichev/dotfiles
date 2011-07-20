@@ -10,9 +10,6 @@ set backspace=indent,eol,start
 " suppose all files in Unix format (\n only)
 set fileformats=unix
 
-" default width (+fold column)
-set columns=86
-
 " 1, 2, 3, 4, etc
 "set foldcolumn=1
 "set foldmethod=syntax
@@ -45,7 +42,7 @@ set incsearch
 set hidden
 
 " don't wait to much for mappings/key codes
-set timeoutlen=100
+set timeout timeoutlen=3000 ttimeoutlen=100
 
 if has('win32')
 	set runtimepath+=$HOME/.vim
@@ -153,12 +150,11 @@ if has('autocmd')
 	source $HOME/.vim/indent.vim
 
 	" mappings
+	let mapleader = ","
 
 	" switching between tabs and buffers
-	nnoremap <silent> <C-h> gT
 	nnoremap <silent> <C-k> :bprev<CR>
 	nnoremap <silent> <C-j> :bnext<CR>
-	nnoremap <silent> <C-l> gt
 
 	" don't show help window when I miss ESC key
 	inoremap <F1> <ESC>
@@ -171,10 +167,10 @@ if has('autocmd')
 	map <F4> :call UpdateSystemTags('')<CR>
 
 	" alternative
-	nnoremap <silent> <M-a> :A<CR>
+	nnoremap <silent> <Leader>a :A<CR>
 
 	" tagbar
-	nnoremap <silent> <M-t> :TagbarToggle<CR>
+	nnoremap <silent> <Leader>t :TagbarToggle<CR>
 
 	" netrw
 	let g:netrw_fastbrowse=2
@@ -183,16 +179,14 @@ if has('autocmd')
 	let g:netrw_special_syntax=1
 
 	" mini buffer explorer
-	let g:miniBufExplCloseOnSelect = 1
-	let g:miniBufExplVSplit = 50
-	nnoremap <silent> <M-b> :TMiniBufExplorer<CR>
+	nnoremap <silent> <Leader>b :MiniBufExplorer<CR>
 
 	" gundo
 	let g:gundo_help=0
 	if !has('python')
 		let g:gundo_disable=1
 	endif
-	nnoremap <silent> <M-u> :GundoToggle<CR>
+	nnoremap <silent> <Leader>u :GundoToggle<CR>
 
 	" omci cpp completion
 	let OmniCpp_MayCompleteDot = 0
@@ -210,11 +204,4 @@ endif
 if &term == "screen"
 	set term=xterm
 	set t_Co=16
-
-	" http://vim.wikia.com/wiki/Fix_meta-keys_that_break_out_of_Insert_mode
-	let c = 'a'
-	while c <= 'z'
-		exec "map " . c . " <M-" . c . ">"
-		let c = nr2char(1 + char2nr(c))
-	endw
 endif
