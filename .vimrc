@@ -162,7 +162,7 @@ if has('autocmd')
 	vnoremap <F1> <ESC>
 
 	" tags related
-	map <F2> :call UpdateTags('')<CR>
+	map <F2> :call UpdateTags()<CR>
 	map <F3> :call UpdateLinuxTags('')<CR>
 	map <F4> :call UpdateSystemTags('')<CR>
 
