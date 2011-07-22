@@ -179,7 +179,11 @@ if has('autocmd')
 	let g:netrw_special_syntax=1
 
 	" mini buffer explorer
-	nnoremap <silent> <Leader>b :MiniBufExplorer<CR>
+"	nnoremap <silent> <Leader>b :MiniBufExplorer<CR>
+
+	" bufexplorer.zip
+	let g:bufExplorerDefaultHelp=0
+	let g:bufExplorerShowRelativePath=1
 
 	" gundo
 	let g:gundo_help=0
@@ -192,8 +196,8 @@ if has('autocmd')
 	let OmniCpp_MayCompleteDot = 0
 	let OmniCpp_MayCompleteArrow = 0
 	let OmniCpp_MayCompleteScope = 0
-	autocmd CursorMovedI * if pumvisible() == 0|pclose|endif
-	autocmd InsertLeave * if pumvisible() == 0|pclose|endif
+"	autocmd CursorMovedI * if pumvisible() == 0|pclose|endif
+"	autocmd InsertLeave * if pumvisible() == 0|pclose|endif
 
 	if filereadable(expand($HOME) . '/local/.vimrc')
 		source $HOME/local/.vimrc
