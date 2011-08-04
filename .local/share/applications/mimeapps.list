@@ -16,6 +16,7 @@ image/jpeg=gnome-eog.desktop;
 image/svg+xml=fedora-inkscape.desktop;
 application/x-shellscript=fedora-gvim.desktop;
 application/pdf=fedora-gvim.desktop;
+inode/directory=vlc.desktop;
 
 [Default Applications]
 audio/x-vorbis+ogg=rhythmbox.desktop
@@ -23,6 +24,9 @@ image/jpeg=gthumb.desktop
 image/svg+xml=gnome-eog.desktop
 text/plain=fedora-gvim.desktop
 application/pdf=evince.desktop
+x-scheme-handler/http=chromium-browser.desktop
+video/x-ogm+ogg=gnome-banshee.desktop
+inode/directory=nautilus.desktop
 
 [Removed Associations]
 text/plain=gedit.desktop;
