@@ -58,7 +58,7 @@ else
 
 	if has('gui_running')
 "		set guifont=DejaVuSansMono
-		set guifont=Monofur\ 12
+		set guifont=Monofur\ 13
 	endif
 endif
 

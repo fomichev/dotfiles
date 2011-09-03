@@ -41,6 +41,17 @@ au BufNewFile,BufRead *.py call FilePy()
 au BufNewFile,BufRead *.xml call FilePy()
 au BufNewFile,BufRead *.java call FilePy()
 
+function! FileVim()
+	" use auto indentation
+	set autoindent
+
+	set sw=2
+	set sts=2
+	set ts=2
+	set et
+endfunction
+au BufNewFile,BufRead *.vim call FileVim()
+
 " change word under cursor in each buffer
 function! BufChange()
 	let from=expand("<cword>")

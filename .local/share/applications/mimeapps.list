@@ -17,6 +17,7 @@ image/svg+xml=fedora-inkscape.desktop;
 application/x-shellscript=fedora-gvim.desktop;
 application/pdf=fedora-gvim.desktop;
 inode/directory=vlc.desktop;
+application/octet-stream=fedora-gvim.desktop;
 
 [Default Applications]
 audio/x-vorbis+ogg=rhythmbox.desktop
