@@ -119,8 +119,7 @@ endif
 if has('autocmd')
 	" pathogen
 	filetype off
-	call pathogen#helptags()
-	call pathogen#runtime_append_all_bundles()
+	call pathogen#infect()
 
 	if has('syntax')
 		" enable syntax coloring
