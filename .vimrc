@@ -199,6 +199,26 @@ if has('autocmd')
 "	autocmd CursorMovedI * if pumvisible() == 0|pclose|endif
 "	autocmd InsertLeave * if pumvisible() == 0|pclose|endif
 
+	" ctrl-p
+	" start with clean prompt each time
+	let g:ctrlp_persistent_input = 0
+	" use regexp search
+	let g:ctrlp_regexp_search = 1
+	" don't search by full path
+	let g:ctrlp_by_filename = 1
+	" don't keep MRU files
+	let g:ctrlp_mru_files = 0
+
+	" automatically remove trailing spaces
+	autocmd BufWritePre  * call StripTrailingWhite()
+
+	function! StripTrailingWhite()
+	    let l:winview = winsaveview()
+	    silent! %s/\s\+$//
+	    call winrestview(l:winview)
+	endfunction
+
+	" execute local configuration
 	if filereadable(expand($HOME) . '/local/.vimrc')
 		source $HOME/local/.vimrc
 	endif
