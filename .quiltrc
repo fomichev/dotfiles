@@ -1,3 +1,6 @@
+QUILT_DIFF_OPTS="-p"
 opt_strip_level=ab
 QUILT_NO_DIFF_INDEX=1
 QUILT_NO_DIFF_TIMESTAMPS=1
+QUILT_PUSH_ARGS="--color=auto"
+QUILT_DIFF_ARGS="--color=auto"

@@ -1,0 +1,11 @@
+#!/bin/bash
+
+submodules=$(cd $PWD && git submodule status | sed 's/^ //g' | cut -f2 -d' ')
+
+# 1. fetch new: git fetch
+# 2. reset to origin: git reset --hard origin/master
+
+for module in $submodules; do
+	echo "-- Update $module:"
+	(cd $module && $*)
+done
