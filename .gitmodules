@@ -39,7 +39,7 @@
 	url = git://github.com/vim-scripts/OmniCppComplete.git
 [submodule ".vim/bundle/bufexplorer.zip"]
 	path = .vim/bundle/bufexplorer.zip
-	url = git://github.com/vim-scripts/bufexplorer.zip.git
+	url = git@github.com:fomichev/bufexplorer.zip.git
 [submodule ".vim/bundle/ctrlp.vim"]
 	path = .vim/bundle/ctrlp.vim
 	url = git://github.com/kien/ctrlp.vim.git
