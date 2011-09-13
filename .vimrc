@@ -207,6 +207,8 @@ if has('autocmd')
 	let g:ctrlp_by_filename = 1
 	" don't keep MRU files
 	let g:ctrlp_mru_files = 0
+	" don't manage working directory
+	let g:ctrlp_working_path_mode = 0
 
 	" automatically remove trailing spaces
 	autocmd BufWritePre  * call StripTrailingWhite()
