@@ -165,50 +165,32 @@ if has('autocmd')
 	map <F3> :call UpdateLinuxTags('')<CR>
 	map <F4> :call UpdateSystemTags('')<CR>
 
-	" alternative
-	nnoremap <silent> <Leader>a :A<CR>
-
-	" tagbar
-	nnoremap <silent> <Leader>t :TagbarToggle<CR>
-
 	" netrw
 	let g:netrw_fastbrowse=2
 	let g:netrw_banner=0
 	let g:netrw_home=expand($HOME) . '/local/.vim'
 	let g:netrw_special_syntax=1
 
-	" mini buffer explorer
-"	nnoremap <silent> <Leader>b :MiniBufExplorer<CR>
+	" alternative
+	nnoremap <silent> <Leader>a :A<CR>
 
-	" bufexplorer.zip
-	let g:bufExplorerDefaultHelp=0
-	let g:bufExplorerShowRelativePath=1
-
-	" gundo
-	let g:gundo_help=0
-	if !has('python')
-		let g:gundo_disable=1
-	endif
-	nnoremap <silent> <Leader>u :GundoToggle<CR>
-
-	" omci cpp completion
-	let OmniCpp_MayCompleteDot = 0
-	let OmniCpp_MayCompleteArrow = 0
-	let OmniCpp_MayCompleteScope = 0
-"	autocmd CursorMovedI * if pumvisible() == 0|pclose|endif
-"	autocmd InsertLeave * if pumvisible() == 0|pclose|endif
+	" tagbar
+	nnoremap <silent> <Leader>t :TagbarToggle<CR>
 
 	" ctrl-p
+
 	" start with clean prompt each time
 	let g:ctrlp_persistent_input = 0
-	" use regexp search
-	let g:ctrlp_regexp_search = 1
 	" don't search by full path
 	let g:ctrlp_by_filename = 1
 	" don't keep MRU files
 	let g:ctrlp_mru_files = 0
 	" don't manage working directory
 	let g:ctrlp_working_path_mode = 0
+	" don't search for dotfiles
+	let g:ctrlp_dotfiles = 0
+	" ignore VC files and other
+	set wildignore+=.git/*,.hg/*,.svn/*,*.o,*.a,*.class
 
 	" automatically remove trailing spaces
 	autocmd BufWritePre  * call StripTrailingWhite()
