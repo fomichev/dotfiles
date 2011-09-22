@@ -151,6 +151,9 @@ if has('autocmd')
 	" mappings
 	let mapleader = ","
 
+	" exit normal mode with jj
+	inoremap jj <ESC>
+
 	" switching between tabs and buffers
 	nnoremap <silent> <C-k> :bprev<CR>
 	nnoremap <silent> <C-j> :bnext<CR>
