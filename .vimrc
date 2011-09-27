@@ -195,14 +195,24 @@ if has('autocmd')
 	" ignore VC files and other
 	set wildignore+=.git/*,.hg/*,.svn/*,*.o,*.a,*.class
 
-	" automatically remove trailing spaces
-	autocmd BufWritePre  * call StripTrailingWhite()
+	function! ShowSpaces()
+		let @/='\v(\s+$)|( +\ze\t)'
+	endfunction
 
-	function! StripTrailingWhite()
+	function! TrimSpaces()
 	    let l:winview = winsaveview()
 	    silent! %s/\s\+$//
 	    call winrestview(l:winview)
 	endfunction
+
+	" automatically remove trailing spaces
+	"autocmd BufWritePre  * call TrimSpaces()
+
+	" show trailing spaces
+	noremap <silent> <Leader>s :call ShowSpaces()<CR>
+
+	" remove trailing spaces
+	noremap <silent> <Leader>r :call TrimSpaces()<CR>
 
 	" execute local configuration
 	if filereadable(expand($HOME) . '/local/.vimrc')
