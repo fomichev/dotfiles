@@ -44,6 +44,9 @@ set hidden
 " don't wait to much for mappings/key codes
 set timeout timeoutlen=3000 ttimeoutlen=100
 
+" highlight current line
+set cursorline
+
 if has('win32')
 	set runtimepath+=$HOME/.vim
 	set directory=$HOME/.vim/tmp
