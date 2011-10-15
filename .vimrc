@@ -210,8 +210,10 @@ if has('autocmd')
 	endif
 endif
 
+" always use 16-color terminal mode
+set t_Co=16
+
 " using PuTTY with GNU Screen makes Vim crazy
 if &term == "screen"
 	set term=xterm
-	set t_Co=16
 endif

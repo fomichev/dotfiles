@@ -10,7 +10,7 @@ if [ -e /usr/bin/yum ]; then
 	alias install='sudo yum install'
 	alias search='sudo yum list -C | grep '
 	alias remove='sudo yum erase'
-	alias upgrade='sudo yum upgrade'
+	alias upgrade='sudo yum upgrade --skip-broken'
 else
 	alias install='sudo apt-get install'
 	alias search='apt-cache search'
