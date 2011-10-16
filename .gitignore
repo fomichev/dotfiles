@@ -24,6 +24,8 @@
 /.vim/.netrwhist
 /.vim/tmp
 !/.vim/tmp/placeholder
+!.Xmodmap
+!.xinitrc
 
 # some brain damaged stuff on virtual machine
 /.vim/.VirtualBox/
