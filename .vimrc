@@ -47,6 +47,9 @@ set timeout timeoutlen=3000 ttimeoutlen=100
 " highlight current line
 set cursorline
 
+" always use 8-color (actually 8 + 8) terminal mode
+set t_Co=8
+
 if has('win32')
 	set runtimepath+=$HOME/.vim
 	set directory=$HOME/.vim/tmp
@@ -127,6 +130,8 @@ if has('autocmd')
 	if has('syntax')
 		" enable syntax coloring
 		set background=dark
+		let g:solarized_termcolors = 8
+		let g:solarized_termtrans = 1
 		colorscheme solarized
 		syntax on
 	endif
@@ -222,9 +227,6 @@ if has('autocmd')
 		source $HOME/local/.vimrc
 	endif
 endif
-
-" always use 16-color terminal mode
-set t_Co=16
 
 " using PuTTY with GNU Screen makes Vim crazy
 if &term == "screen"
