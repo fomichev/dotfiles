@@ -1,5 +1,9 @@
 . ~/.bashrc
 
 if [ -z "$TMUX" ]; then
-	tmux attach
+	if tmux has-session; then
+		tmux attach
+	else
+		tmux new bash
+	fi
 fi
