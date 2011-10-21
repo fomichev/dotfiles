@@ -102,3 +102,4 @@ GPIO
 NAND
 ACL
 whitelist
+postgresql
