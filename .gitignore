@@ -12,6 +12,7 @@
 !.inputrc
 !.muttprintrc
 !.vimrc
+!.tmux.conf
 !/bin
 !/.bundle
 !/Fonts

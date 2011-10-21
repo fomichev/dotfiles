@@ -1,3 +1,5 @@
 . ~/.bashrc
 
-screen -R
+if [ -z "$TMUX" ]; then
+	tmux attach
+fi
