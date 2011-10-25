@@ -50,6 +50,9 @@ set cursorline
 " always use 8-color (actually 8 + 8) terminal mode
 set t_Co=8
 
+" don't beep!
+set visualbell
+
 if has('win32')
 	set runtimepath+=$HOME/.vim
 	set directory=$HOME/.vim/tmp
