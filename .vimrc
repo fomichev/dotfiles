@@ -66,8 +66,11 @@ else
 	set backupdir=~/.vim/tmp
 
 	if has('gui_running')
-"		set guifont=DejaVuSansMono
-		set guifont=Monofur\ 13
+		if has("gui_macvim")
+			set guifont=Monofur:h17
+		else
+			set guifont=Monofur\ 13
+		endif
 	endif
 endif
 

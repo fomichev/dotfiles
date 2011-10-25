@@ -1,10 +1,14 @@
-alias g='gvim --remote-silent'
-alias v='vim --remote-silent'
-alias vimserve='vim --servername VIM'
+alias vi='vim'
+
+if [ -e /usr/local/bin/mvim ]; then
+	alias g='mvim --remote-silent'
+else
+	alias g='gvim --remote-silent'
+fi
+
 alias ls='ls --color=auto'
 alias la='ls -lah'
 alias j='jobs -l'
-alias vi='vim'
 
 if [ -e /usr/bin/yum ]; then
 	alias install='sudo yum install'

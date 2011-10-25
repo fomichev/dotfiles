@@ -16,6 +16,7 @@
 !/bin
 !/.bundle
 !/Fonts
+/Fonts/.DS_Store
 !/.fonts
 !/.mutt
 /.mutt/cache

@@ -1,6 +1,6 @@
  . ~/.bash_aliases
 
-export PATH=~/bin:~/local/bin:$PATH
+export PATH=/usr/local/bin:~/bin:~/local/bin:$PATH
 
 if [ -d /opt/vim ]; then
 	export PATH=/opt/vim/bin:$PATH
