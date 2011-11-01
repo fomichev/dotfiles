@@ -187,6 +187,7 @@ if has('autocmd')
 	let g:netrw_banner=0
 	let g:netrw_home=expand($HOME) . '/local/.vim'
 	let g:netrw_special_syntax=1
+	let g:netrw_browse_split=0
 
 	" alternative
 	nnoremap <silent> <Leader>a :A<CR>
