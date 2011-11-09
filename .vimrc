@@ -209,6 +209,9 @@ if has('autocmd')
 	let g:ctrlp_dotfiles = 0
 	" ignore VC files and other
 	set wildignore+=.git/*,.hg/*,.svn/*,*.o,*.a,*.class
+	" don't split when open
+	let g:ctrlp_split_window = 0
+	let g:ctrlp_open_new_file = 0
 
 	function! ShowSpaces()
 		let @/='\v(\s+$)|( +\ze\t)'
