@@ -222,6 +222,8 @@ if has('autocmd')
 	" don't split when open
 	let g:ctrlp_split_window = 0
 	let g:ctrlp_open_new_file = 0
+	" let ctrl-p replace netrw buffer
+	let g:ctrlp_dont_split = 'netrw'
 
 	function! ShowSpaces()
 		let @/='\v(\s+$)|( +\ze\t)'
