@@ -53,6 +53,9 @@ set t_Co=8
 " don't beep!
 set visualbell
 
+" messages tweaks
+set shortmess=atToOI
+
 if has('win32')
 	set runtimepath+=$HOME/.vim
 	set directory=$HOME/.vim/tmp
@@ -79,8 +82,10 @@ if has('gui_running')
 	set guioptions-=T
 	" remove menubar
 	set guioptions-=m
-	" use text tabs
-	set guioptions-=e
+	if has("gui_macvim") " leave pretty tabs on mac
+		" use text tabs
+		set guioptions-=e
+	endif
 	" remove right scrollbar
 	set guioptions-=r
 	set guioptions-=R
@@ -99,6 +104,7 @@ if has('multi_byte')
 	set list
 	set listchars=tab:»·,trail:·
 "	set listchars=tab:»~,trail:·,eol:¶
+"	set listchars=tab:»~,trail:·,eol:¬
 endif
 
 if has('spell')
@@ -164,6 +170,10 @@ if has('autocmd')
 
 	" mappings
 	let mapleader = ","
+
+	" make j and k work nice with wrapped lines
+	nnoremap j gj
+	nnoremap k gk
 
 	" exit normal mode with jj
 	inoremap jj <ESC>
