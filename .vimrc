@@ -172,8 +172,8 @@ if has('autocmd')
 	let mapleader = ","
 
 	" make j and k work nice with wrapped lines
-	nnoremap j gj
-	nnoremap k gk
+"	nnoremap j gj
+"	nnoremap k gk
 
 	" exit normal mode with jj
 	inoremap jj <ESC>
