@@ -82,7 +82,7 @@ if has('gui_running')
 	set guioptions-=T
 	" remove menubar
 	set guioptions-=m
-	if has("gui_macvim") " leave pretty tabs on mac
+	if !has("gui_macvim") " leave pretty tabs on mac
 		" use text tabs
 		set guioptions-=e
 	endif
