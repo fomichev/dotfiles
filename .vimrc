@@ -10,10 +10,6 @@ set backspace=indent,eol,start
 " suppose all files in Unix format (\n only)
 set fileformats=unix
 
-" 1, 2, 3, 4, etc
-"set foldcolumn=1
-"set foldmethod=syntax
-
 " place a $ mark at the end of change
 set cpoptions+=$
 
@@ -103,8 +99,6 @@ endif
 if has('multi_byte')
 	set list
 	set listchars=tab:»·,trail:·
-"	set listchars=tab:»~,trail:·,eol:¶
-"	set listchars=tab:»~,trail:·,eol:¬
 endif
 
 if has('spell')
@@ -171,13 +165,6 @@ if has('autocmd')
 	" mappings
 	let mapleader = ","
 
-	" make j and k work nice with wrapped lines
-"	nnoremap j gj
-"	nnoremap k gk
-
-	" exit normal mode with jj
-	inoremap jj <ESC>
-
 	" switching between tabs and buffers
 	nnoremap <silent> <C-k> :bprev<CR>
 	nnoremap <silent> <C-j> :bnext<CR>
@@ -188,9 +175,9 @@ if has('autocmd')
 	vnoremap <F1> <ESC>
 
 	" tags related
-	map <F2> :call UpdateTags()<CR>
-	map <F3> :call UpdateLinuxTags('')<CR>
-	map <F4> :call UpdateSystemTags('')<CR>
+	map <Leader>tp :call UpdateTags()<CR>
+	map <Leader>tl :call UpdateLinuxTags('')<CR>
+	map <Leader>ts :call UpdateSystemTags('')<CR>
 
 	" netrw
 	let g:netrw_fastbrowse=2
@@ -203,7 +190,7 @@ if has('autocmd')
 	nnoremap <silent> <Leader>a :A<CR>
 
 	" tagbar
-	nnoremap <silent> <Leader>t :TagbarToggle<CR>
+	nnoremap <silent> <Leader>b :TagbarToggle<CR>
 
 	" ctrl-p
 
@@ -224,6 +211,8 @@ if has('autocmd')
 	let g:ctrlp_open_new_file = 0
 	" let ctrl-p replace netrw buffer
 	let g:ctrlp_dont_split = 'netrw'
+	" use ,f to invoke
+	let g:ctrlp_map = '<Leader>f'
 
 	function! ShowSpaces()
 		let @/='\v(\s+$)|( +\ze\t)'
@@ -235,14 +224,14 @@ if has('autocmd')
 	    call winrestview(l:winview)
 	endfunction
 
-	" automatically remove trailing spaces
-	"autocmd BufWritePre  * call TrimSpaces()
-
 	" show trailing spaces
-	noremap <silent> <Leader>s :call ShowSpaces()<CR>
+	noremap <silent> <Leader>ss :call ShowSpaces()<CR>
 
 	" remove trailing spaces
-	noremap <silent> <Leader>r :call TrimSpaces()<CR>
+	noremap <silent> <Leader>sr :call TrimSpaces()<CR>
+
+	" invoke :Ack
+	noremap <silent> <Leader>g :Ack<space>
 
 	" execute local configuration
 	if filereadable(expand($HOME) . '/local/.vimrc')
