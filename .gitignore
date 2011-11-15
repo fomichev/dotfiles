@@ -34,3 +34,6 @@
 /.vim/.hgrc
 /.vim/_viminfo
 /.vim/projects/
+
+# mac
+.DS_Store
