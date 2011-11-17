@@ -52,6 +52,9 @@ set visualbell
 " messages tweaks
 set shortmess=atToOI
 
+" don't put the first matched word and always show menu
+set completeopt=menu,menuone,longest
+
 if has('win32')
 	set runtimepath+=$HOME/.vim
 	set directory=$HOME/.vim/tmp
@@ -213,6 +216,16 @@ if has('autocmd')
 	let g:ctrlp_dont_split = 'netrw'
 	" use ,f to invoke
 	let g:ctrlp_map = '<Leader>f'
+
+	" clang_complete
+	let g:clang_complete_copen = 1
+	let g:clang_snippets = 1
+	let g:clang_complete_auto = 0
+
+	noremap <silent> <Leader>c :call g:ClangUpdateQuickFix()<CR>
+
+	" supertab
+	let g:SuperTabDefaultCompletionType = "<c-x><c-o>"
 
 	function! ShowSpaces()
 		let @/='\v(\s+$)|( +\ze\t)'
