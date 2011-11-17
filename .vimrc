@@ -224,9 +224,10 @@ if has('autocmd')
 
 	noremap <silent> <Leader>c :call g:ClangUpdateQuickFix()<CR>
 
-	" supertab
-	let g:SuperTabDefaultCompletionType = "<c-x><c-o>"
+	" omni completion
+	inoremap <silent> <S-Tab> <C-x><C-o>
 
+	" trailing spaces
 	function! ShowSpaces()
 		let @/='\v(\s+$)|( +\ze\t)'
 	endfunction
