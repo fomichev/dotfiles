@@ -55,6 +55,9 @@ set shortmess=atToOI
 " don't put the first matched word and always show menu
 set completeopt=menu,menuone,longest
 
+" don't insert comment when pressing o/O
+set formatoptions-=o
+
 if has('win32')
 	set runtimepath+=$HOME/.vim
 	set directory=$HOME/.vim/tmp
