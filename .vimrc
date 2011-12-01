@@ -248,7 +248,7 @@ if has('autocmd')
 	noremap <silent> <Leader>sr :call TrimSpaces()<CR>
 
 	" invoke :Ack
-	noremap <silent> <Leader>g :Ack<space>
+	noremap <Leader>g :Ack!<space>
 
 	" execute local configuration
 	if filereadable(expand($HOME) . '/local/.vimrc')
