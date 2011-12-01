@@ -58,6 +58,9 @@ set completeopt=menu,menuone,longest
 " don't insert comment when pressing o/O
 set formatoptions-=o
 
+" don't place additional spaces on join
+set nojoinspaces
+
 if has('win32')
 	set runtimepath+=$HOME/.vim
 	set directory=$HOME/.vim/tmp
@@ -104,7 +107,7 @@ endif
 " show tabs and trailing spaces
 if has('multi_byte')
 	set list
-	set listchars=tab:»·,trail:·
+	set listchars=tab:→·,trail:·
 endif
 
 if has('spell')
