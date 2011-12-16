@@ -6,7 +6,7 @@ set sort = threads
 
 # check regulary
 set timeout = 15
-set mail_check = 60
+set mail_check = 300
 
 # keep internal data in home dir
 set header_cache = ~/.mutt/cache/
