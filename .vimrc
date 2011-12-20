@@ -61,6 +61,10 @@ set formatoptions-=o
 " don't place additional spaces on join
 set nojoinspaces
 
+" use bash-like completion
+set wildmenu
+set wildmode=list:longest
+
 if has('win32')
 	set runtimepath+=$HOME/.vim
 	set directory=$HOME/.vim/tmp
@@ -178,6 +182,12 @@ if has('autocmd')
 	nnoremap <silent> <C-k> :bprev<CR>
 	nnoremap <silent> <C-j> :bnext<CR>
 
+	" disable search highlight
+	nmap <silent> <leader>n :silent :nohlsearch<CR>
+
+	" toggle list option
+	nmap <silent> <leader>l :set nolist!<CR>
+
 	" don't show help window when I miss ESC key
 	inoremap <F1> <ESC>
 	nnoremap <F1> <ESC>
@@ -252,6 +262,9 @@ if has('autocmd')
 
 	" invoke :Ack
 	noremap <Leader>g :Ack!<space>
+
+	" load matchit
+	runtime macros/matchit.vim
 
 	" execute local configuration
 	if filereadable(expand($HOME) . '/local/.vimrc')
