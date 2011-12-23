@@ -61,47 +61,27 @@ set formatoptions-=o
 " don't place additional spaces on join
 set nojoinspaces
 
+" use bash-like completion
+set wildmenu
+set wildmode=list:longest
+
+" show non-ASCII
+set isprint=
+
+" cache more lines
+let c_minlines=100
+
+" mappings
+let mapleader = ","
+
+" place all auxiliary files under one directory
 if has('win32')
 	set runtimepath+=$HOME/.vim
 	set directory=$HOME/.vim/tmp
 	set backupdir=$HOME/.vim/tmp
-
-	if has('gui_running')
-		set guifont=Lucida_Console:h10
-	endif
 else
 	set directory=~/.vim/tmp
 	set backupdir=~/.vim/tmp
-
-	if has('gui_running')
-		if has("gui_macvim")
-			set guifont=Monofur:h17
-		else
-			set guifont=Monofur\ 13
-		endif
-	endif
-endif
-
-if has('gui_running')
-	" remove toolbar
-	set guioptions-=T
-	" remove menubar
-	set guioptions-=m
-	if !has("gui_macvim") " leave pretty tabs on mac
-		" use text tabs
-		set guioptions-=e
-	endif
-	" remove right scrollbar
-	set guioptions-=r
-	set guioptions-=R
-	" remove left scrollbar
-	set guioptions-=l
-	set guioptions-=L
-	" remove bottom scrollbar
-	set guioptions-=b
-	set guioptions-=h
-	" use console dialogs
-	set guioptions+=c
 endif
 
 " show tabs and trailing spaces
@@ -151,12 +131,6 @@ if has('autocmd')
 		syntax on
 	endif
 
-	" show non-ASCII
-	set isprint=
-
-	" cache more lines
-	let c_minlines=100
-
 	" enable filetype & indent plugins
 	filetype plugin indent on
 
@@ -169,14 +143,17 @@ if has('autocmd')
 	augroup END
 
 	source $HOME/.vim/tags.vim
-	source $HOME/.vim/indent.vim
-
-	" mappings
-	let mapleader = ","
+	source $HOME/.vim/aux.vim
 
 	" switching between tabs and buffers
 	nnoremap <silent> <C-k> :bprev<CR>
 	nnoremap <silent> <C-j> :bnext<CR>
+
+	" disable search highlight
+	nmap <silent> <leader>n :silent :nohlsearch<CR>
+
+	" toggle list option
+	nmap <silent> <leader>l :set nolist!<CR>
 
 	" don't show help window when I miss ESC key
 	inoremap <F1> <ESC>
@@ -195,7 +172,7 @@ if has('autocmd')
 	let g:netrw_special_syntax=1
 	let g:netrw_browse_split=0
 
-	" alternative
+	" alternative (header/source)
 	nnoremap <silent> <Leader>a :A<CR>
 
 	" tagbar
@@ -229,8 +206,6 @@ if has('autocmd')
 	let g:clang_complete_auto = 0
 
 	noremap <silent> <Leader>c :call g:ClangUpdateQuickFix()<CR>
-
-	" omni completion
 	inoremap <silent> <S-Tab> <C-x><C-o>
 
 	" trailing spaces
@@ -252,6 +227,9 @@ if has('autocmd')
 
 	" invoke :Ack
 	noremap <Leader>g :Ack!<space>
+
+	" load matchit
+	runtime macros/matchit.vim
 
 	" execute local configuration
 	if filereadable(expand($HOME) . '/local/.vimrc')

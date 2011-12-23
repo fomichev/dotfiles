@@ -28,6 +28,7 @@
 !/.vim/tmp/placeholder
 !.Xmodmap
 !.xinitrc
+!.gvimrc
 
 # some brain damaged stuff on virtual machine
 /.vim/.VirtualBox/
