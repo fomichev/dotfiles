@@ -19,23 +19,23 @@ alias ..='cd ..'
 
 alias df='df -h'
 
-if which -s mvim; then
+if which mvim &>/dev/null; then
 	alias g='mvim --remote-silent'
 else
 	alias g='gvim --remote-silent'
 fi
 
-if which -s yum; then
+if which yum &>/dev/null; then
 	alias install='sudo yum install'
 	alias search='sudo yum list -C | grep '
 	alias remove='sudo yum erase'
 	alias upgrade='sudo yum upgrade --skip-broken'
-elif which -s apt-get; then
+elif which apt-get &>/dev/null; then
 	alias install='sudo apt-get install'
 	alias search='apt-cache search'
 	alias remove='sudo apt-get remove'
 	alias upgrade='sudo apt-get update && sudo apt-get dist-upgrade'
-elif which -s brew; then
+elif which brew &>/dev/null; then
 	alias install='brew install'
 	alias search='brew search'
 	alias remove='brew remove'
