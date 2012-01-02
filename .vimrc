@@ -204,6 +204,7 @@ if has('autocmd')
 	let g:clang_complete_copen = 1
 	let g:clang_snippets = 1
 	let g:clang_complete_auto = 0
+	let g:clang_auto_user_options = '.clang_complete'
 
 	noremap <silent> <Leader>c :call g:ClangUpdateQuickFix()<CR>
 	inoremap <silent> <S-Tab> <C-x><C-o>
