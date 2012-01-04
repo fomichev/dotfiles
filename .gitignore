@@ -13,6 +13,7 @@
 !.muttprintrc
 !.vimrc
 !.tmux.conf
+!.w3m/keymap
 !/bin
 !/.bundle
 !/Fonts

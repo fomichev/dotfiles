@@ -1,0 +1,8 @@
+keymap C-d NEXT_PAGE
+keymap C-u PREV_PAGE
+keymap C-y DOWN
+keymap C-e UP
+keymap 0 LINE_BEGIN
+keymap b PREV_WORD
+keymap C-i NEXT
+keymap C-o PREV
