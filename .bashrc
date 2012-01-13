@@ -18,6 +18,8 @@ export BROWSER=w3m
 shopt -s cmdhist # keep the same history entries in one entry
 shopt -s histappend # don't overwrite history
 
+export GREP_OPTIONS='--color=auto'
+
 if [ -e ~/local/.bashrc ]; then
 	source ~/local/.bashrc
 fi
