@@ -13,6 +13,12 @@ set nocompatible
 " use utf-8 everywhere
 set encoding=utf-8
 
+" show current mode
+set showmode
+
+" show partial command
+set showcmd
+
 " allow backspacing over everything
 set backspace=indent,eol,start
 
@@ -22,11 +28,17 @@ set fileformats=unix
 " place a $ mark at the end of change
 set cpoptions+=$
 
+" don't show relative numbers to current line
+set norelativenumber
+
 " enable line numbers
 set number
 
+" always show status line
+set laststatus=2
+
 " speedup macros
-set nolazyredraw
+set lazyredraw
 
 " show partial command on the last line
 set showcmd
@@ -75,10 +87,22 @@ set wildmenu
 set wildmode=list:longest
 
 " ignore VC files and other
-set wildignore+=.git/*,.hg/*,.svn/*,*.o,*.a,*.class
+set wildignore+=.git/*,.hg/*,.svn/*
+
+" ignore compiled files
+set wildignore+=*.o,*.a,*.class,*.pyc
+
+" ignore OSX shit
+set wildignore+=.DS_Store
+
+" other ignores
+set wildignore+=*.orig
 
 " show non-ASCII
 set isprint=
+
+" start with all folds closed
+set foldlevelstart=0
 
 " cache more lines
 let c_minlines=100
@@ -141,15 +165,22 @@ syntax on
 " Common {{{2
 
 " disable search highlight
-nmap <silent> <leader>n :silent :nohlsearch<CR>
+nmap <silent> <Leader>n :silent :nohlsearch<CR>
 
 " toggle list option
-nmap <silent> <leader>l :set nolist!<CR>
+nmap <silent> <Leader>l :set nolist!<CR>
 
 " don't show help window when I miss ESC key
 inoremap <F1> <ESC>
 nnoremap <F1> <ESC>
 vnoremap <F1> <ESC>
+
+" don't jump on * & #
+nnoremap * *<c-o>
+nnoremap # #<c-o>
+
+" use sudo to save file
+cmap w!! w !sudo tee % > /dev/null
 
 " 2}}}
 " Windows {{{2
@@ -175,11 +206,6 @@ nnoremap <Space> za
 vnoremap <Space> za
 
 " 2}}}
-" Grep/Ack {{{2
-
-noremap <Leader>g :Ack!<space>
-
-" 2}}}
 " Spaces {{{2
 
 function! ShowSpaces()
@@ -201,6 +227,11 @@ noremap <silent> <Leader>sr :call TrimSpaces()<CR>
 " 2}}}
 " 1}}}
 " Plugins {{{1
+" Ack {{{2
+
+noremap <Leader>g :Ack!<space>
+
+" 2}}}
 " Clang complete {{{2
 
 let g:clang_complete_copen = 1
@@ -229,7 +260,7 @@ let g:ctrlp_open_new_file = 0
 " let ctrl-p replace netrw buffer
 let g:ctrlp_dont_split = 'netrw'
 " use ,f to invoke
-let g:ctrlp_map = '<Leader>f'
+let g:ctrlp_map = '<Leader>,'
 
 " 2}}}
 " Tagbar {{{2
