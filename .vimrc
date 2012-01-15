@@ -202,8 +202,8 @@ map <Leader>ts :call UpdateSystemTags('')<CR>
 " 2}}}
 " Folding {{{2
 
-nnoremap <Space> za
-vnoremap <Space> za
+nnoremap <Space> zA
+vnoremap <Space> zA
 
 " 2}}}
 " Spaces {{{2
