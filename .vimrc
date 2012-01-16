@@ -1,14 +1,12 @@
 " Pathogen {{{1
 
+set nocompatible
 filetype off
 call pathogen#infect()
 filetype plugin indent on
 
 "1}}}
 " Essentials {{{1
-
-" don't compatible with vi
-set nocompatible
 
 " use utf-8 everywhere
 set encoding=utf-8
@@ -159,6 +157,26 @@ let g:solarized_termcolors = 8
 let g:solarized_termtrans = 1
 colorscheme solarized
 syntax on
+
+" 1}}}
+" Folding {{{1
+
+function! MyFoldText()
+    let line = getline(v:foldstart)
+
+    let nucolwidth = &fdc + &number * &numberwidth
+    let windowwidth = winwidth(0) - nucolwidth - 2
+    let foldedlinecount = v:foldend - v:foldstart
+
+    " expand tabs into spaces
+    let onetab = strpart('          ', 0, &tabstop)
+    let line = substitute(line, '\t', onetab, 'g')
+
+    let line = strpart(line, 0, windowwidth - 2 -len(foldedlinecount))
+    let fillcharcount = windowwidth - len(line) - len(foldedlinecount)
+    return line . ' ' . repeat(" ",fillcharcount) . foldedlinecount . ' '
+endfunction
+set foldtext=MyFoldText()
 
 " 1}}}
 " Mappings {{{1
