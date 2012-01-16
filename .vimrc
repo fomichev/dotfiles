@@ -102,6 +102,9 @@ set isprint=
 " start with all folds closed
 set foldlevelstart=0
 
+" support only root fold for syntax
+set foldnestmax=1
+
 " cache more lines
 let c_minlines=100
 
@@ -148,7 +151,7 @@ if version >= 703
 	endif
 endif
 
-"1}}}
+" 1}}}
 " Color scheme {{{1
 
 " enable syntax coloring
@@ -176,6 +179,7 @@ function! MyFoldText()
     let fillcharcount = windowwidth - len(line) - len(foldedlinecount)
     return line . ' ' . repeat(" ",fillcharcount) . foldedlinecount . ' '
 endfunction
+
 set foldtext=MyFoldText()
 
 " 1}}}
@@ -203,6 +207,7 @@ cmap w!! w !sudo tee % > /dev/null
 " 2}}}
 " Windows {{{2
 
+" jump between windows easily
 nnoremap <C-h> <C-w>h
 nnoremap <C-j> <C-w>j
 nnoremap <C-k> <C-w>k
@@ -211,17 +216,14 @@ nnoremap <C-v> <C-w>v
 nnoremap <C-s> <C-w>s
 
 " 2}}}
-" Tags {{{2
-
-map <Leader>tp :call UpdateTags()<CR>
-map <Leader>tl :call UpdateLinuxTags('')<CR>
-map <Leader>ts :call UpdateSystemTags('')<CR>
-
-" 2}}}
 " Folding {{{2
 
+" use space to open/close folds
 nnoremap <Space> za
 vnoremap <Space> za
+
+" make zO work no matter where the cursor is
+nnoremap zO zCzO
 
 " 2}}}
 " Spaces {{{2
@@ -293,7 +295,6 @@ nnoremap <silent> <Leader>a :A<CR>
 " 2}}}
 " Netrw {{{2
 
-" netrw
 let g:netrw_fastbrowse=2
 let g:netrw_banner=0
 let g:netrw_home=expand($HOME) . '/local/.vim'
@@ -303,7 +304,6 @@ let g:netrw_browse_split=0
 " 2}}}
 " Matchit {{{2
 
-" load matchit
 runtime macros/matchit.vim
 
 " 2}}}
@@ -423,9 +423,8 @@ augroup END
 " 2}}}
 " 1}}}
 " Ctags {{{1
+" Current directory (tags should include ./tags) {{{2
 
-" update tags in the current directory and add them to the tags
-" variable
 function! UpdateTags()
 	let l:path = fnamemodify(".",":ph")
 
@@ -438,12 +437,20 @@ function! UpdateTags()
 	set tags+=l:tags_path
 endfunction
 
+map <Leader>tp :call UpdateTags()<CR>
+
+" 2}}}
+" Custom directory (don't include in tags) {{{2
+
 function! UpdateCustomTags(path)
 	let l:path = a:path . '/'
 	let l:ctags_opts='--format=2 --excmd=pattern --fields=+iaS --extra=+q'
 
 	exec system('ctags --exclude=build_linux -R -f ' . l:path . 'tags ' . l:ctags_opts . ' ' . l:path)
 endfunction
+
+" 2}}}
+" System directory (and add to tags) {{{2
 
 function! UpdateSystemTags(path)
 	if a:path == ''
@@ -456,6 +463,13 @@ function! UpdateSystemTags(path)
 
 	exec system('ctags -R -f $HOME/.vim/tmp/system_tags ' . l:ctags_opts . ' ' . l:path)
 endfunction
+
+map <Leader>ts :call UpdateSystemTags('')<CR>
+
+set tags+=$HOME/.vim/tmp/system_tags
+
+" 2}}}
+" Linux directory (and add to tags) {{{2
 
 function! UpdateLinuxTags(path)
 	if a:path == ''
@@ -497,9 +511,11 @@ function! UpdateLinuxTags(path)
 	exec system('ctags -R -f $HOME/.vim/tmp/linux_tags ' . l:ctags_opts . ' ' . l:path_dirs)
 endfunction
 
-set tags+=$HOME/.vim/tmp/system_tags
+map <Leader>tl :call UpdateLinuxTags('')<CR>
+
 set tags+=$HOME/.vim/tmp/linux_tags
 
+" 2}}}
 " 1}}}
 " Auxiliary functions {{{1
 
