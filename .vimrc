@@ -212,8 +212,6 @@ nnoremap <C-h> <C-w>h
 nnoremap <C-j> <C-w>j
 nnoremap <C-k> <C-w>k
 nnoremap <C-l> <C-w>l
-nnoremap <C-v> <C-w>v
-nnoremap <C-s> <C-w>s
 
 " 2}}}
 " Folding {{{2
