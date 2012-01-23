@@ -30,6 +30,9 @@
 !.Xmodmap
 !.xinitrc
 !.gvimrc
+!.pentadactylrc
+!/.pentadactyl
+/.pentadactyl/info
 
 # some brain damaged stuff on virtual machine
 /.vim/.VirtualBox/
