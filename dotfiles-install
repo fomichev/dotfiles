@@ -1,0 +1,86 @@
+#!/bin/sh
+
+dotdir=$(cd $(dirname $0) && pwd)
+
+#dbg() { echo $*; }
+dbg() { return; }
+
+cmd() { dbg $*; eval $*; }
+#cmd() { dbg $*; }
+
+do_install_dirs() {
+	local from=$1
+	local to=$2
+
+	local dirs=`(cd $from && find . -maxdepth 1 -and -mindepth 1 -and -type d -print)`
+	for d in $dirs; do
+		local target="$to/`basename $d`"
+		local source="$from/`basename $d`"
+
+		dbg D $target
+
+		if [ `basename $d` = '.git' ]; then
+			dbg pass .git directory
+			continue
+		fi
+
+		if [ -L $target ]; then
+			dbg link exists $target
+			local link=`readlink $target`
+			if [ "$link" != "$source" ]; then
+				dbg rewrite link $target which points to $link instead of $source
+				cmd mv $target $target.bak
+				cmd ln -s $source $target
+			fi
+		elif [ -d $target ]; then
+			dbg directory $target exist
+			do_install $source $target
+		elif [ -e $target ]; then
+			dbg file $target exist
+			cmd mv $target $target.bak
+			cmd ln -s $source $target
+		else
+			dbg directory $target does not exist
+			cmd ln -s $source $target
+		fi
+	done
+}
+
+do_install_files() {
+	local from=$1
+	local to=$2
+
+	local files=`(cd $from && find . -maxdepth 1 -and -mindepth 1 -and \( -type f -or -type l \) -print)`
+	for f in $files; do
+		local target="$to/`basename $f`"
+		local source="$from/`basename $f`"
+
+		dbg F $target
+
+		if [ -L $target ]; then
+			dbg link exists $target
+			local link=`readlink $target`
+			if [ "$link" != "$source" ]; then
+				dbg rewrite link $target which points to $link instead of $source
+				cmd mv $target $target.bak
+				cmd ln -s $source $target
+			fi
+		elif [ -e $target ]; then
+			cmd mv $target $target.bak
+			cmd ln -s $source $target
+		else
+			cmd ln -s $source $target
+		fi
+	done
+}
+
+do_install() {
+	local from=$1
+	local to=$2
+
+	dbg INSTALL $1 TO $2
+	do_install_dirs $from $to
+	do_install_files $from $to
+}
+
+do_install $dotdir ~
