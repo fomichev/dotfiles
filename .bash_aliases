@@ -1,6 +1,6 @@
 alias vi='vim'
 
-alias ls='ls --color=auto'
+[ $os = "linux" ] && { alias ls='ls --color=auto'; }
 alias la='ls -lah'
 alias j='jobs -l'
 
