@@ -14,12 +14,13 @@ do_install_dirs() {
 
 	local dirs=`(cd $from && find . -maxdepth 1 -and -mindepth 1 -and -type d -print)`
 	for d in $dirs; do
-		local target="$to/`basename $d`"
-		local source="$from/`basename $d`"
+		local name=`basename $d`
+		local target="$to/$name"
+		local source="$from/$name"
 
 		dbg D $target
 
-		if [ `basename $d` = '.git' ]; then
+		if [ $name = '.git' ]; then
 			dbg pass .git directory
 			continue
 		fi
@@ -52,10 +53,16 @@ do_install_files() {
 
 	local files=`(cd $from && find . -maxdepth 1 -and -mindepth 1 -and \( -type f -or -type l \) -print)`
 	for f in $files; do
-		local target="$to/`basename $f`"
-		local source="$from/`basename $f`"
+		local name=`basename $f`
+		local target="$to/$name"
+		local source="$from/$name"
 
 		dbg F $target
+
+		if [ $name = 'dotfiles-install' ]; then
+			dbg pass dotfiles-install file
+			continue
+		fi
 
 		if [ -L $target ]; then
 			dbg link exists $target
