@@ -103,3 +103,5 @@ NAND
 ACL
 whitelist
 postgresql
+endianness
+endian

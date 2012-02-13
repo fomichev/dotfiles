@@ -17,3 +17,4 @@ silent qmark c http://google.com/calendar
 silent qmark r http://google.com/reader
 silent qmark i http://instapaper.com
 silent qmark e http://evernote.com
+silent qmark t http://twitter.com

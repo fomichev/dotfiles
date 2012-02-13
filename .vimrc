@@ -383,12 +383,12 @@ augroup END
 augroup ft_python
 	au!
 
-	au FileType py setlocal autoindent
+	au FileType python setlocal autoindent
 
-	au FileType py setlocal shiftwidth=4
-	au FileType py setlocal softtabstop=4
-	au FileType py setlocal tabstop=4
-	au FileType py setlocal expandtab
+	au FileType python setlocal shiftwidth=4
+	au FileType python setlocal softtabstop=4
+	au FileType python setlocal tabstop=4
+	au FileType python setlocal expandtab
 augroup END
 
 " 2}}}
