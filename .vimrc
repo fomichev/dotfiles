@@ -419,6 +419,21 @@ augroup ft_mutt
 augroup END
 
 " 2}}}
+" Shell {{{2
+
+augroup ft_sh
+	au!
+
+	au FileType sh setlocal foldmethod=marker
+	au FileType sh setlocal autoindent
+
+	au FileType sh setlocal shiftwidth=8
+	au FileType sh setlocal softtabstop=8
+	au FileType sh setlocal tabstop=8
+	au FileType sh setlocal noexpandtab
+augroup END
+
+" 2}}}
 " 1}}}
 " Ctags {{{1
 " Current directory (tags should include ./tags) {{{2
