@@ -64,6 +64,11 @@ do_install_files() {
 			continue
 		fi
 
+		if [ $name = 'dotfiles-update' ]; then
+			dbg pass dotfiles-update file
+			continue
+		fi
+
 		if [ -L $target ]; then
 			dbg link exists $target
 			local link=`readlink $target`
