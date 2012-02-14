@@ -262,23 +262,30 @@ inoremap <silent> <S-Tab> <C-x><C-o>
 " 2}}}
 " Ctrl-p {{{2
 
-" start with clean prompt each time
-let g:ctrlp_persistent_input = 0
 " don't search by full path
 let g:ctrlp_by_filename = 1
-" don't keep MRU files
-let g:ctrlp_mru_files = 0
 " don't manage working directory
 let g:ctrlp_working_path_mode = 0
 " don't search for dotfiles
 let g:ctrlp_dotfiles = 0
 " don't split when open
 let g:ctrlp_split_window = 0
-let g:ctrlp_open_new_file = 0
+" open new file in current window
+let g:ctrlp_open_new_file = 'r'
 " let ctrl-p replace netrw buffer
-let g:ctrlp_dont_split = 'netrw'
+let g:ctrlp_dont_split = 'netrw\|help\|quickfix'
 " use ,f to invoke
 let g:ctrlp_map = '<Leader>,'
+" try to use VC listing commands if possible
+let g:ctrlp_user_command = {
+	\ 'types': {
+		\ 1: ['.git/', 'cd %s && git ls-files'],
+		\ 2: ['.hg/', 'hg --cwd %s locate -I .'],
+		\ },
+	\ 'fallback': 'find %s -type f'
+	\ }
+
+nnoremap <leader>. :CtrlPMRUFiles<cr>
 
 " 2}}}
 " Tagbar {{{2

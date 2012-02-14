@@ -12,7 +12,7 @@ do_install_dirs() {
 	local from=$1
 	local to=$2
 
-	local dirs=`(cd $from && find . -maxdepth 1 -and -mindepth 1 -and -type d -print)`
+	local dirs=`(cd $from && find . -maxdepth 1 -mindepth 1 -type d -print)`
 	for d in $dirs; do
 		local name=`basename $d`
 		local target="$to/$name"
@@ -51,7 +51,7 @@ do_install_files() {
 	local from=$1
 	local to=$2
 
-	local files=`(cd $from && find . -maxdepth 1 -and -mindepth 1 -and \( -type f -or -type l \) -print)`
+	local files=`(cd $from && find . -maxdepth 1 -mindepth 1 -type f -or -type l -print)`
 	for f in $files; do
 		local name=`basename $f`
 		local target="$to/$name"
@@ -59,12 +59,12 @@ do_install_files() {
 
 		dbg F $target
 
-		if [ $name = 'dotfiles-install' ]; then
+		if [ $name = 'dotfiles-submodules-install' ]; then
 			dbg pass dotfiles-install file
 			continue
 		fi
 
-		if [ $name = 'dotfiles-update' ]; then
+		if [ $name = 'dotfiles-submodules-update' ]; then
 			dbg pass dotfiles-update file
 			continue
 		fi
