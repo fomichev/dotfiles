@@ -29,8 +29,17 @@ fi
 
 PS1='$ '
 
-shopt -s cmdhist # keep the same history entries in one entry
-shopt -s histappend # don't overwrite history
+# keep the same multi line history entries in one entry
+shopt -s cmdhist
+# don't overwrite history
+shopt -s histappend
+# don't save matching lines
+export HISTCONTROL=ignoreboth
+
+# enable completion
+if [ -f /etc/bash_completion ]; then
+	. /etc/bash_completion
+fi
 
 # }}}
 # OS dependent settings {{{
