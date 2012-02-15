@@ -283,7 +283,7 @@ let g:ctrlp_split_window = 0
 let g:ctrlp_open_new_file = 'r'
 " let ctrl-p replace netrw buffer
 let g:ctrlp_dont_split = 'netrw\|help\|quickfix'
-" use ,f to invoke
+" use ,, to invoke
 let g:ctrlp_map = '<Leader>,'
 " try to use VC listing commands if possible
 let g:ctrlp_user_command = {
@@ -472,8 +472,6 @@ map <Leader>tp :call UpdateTags('')<CR>
 function! UpdateCustomTags(opts, tags_path, path)
 	let l:ctags_opts='--format=2 --excmd=pattern --fields=+iaS --extra=+q'
 	let l:ctags_exclude='--exclude=*.o --exclude=build_linux'
-
-	echoe 'ctags -R -f ' . a:tags_path . ' ' . l:ctags_opts . ' ' . l:ctags_exclude . ' ' . a:opts . ' ' . a:path . ' 2>/dev/null'
 
 	exec system('ctags -R -f ' . a:tags_path . ' ' . l:ctags_opts . ' ' . l:ctags_exclude . ' ' . a:opts . ' ' . a:path)
 endfunction
