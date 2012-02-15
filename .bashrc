@@ -74,6 +74,8 @@ function bookmark() {
 	eval "alias cd-$name='cd $path && pwd'"
 }
 
+bookmark dotfiles ~/dotfiles
+
 # }}}
 # Include local settings {{{
 

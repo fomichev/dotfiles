@@ -53,6 +53,15 @@ set hlsearch
 " find the next match as we type
 set incsearch
 
+" ":substitute" flag 'g' is default on
+set gdefault
+
+" ignore case in search patterns
+set ignorecase
+
+" switch off ignorecase when pattern contains upper case chars
+set smartcase
+
 " don't force me to save file
 set hidden
 
