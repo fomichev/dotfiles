@@ -56,6 +56,16 @@ export BROWSER=w3m
 export GREP_OPTIONS='--color=auto'
 
 # }}}
+# Bookmarks {{{
+
+function bookmark() {
+	name=$1
+	path=$2
+
+	eval "alias cd-$name='cd $path && pwd'"
+}
+
+# }}}
 # Include local settings {{{
 
 if [ -e ~/local/.bashrc ]; then
