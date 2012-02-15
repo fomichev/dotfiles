@@ -27,3 +27,7 @@ set guioptions-=b
 set guioptions-=h
 " use console dialogs
 set guioptions+=c
+
+if has("gui_macvim")
+	macmenu &Tools.Make key=<nop>
+endif

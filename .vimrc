@@ -352,7 +352,8 @@ augroup ft_objc
 	au FileType objc setlocal tabstop=2
 	au FileType objc setlocal expandtab
 	au FileType objc setlocal cinoptions=>s,e0,n0,f0,{0,}0,^0,:0,=s,l0,b0,gs,hs,ps,t0,is,+s,c3,C0,(0
-	au FileType objc setlocal makeprg=xcodebuild\ -sdk\ iphonesimulator5.0
+
+	au FileType objc map <Leader>tp :call UpdateTags('--language-force=ObjectiveC')<CR>
 augroup END
 
 " 2}}}
@@ -445,28 +446,27 @@ augroup END
 " Ctags {{{1
 " Current directory (tags should include ./tags) {{{2
 
-function! UpdateTags()
+function! UpdateTags(opts)
 	let l:path = fnamemodify(".",":ph")
-
-	let l:ctags_opts='--format=2 --excmd=pattern --fields=+iaS --extra=+q'
-
-	exec system('ctags -R -f ' . l:path . 'tags ' . l:ctags_opts . ' ' . l:path)
-
 	let l:tags_path = l:path . 'tags'
+
+	call UpdateCustomTags(a:opts, tags_path, path)
 
 	set tags+=l:tags_path
 endfunction
 
-map <Leader>tp :call UpdateTags()<CR>
+map <Leader>tp :call UpdateTags('')<CR>
 
 " 2}}}
 " Custom directory (don't include in tags) {{{2
 
-function! UpdateCustomTags(path)
-	let l:path = a:path . '/'
+function! UpdateCustomTags(opts, tags_path, path)
 	let l:ctags_opts='--format=2 --excmd=pattern --fields=+iaS --extra=+q'
+	let l:ctags_exclude='--exclude=*.o --exclude=build_linux'
 
-	exec system('ctags --exclude=build_linux -R -f ' . l:path . 'tags ' . l:ctags_opts . ' ' . l:path)
+	echoe 'ctags -R -f ' . a:tags_path . ' ' . l:ctags_opts . ' ' . l:ctags_exclude . ' ' . a:opts . ' ' . a:path . ' 2>/dev/null'
+
+	exec system('ctags -R -f ' . a:tags_path . ' ' . l:ctags_opts . ' ' . l:ctags_exclude . ' ' . a:opts . ' ' . a:path)
 endfunction
 
 " 2}}}
@@ -479,9 +479,7 @@ function! UpdateSystemTags(path)
 		let l:path = a:path . '/'
 	endif
 
-	let l:ctags_opts='--format=2 --excmd=pattern --fields=+iaS --extra=+q'
-
-	exec system('ctags -R -f $HOME/.vim/tmp/system_tags ' . l:ctags_opts . ' ' . l:path)
+	call UpdateCustomTags('', '$HOME/.vim/tmp/system_tags', l:path)
 endfunction
 
 map <Leader>ts :call UpdateSystemTags('')<CR>
@@ -510,8 +508,8 @@ function! UpdateLinuxTags(path)
 				\ '--regex-c=''/^SYSCALL_DEFINE[[:digit:]]?\(([^,)]*).*/sys_\1/'' ' .
 				\ '--regex-c++=''/^TRACE_EVENT\(([^,)]*).*/trace_\1/'' ' .
 				\ '--regex-c++=''/^DEFINE_EVENT\(([^,)]*).*/trace_\1/'' ' .
-				\ '--c-kinds=-m+px --format=2 --extra=+q ' .
-				\ '--excmd=pattern --fields=+S'
+				\ '--c-kinds=-m+px ' .
+				\ '--fields=+S'
 
 	let l:path_dirs =
 				\ l:path . 'arch/x86 ' .
@@ -528,7 +526,7 @@ function! UpdateLinuxTags(path)
 				\ l:path . 'security ' .
 				\ l:path . 'virt'
 
-	exec system('ctags -R -f $HOME/.vim/tmp/linux_tags ' . l:ctags_opts . ' ' . l:path_dirs)
+	call UpdateCustomTags(l:ctags_opts, '$HOME/.vim/tmp/linux_tags', l:path_dirs)
 endfunction
 
 map <Leader>tl :call UpdateLinuxTags('')<CR>
