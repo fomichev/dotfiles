@@ -259,6 +259,11 @@ noremap <silent> <Leader>sr :call TrimSpaces()<CR>
 noremap <Leader>g :Ack!<space>
 
 " 2}}}
+" Cocoa.vim {{{2
+
+nmap <silent> <Leader>x :w<bar>call g:RunInXcode()<CR>
+
+" }}}2
 " Clang complete {{{2
 
 let g:clang_complete_copen = 1
@@ -321,6 +326,11 @@ let g:netrw_browse_split=0
 runtime macros/matchit.vim
 
 " 2}}}
+" Fakeclip {{{2
+
+let g:fakeclip_terminal_multiplexer_type = "tmux"
+
+" }}}2
 " 1}}}
 " Filetypes {{{1
 " C {{{2
