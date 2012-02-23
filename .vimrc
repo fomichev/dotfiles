@@ -481,7 +481,7 @@ map <Leader>tp :call UpdateTags('')<CR>
 
 function! UpdateCustomTags(opts, tags_path, path)
 	let l:ctags_opts='--format=2 --excmd=pattern --fields=+iaS --extra=+q'
-	let l:ctags_exclude='--exclude=*.o --exclude=build_linux'
+	let l:ctags_exclude='--exclude=*.o --exclude=build_linux --exclude=tags'
 
 	exec system('ctags -R -f ' . a:tags_path . ' ' . l:ctags_opts . ' ' . l:ctags_exclude . ' ' . a:opts . ' ' . a:path)
 endfunction

@@ -1,4 +1,8 @@
-alias vi='vim'
+if which cvim &>/dev/null; then
+	alias vi='cvim'
+else
+	alias vi='vim'
+fi
 
 [ $os = "linux" ] && { alias ls='ls --color=auto'; }
 alias la='ls -lah'
