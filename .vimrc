@@ -71,9 +71,6 @@ set timeout timeoutlen=3000 ttimeoutlen=100
 " highlight current line
 set cursorline
 
-" always use 8-color (actually 8 + 8) terminal mode
-set t_Co=8
-
 " don't beep!
 set visualbell
 
@@ -163,13 +160,18 @@ endif
 " 1}}}
 " Color scheme {{{1
 
-" enable syntax coloring
+syntax enable
+set t_Co=16
 set background=dark
-let g:solarized_termcolors = 8
-let g:solarized_termtrans = 1
 colorscheme solarized
-syntax on
 
+" GNU Screen / Tmux {{{2
+
+if &term == "screen"
+	set term=xterm
+endif
+
+" 2}}}
 " 1}}}
 " Folding {{{1
 
@@ -303,6 +305,41 @@ nnoremap <leader>. :CtrlPMRUFiles<cr>
 
 " 2}}}
 " Tagbar {{{2
+
+" add a definition for Objective-C to tagbar
+let g:tagbar_type_objc = {
+    \ 'ctagstype' : 'ObjectiveC',
+    \ 'kinds'     : [
+        \ 'i:interface',
+        \ 'I:implementation',
+        \ 'p:Protocol',
+        \ 'm:Object_method',
+        \ 'c:Class_method',
+        \ 'v:Global_variable',
+        \ 'F:Object field',
+        \ 'f:function',
+        \ 'p:property',
+        \ 't:type_alias',
+        \ 's:type_structure',
+        \ 'e:enumeration',
+        \ 'M:preprocessor_macro',
+    \ ],
+    \ 'sro'        : ' ',
+    \ 'kind2scope' : {
+        \ 'i' : 'interface',
+        \ 'I' : 'implementation',
+        \ 'p' : 'Protocol',
+        \ 's' : 'type_structure',
+        \ 'e' : 'enumeration'
+    \ },
+    \ 'scope2kind' : {
+        \ 'interface'      : 'i',
+        \ 'implementation' : 'I',
+        \ 'Protocol'       : 'p',
+        \ 'type_structure' : 's',
+        \ 'enumeration'    : 'e'
+    \ }
+\ }
 
 nnoremap <silent> <Leader>b :TagbarToggle<CR>
 
@@ -574,11 +611,3 @@ if filereadable(expand($HOME) . '/local/.vimrc')
 endif
 
 " 1}}}
-" GNU Screen {{{1
-
-" using PuTTY with GNU Screen makes Vim crazy
-if &term == "screen"
-	set term=xterm
-endif
-
-"1}}}
