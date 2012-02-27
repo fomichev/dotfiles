@@ -159,19 +159,21 @@ endif
 
 " 1}}}
 " Color scheme {{{1
+" GNU Screen / Tmux {{{2
+
+if &term == "screen"
+	set term=xterm
+	" problem with PuTTY
+	let g:solarized_termtrans = 1
+endif
+
+" 2}}}
 
 syntax enable
 set t_Co=16
 set background=dark
 colorscheme solarized
 
-" GNU Screen / Tmux {{{2
-
-if &term == "screen"
-	set term=xterm
-endif
-
-" 2}}}
 " 1}}}
 " Folding {{{1
 
