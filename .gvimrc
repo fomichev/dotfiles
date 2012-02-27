@@ -12,10 +12,8 @@ endif
 set guioptions-=T
 " remove menubar
 set guioptions-=m
-if !has("gui_macvim") " leave pretty tabs on mac
-	" use text tabs
-	set guioptions-=e
-endif
+" use text tabs
+set guioptions-=e
 " remove right scrollbar
 set guioptions-=r
 set guioptions-=R

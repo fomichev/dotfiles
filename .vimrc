@@ -207,7 +207,7 @@ set foldtext=MyFoldText()
 " Common {{{2
 
 " disable search highlight
-nmap <silent> <Leader>n :silent :nohlsearch<CR>
+nmap <silent> <Leader>/ :silent :nohlsearch<CR>
 
 " toggle list option
 nmap <silent> <Leader>l :set nolist!<CR>
