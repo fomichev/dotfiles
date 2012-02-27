@@ -129,7 +129,7 @@ endif
 
 " show tabs and trailing spaces
 set list
-set listchars=tab:→·,trail:·
+set listchars=tab:→\ ,trail:·
 
 " enable spell check
 set spelllang=en_us
