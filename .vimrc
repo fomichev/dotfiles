@@ -168,6 +168,13 @@ if &term == "screen"
 endif
 
 " 2}}}
+" Solarized {{{2
+
+let g:solarized_underline = 0
+let g:solarized_bold = 1
+let g:solarized_italic = 1
+
+" }}}2
 
 syntax enable
 set t_Co=16
@@ -178,19 +185,19 @@ colorscheme solarized
 " Folding {{{1
 
 function! MyFoldText()
-    let line = getline(v:foldstart)
+	let line = getline(v:foldstart)
 
-    let nucolwidth = &fdc + &number * &numberwidth
-    let windowwidth = winwidth(0) - nucolwidth - 2
-    let foldedlinecount = v:foldend - v:foldstart
+	let nucolwidth = &fdc + &number * &numberwidth
+	let windowwidth = winwidth(0) - nucolwidth - 2
+	let foldedlinecount = v:foldend - v:foldstart
 
-    " expand tabs into spaces
-    let onetab = strpart('          ', 0, &tabstop)
-    let line = substitute(line, '\t', onetab, 'g')
+	" expand tabs into spaces
+	let onetab = strpart('          ', 0, &tabstop)
+	let line = substitute(line, '\t', onetab, 'g')
 
-    let line = strpart(line, 0, windowwidth - 2 -len(foldedlinecount))
-    let fillcharcount = windowwidth - len(line) - len(foldedlinecount)
-    return line . ' ' . repeat(" ",fillcharcount) . foldedlinecount . ' '
+	let line = strpart(line, 0, windowwidth - 2 -len(foldedlinecount))
+	let fillcharcount = windowwidth - len(line) - len(foldedlinecount)
+	return line . ' ' . repeat(" ",fillcharcount) . foldedlinecount . ' '
 endfunction
 
 set foldtext=MyFoldText()
@@ -310,37 +317,37 @@ nnoremap <leader>. :CtrlPMRUFiles<cr>
 
 " add a definition for Objective-C to tagbar
 let g:tagbar_type_objc = {
-    \ 'ctagstype' : 'ObjectiveC',
-    \ 'kinds'     : [
-        \ 'i:interface',
-        \ 'I:implementation',
-        \ 'p:Protocol',
-        \ 'm:Object_method',
-        \ 'c:Class_method',
-        \ 'v:Global_variable',
-        \ 'F:Object field',
-        \ 'f:function',
-        \ 'p:property',
-        \ 't:type_alias',
-        \ 's:type_structure',
-        \ 'e:enumeration',
-        \ 'M:preprocessor_macro',
-    \ ],
-    \ 'sro'        : ' ',
-    \ 'kind2scope' : {
-        \ 'i' : 'interface',
-        \ 'I' : 'implementation',
-        \ 'p' : 'Protocol',
-        \ 's' : 'type_structure',
-        \ 'e' : 'enumeration'
-    \ },
-    \ 'scope2kind' : {
-        \ 'interface'      : 'i',
-        \ 'implementation' : 'I',
-        \ 'Protocol'       : 'p',
-        \ 'type_structure' : 's',
-        \ 'enumeration'    : 'e'
-    \ }
+	\ 'ctagstype' : 'ObjectiveC',
+	\ 'kinds'     : [
+		\ 'i:interface',
+		\ 'I:implementation',
+		\ 'p:Protocol',
+		\ 'm:Object_method',
+		\ 'c:Class_method',
+		\ 'v:Global_variable',
+		\ 'F:Object field',
+		\ 'f:function',
+		\ 'p:property',
+		\ 't:type_alias',
+		\ 's:type_structure',
+		\ 'e:enumeration',
+		\ 'M:preprocessor_macro',
+	\ ],
+	\ 'sro'        : ' ',
+	\ 'kind2scope' : {
+		\ 'i' : 'interface',
+		\ 'I' : 'implementation',
+		\ 'p' : 'Protocol',
+		\ 's' : 'type_structure',
+		\ 'e' : 'enumeration'
+	\ },
+	\ 'scope2kind' : {
+		\ 'interface'      : 'i',
+		\ 'implementation' : 'I',
+		\ 'Protocol'       : 'p',
+		\ 'type_structure' : 's',
+		\ 'enumeration'    : 'e'
+	\ }
 \ }
 
 nnoremap <silent> <Leader>b :TagbarToggle<CR>
