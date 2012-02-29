@@ -1,33 +1,53 @@
+#!/bin/sh
+
+# ls {{{
+
+[ $os = "linux" ] && { alias ls='ls --color=auto'; }
+alias la='ls -lah'
+alias l='ls -AF'
+alias j='jobs -l'
+
+# }}}
+# vim {{{
+
 if which cvim &>/dev/null; then
 	alias vi='cvim'
 else
 	alias vi='vim'
 fi
 
-[ $os = "linux" ] && { alias ls='ls --color=auto'; }
-alias la='ls -lah'
-alias j='jobs -l'
+if which mvim &>/dev/null; then
+	alias v='mvim --remote-silent'
+else
+	alias v='gvim --remote-silent'
+fi
+
+# }}}
+# mutt {{{
 
 alias rmutt='mutt -R'
+
+# }}}
+# make {{{
 
 alias nake='nice -10 make'
 alias jake='make -j8'
 
+# }}}
+# gpg {{{
+
 alias decrypt='gpg --decrypt'
 
-alias w='w -sh | sort'
-
-alias nack='ack -n'
+# }}}
+# cd {{{
 
 alias ..='cd ..'
+alias ...='cd ../..'
+alias ....='cd ../../..'
+alias -- -='cd -'
 
-alias df='df -h'
-
-if which mvim &>/dev/null; then
-	alias g='mvim --remote-silent'
-else
-	alias g='gvim --remote-silent'
-fi
+# }}}
+# package management {{{
 
 if which yum &>/dev/null; then
 	alias install='sudo yum install'
@@ -45,3 +65,9 @@ elif which brew &>/dev/null; then
 	alias remove='brew remove'
 	alias upgrade='brew update && brew upgrade'
 fi
+
+# }}}
+# other {{{
+alias w='w -sh | sort'
+alias df='df -h'
+# }}}
