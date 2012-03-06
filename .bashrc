@@ -19,6 +19,12 @@ if [ -d ~/opt/vim ]; then
 	export PATH=~/opt/vim/bin:$PATH
 fi
 
+if [ $os = 'darwin' ]; then
+	if [ -d `brew --prefix ruby`/bin ]; then
+		export PATH=`brew --prefix ruby`/bin:$PATH
+	fi
+fi
+
 # }}}
 # Include aliases {{{
 
@@ -39,6 +45,12 @@ export HISTCONTROL=ignoreboth
 # enable completion
 if [ -f /etc/bash_completion ]; then
 	. /etc/bash_completion
+fi
+
+if [ $os = 'darwin' ]; then
+	if [ -f `brew --prefix`/etc/bash_completion ]; then
+		. `brew --prefix`/etc/bash_completion
+	fi
 fi
 
 # }}}
