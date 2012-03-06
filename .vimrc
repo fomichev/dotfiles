@@ -472,10 +472,6 @@ augroup ft_python
 	au FileType python setlocal expandtab
 
 	au FileType python setlocal completeopt+=preview
-
-	au CursorMovedI * if pumvisible() == 0|pclose|endif
-	au InsertLeave * if pumvisible() == 0|pclose|endif
-
 augroup END
 
 " 2}}}
