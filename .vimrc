@@ -466,6 +466,12 @@ augroup ft_python
 	au FileType python setlocal softtabstop=4
 	au FileType python setlocal tabstop=4
 	au FileType python setlocal expandtab
+
+	au FileType python setlocal completeopt+=preview
+
+	au CursorMovedI * if pumvisible() == 0|pclose|endif
+	au InsertLeave * if pumvisible() == 0|pclose|endif
+
 augroup END
 
 " 2}}}
