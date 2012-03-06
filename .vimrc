@@ -288,6 +288,7 @@ let g:clang_complete_copen = 1
 let g:clang_snippets = 1
 let g:clang_snippets_engine = 'clang_complete'
 let g:clang_complete_auto = 0
+let g:clang_use_library = 1
 
 noremap <silent> <Leader>c :call g:ClangUpdateQuickFix()<CR>
 inoremap <silent> <S-Tab> <C-x><C-o>
