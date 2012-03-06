@@ -5,7 +5,7 @@ set signature = ~/.mutt/signature
 set sort = threads
 
 # check regulary
-set timeout = 15
+set timeout = 300
 set mail_check = 300
 
 # keep internal data in home dir
