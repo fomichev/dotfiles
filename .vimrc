@@ -411,6 +411,24 @@ augroup ft_c
 augroup END
 
 " 2}}}
+" C++ {{{2
+
+augroup ft_cpp
+	au!
+
+	au FileType cpp let g:clang_auto_user_options = 'path, .clang_complete'
+
+	au FileType cpp setlocal foldmethod=syntax
+	au FileType cpp setlocal cindent
+
+	au FileType cpp setlocal shiftwidth=4
+	au FileType cpp setlocal softtabstop=4
+	au FileType cpp setlocal tabstop=4
+	au FileType cpp setlocal expandtab
+augroup END
+
+"
+" }}}2
 " Objective-C {{{2
 
 augroup ft_objc
