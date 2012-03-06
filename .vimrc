@@ -21,7 +21,7 @@ set showcmd
 set backspace=indent,eol,start
 
 " suppose all files in Unix format (\n only)
-set fileformats=unix
+set fileformats=unix,dos
 
 " place a $ mark at the end of change
 set cpoptions+=$
@@ -34,6 +34,9 @@ set number
 
 " always show status line
 set laststatus=2
+
+" customize status line
+set statusline=%<%m\ %f\ [%{&fileformat}]\ %r%=%c:%l/%L\ %P
 
 " speedup macros
 set lazyredraw
@@ -283,6 +286,7 @@ nmap <silent> <Leader>x :w<bar>call g:RunInXcode()<CR>
 
 let g:clang_complete_copen = 1
 let g:clang_snippets = 1
+let g:clang_snippets_engine = 'clang_complete'
 let g:clang_complete_auto = 0
 
 noremap <silent> <Leader>c :call g:ClangUpdateQuickFix()<CR>
