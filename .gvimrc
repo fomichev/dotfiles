@@ -29,5 +29,3 @@ set guioptions+=c
 if has("gui_macvim")
 	macmenu &Tools.Make key=<nop>
 endif
-
-set background=light
