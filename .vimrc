@@ -21,7 +21,7 @@ set showcmd
 set backspace=indent,eol,start
 
 " suppose all files in Unix format (\n only)
-set fileformats=unix
+set fileformats=unix,dos
 
 " place a $ mark at the end of change
 set cpoptions+=$
@@ -34,6 +34,9 @@ set number
 
 " always show status line
 set laststatus=2
+
+" customize status line
+set statusline=%<%m\ %f\ [%{&fileformat}]\ %r%=%c:%l/%L\ %P
 
 " speedup macros
 set lazyredraw
@@ -283,7 +286,9 @@ nmap <silent> <Leader>x :w<bar>call g:RunInXcode()<CR>
 
 let g:clang_complete_copen = 1
 let g:clang_snippets = 1
+let g:clang_snippets_engine = 'clang_complete'
 let g:clang_complete_auto = 0
+let g:clang_use_library = 1
 
 noremap <silent> <Leader>c :call g:ClangUpdateQuickFix()<CR>
 inoremap <silent> <S-Tab> <C-x><C-o>
@@ -406,6 +411,24 @@ augroup ft_c
 augroup END
 
 " 2}}}
+" C++ {{{2
+
+augroup ft_cpp
+	au!
+
+	au FileType cpp let g:clang_auto_user_options = 'path, .clang_complete'
+
+	au FileType cpp setlocal foldmethod=syntax
+	au FileType cpp setlocal cindent
+
+	au FileType cpp setlocal shiftwidth=4
+	au FileType cpp setlocal softtabstop=4
+	au FileType cpp setlocal tabstop=4
+	au FileType cpp setlocal expandtab
+augroup END
+
+"
+" }}}2
 " Objective-C {{{2
 
 augroup ft_objc
@@ -466,6 +489,8 @@ augroup ft_python
 	au FileType python setlocal softtabstop=4
 	au FileType python setlocal tabstop=4
 	au FileType python setlocal expandtab
+
+	au FileType python setlocal completeopt+=preview
 augroup END
 
 " 2}}}
