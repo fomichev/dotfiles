@@ -416,9 +416,9 @@ augroup ft_objc
 	au FileType objc setlocal foldmethod=syntax
 	au FileType objc setlocal smartindent
 
-	au FileType objc setlocal shiftwidth=4
-	au FileType objc setlocal softtabstop=4
-	au FileType objc setlocal tabstop=4
+	au FileType objc setlocal shiftwidth=2
+	au FileType objc setlocal softtabstop=2
+	au FileType objc setlocal tabstop=2
 	au FileType objc setlocal expandtab
 	au FileType objc setlocal cinoptions=>s,e0,n0,f0,{0,}0,^0,:0,=s,l0,b0,gs,hs,ps,t0,is,+s,c3,C0,(0
 
