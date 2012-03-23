@@ -394,6 +394,8 @@ let c_space_errors=1
 let c_curly_error=1
 let c_bracket_error=1
 let c_gnu=1
+" treat .h files as C files
+let g:c_syntax_for_h=1
 
 augroup ft_c
 	au!
@@ -536,6 +538,13 @@ augroup ft_sh
 augroup END
 
 " 2}}}
+" Markdown {{{2
+augroup ft_sh
+	au!
+
+	autocmd BufRead,BufNewFile *.md setlocal filetype=markdown
+augroup END
+" }}}2
 " 1}}}
 " Ctags {{{1
 " Current directory (tags should include ./tags) {{{2

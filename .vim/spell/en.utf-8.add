@@ -105,3 +105,4 @@ whitelist
 postgresql
 endianness
 endian
+OProfile
