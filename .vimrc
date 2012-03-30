@@ -543,6 +543,7 @@ augroup ft_sh
 	au!
 
 	autocmd BufRead,BufNewFile *.md setlocal filetype=markdown
+	autocmd BufRead,BufNewFile *.txt setlocal filetype=markdown
 augroup END
 " }}}2
 " 1}}}
