@@ -539,19 +539,17 @@ augroup END
 
 " 2}}}
 " Markdown {{{2
-augroup ft_sh
+augroup ft_markdown
 	au!
 
 	autocmd BufRead,BufNewFile *.md setlocal filetype=markdown
-	autocmd BufRead,BufNewFile *.txt setlocal filetype=markdown
 augroup END
 " }}}2
-" Outline {{{2
-augroup ft_outline
+" Text files {{{2
+augroup ft_txt
 	au!
 
-	autocmd BufRead,BufNewFile *.org setlocal filetype=outline
-	autocmd BufRead,BufNewFile *.outline setlocal filetype=outline
+	autocmd BufRead,BufNewFile *.txt setlocal filetype=markdown
 augroup END
 " 2}}}
 " 1}}}
