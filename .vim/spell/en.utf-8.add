@@ -106,3 +106,8 @@ postgresql
 endianness
 endian
 OProfile
+hoodie
+SVIP
+svip
+uboot
+sflash
