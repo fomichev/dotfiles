@@ -288,7 +288,7 @@ let g:clang_complete_copen = 1
 let g:clang_snippets = 1
 let g:clang_snippets_engine = 'clang_complete'
 let g:clang_complete_auto = 0
-let g:clang_use_library = 1
+let g:clang_use_library = 0
 
 noremap <silent> <Leader>c :call g:ClangUpdateQuickFix()<CR>
 inoremap <silent> <S-Tab> <C-x><C-o>
@@ -546,6 +546,14 @@ augroup ft_sh
 	autocmd BufRead,BufNewFile *.txt setlocal filetype=markdown
 augroup END
 " }}}2
+" Outline {{{2
+augroup ft_outline
+	au!
+
+	autocmd BufRead,BufNewFile *.org setlocal filetype=outline
+	autocmd BufRead,BufNewFile *.outline setlocal filetype=outline
+augroup END
+" 2}}}
 " 1}}}
 " Ctags {{{1
 " Current directory (tags should include ./tags) {{{2
