@@ -310,14 +310,8 @@ let g:ctrlp_open_new_file = 'r'
 let g:ctrlp_dont_split = 'netrw\|help\|quickfix'
 " use ,, to invoke
 let g:ctrlp_map = '<Leader>,'
-" try to use VC listing commands if possible
-let g:ctrlp_user_command = {
-	\ 'types': {
-		\ 1: ['.git/', 'cd %s && git ls-files'],
-		\ 2: ['.hg/', 'hg --cwd %s locate -I .'],
-		\ },
-	\ 'fallback': 'find %s -type f'
-	\ }
+" store cache along with other temporary files
+let g:ctrlp_cache_dir = $HOME.'/.vim/tmp/ctrlp'
 
 nnoremap <leader>. :CtrlPMRUFiles<cr>
 
