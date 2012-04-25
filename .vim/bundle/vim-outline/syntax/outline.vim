@@ -6,13 +6,16 @@ setlocal foldmethod=syntax
 setlocal foldnestmax=99
 
 syn keyword OrgTodo TODO contained
-syn keyword OrgDone DONE contained
-syn cluster OrgTask contains=OrgTodo,OrgDone
+syn keyword OrgNow DONE contained
+syn keyword OrgDone NOW contained
+syn cluster OrgTask contains=OrgTodo,OrgDone,OrgNow
 
-syn match OrgTag /:\zs[^:]*\ze:/
+"syn match OrgTag /:\zs[^:]*\ze:/
+syn match OrgTag /#\w\+/
 
 syn match OrgScheduled /SCHEDULED:/
 syn match OrgDeadline /DEADLINE:/
+syn match OrgDeadline /^\s*\w+:/
 syn match OrgDate /<[^>]*>/
 
 syn cluster OrgInline contains=@OrgTask,OrgTag,OrgDate,OrgScheduled,OrgDeadline
@@ -88,6 +91,7 @@ hi! default link OrgOutline3Header Type
 hi! default link OrgOutline4Header Statement
 
 hi! default link OrgTodo Todo
+hi! default link OrgNow Todo
 hi! default link OrgDone Todo
 
 hi! default link OrgTag Label
