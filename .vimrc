@@ -547,6 +547,20 @@ augroup ft_txt
 	autocmd BufRead,BufNewFile *.txt setlocal filetype=markdown
 augroup END
 " 2}}}
+" LaTeX {{{2
+
+augroup ft_latex
+	au!
+
+	au FileType tex setlocal shiftwidth=2
+	au FileType tex setlocal softtabstop=2
+	au FileType tex setlocal tabstop=2
+	au FileType tex setlocal expandtab
+
+	autocmd BufRead,BufNewFile *.cls setlocal filetype=tex
+augroup END
+
+" 2}}}
 " 1}}}
 " Ctags {{{1
 " Current directory (tags should include ./tags) {{{2
