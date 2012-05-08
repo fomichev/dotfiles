@@ -136,7 +136,7 @@ set list
 set listchars=tab:→\ ,trail:·
 
 " enable spell check
-set spelllang=en_us
+set spelllang=en_us,ru
 set spell
 
 " make russian keys work in normal mode
