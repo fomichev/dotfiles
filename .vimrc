@@ -137,6 +137,7 @@ set listchars=tab:→\ ,trail:·
 
 " enable spell check
 set spelllang=en_us,ru
+set spellfile=$HOME/.vim/spell/all.add
 set spell
 
 " make russian keys work in normal mode
