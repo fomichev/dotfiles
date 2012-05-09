@@ -141,7 +141,9 @@ set spellfile=$HOME/.vim/spell/all.add
 set spell
 
 " make russian keys work in normal mode
-set langmap=ФИСВУАПРШОЛДЬТЩЗЙКЫЕГМЦЧНЯ;ABCDEFGHIJKLMNOPQRSTUVWXYZ,фисвуапршолдьтщзйкыегмцчня;abcdefghijklmnopqrstuvwxyz
+set keymap=russian-jcukenwin
+set imsearch=0
+set iminsert=0
 
 " highlight trailing white spaces
 	highlight TrailWhitespace ctermbg=red guibg=red
