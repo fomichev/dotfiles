@@ -669,6 +669,12 @@ function! BufChange()
 endfunction
 
 " 1}}}
+" Abbreviations {{{1
+ia sf Stanislav Fomichev
+ia br Best regards,
+ia wtbr With the best regards,
+ia kr Kind regards,
+" }}}1
 " Local configuration {{{1
 
 " execute local configuration

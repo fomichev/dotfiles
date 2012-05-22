@@ -70,14 +70,14 @@ syn region OrgOutline2 matchgroup=NONE
 			\ transparent
 			\ contains=OrgOutline2Header,OrgOutline3,@OrgInline,@OrgInBody
 
-syn region OrgOutline3 matchgroup=OrgOutline3Header
+syn region OrgOutline3 matchgroup=NONE
 			\ start='^\*\{3\}[^*].*$'
 			\ end='\(\n\ze\*\{1,3\}[^*]\)\|\(\%$\)'
 			\ fold keepend
 			\ transparent
 			\ contains=OrgOutline3Header,OrgOutline4,@OrgInline,@OrgInBody
 
-syn region OrgOutline4 matchgroup=OrgOutline4Header
+syn region OrgOutline4 matchgroup=NONE
 			\ start='^\*\{4\}[^*].*$'
 			\ end='\(\n\ze\*\{1,4\}[^*]\)\|\(\%$\)'
 			\ fold keepend
