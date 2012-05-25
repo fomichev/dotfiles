@@ -1,8 +1,11 @@
 #!/bin/sh
 
-VBoxClient-all &
+setxkbmap -layout "us, ru" -option "grp:alt_shift_toggle"
 
-echo "called with $1" > /home/fomichev/aaaaaa
+xscreensaver -nosplash &
+VBoxClient-all &
+dropboxd &
+xxkb &
 
 DEFAULT_SESSION=awesome
 case $1 in
