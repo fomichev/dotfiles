@@ -1,0 +1,7 @@
+MODKEY=Mod4
+WMII_TERM='urxvt'
+WMII_FONT='xft:Monofur-10'
+
+status(){
+	echo -n $(xkblayout-state print "%s") $(conky -i 1 ~/.conkyrc)
+}

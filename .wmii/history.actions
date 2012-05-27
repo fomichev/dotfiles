@@ -1,0 +1,9 @@
+status
+exec firefox
+exec urxvt
+showkeys
+QUIT
+sslshhk
+welcome
+qiot
+quit
