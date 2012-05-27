@@ -1,3 +1,6 @@
 .vim/tmp/
 .mutt/cache/
 .w3m/history
+.wmii/history.progs
+.wmii/history.tags
+.newsbeuter/cache.db
