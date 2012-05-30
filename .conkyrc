@@ -6,4 +6,4 @@ out_to_x no
 out_to_console yes
 
 TEXT
-${loadavg 1} ${mem} ${battery} ${time %H:%M %d %b}
+${battery_time} ${battery} ${loadavg 1} ${mem} ${time %H:%M %d %b}

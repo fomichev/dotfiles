@@ -2,5 +2,7 @@
 .mutt/cache/
 .w3m/history
 .wmii/history.progs
+.wmii/history.actions
 .wmii/history.tags
 .newsbeuter/cache.db
+.newsbeuter/cache.db.lock

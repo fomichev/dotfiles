@@ -17,3 +17,6 @@ auto-reload yes
 refresh-on-startup yes
 goto-next-feed no
 browser firefox
+
+# save state to the dropbox
+cache-file "~/Dropbox/.newsbeuter/cache.db"
