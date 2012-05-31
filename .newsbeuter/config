@@ -18,5 +18,7 @@ refresh-on-startup yes
 goto-next-feed no
 browser firefox
 
-# save state to the dropbox
-cache-file "~/Dropbox/.newsbeuter/cache.db"
+urls-source "googlereader"
+googlereader-login "s@fomichev.me"
+googlereader-passwordfile "~/.newsbeuter/pwd"
+googlereader-show-special-feeds no

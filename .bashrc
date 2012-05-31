@@ -99,3 +99,10 @@ if [ -e ~/local/.bashrc ]; then
 fi
 
 # }}}
+# Cowsay {{{
+
+if [[ $- == *i* ]]; then
+	[ -x /usr/bin/cowsay ] && { cowsay $(fortune); }
+fi
+
+# }}}

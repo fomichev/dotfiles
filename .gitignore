@@ -6,3 +6,4 @@
 .wmii/history.tags
 .newsbeuter/cache.db
 .newsbeuter/cache.db.lock
+.newsbeuter/pwd
