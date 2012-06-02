@@ -1,0 +1,20 @@
+#!/bin/sh
+
+echo "-> Installed: $(pacman -Q | wc -l)"
+echo "-> Explicit : $(pacman -Qe | wc -l)"
+echo "-> Foreign  : $(pacman -Qm | wc -l)"
+
+orphans=$(pacman -Qdt | wc -l)
+if [ $orphans != "0" ]; then
+	echo "-> Orphans  : $orphans"
+	echo $(pacman -Qdt)
+fi
+
+outdated=$(pacman -Qu | wc -l)
+if [ $outdated != "0" ]; then
+	echo "-> Outdated : $outdated"
+	echo $(pacman -Qu)
+fi
+
+#echo "-> Explicit by group:"
+#pacman -Qg #list all packages grouped
