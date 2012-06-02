@@ -39,6 +39,8 @@ PS1='$ '
 shopt -s cmdhist
 # don't overwrite history
 shopt -s histappend
+# don't try to complete empty line
+shopt -s no_empty_cmd_completion
 # don't save matching lines
 export HISTCONTROL=ignoreboth
 

@@ -70,4 +70,5 @@ fi
 # other {{{
 alias w='w -sh | sort'
 alias df='df -h'
+alias info='info --vi-keys'
 # }}}
