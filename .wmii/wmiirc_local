@@ -1,5 +1,5 @@
 MODKEY=Mod4
-WMII_TERM='urxvt'
+WMII_TERM='urxvt -e bash -c "tmux -q has-session && exec tmux attach-session -d || exec tmux new-session -s $USER"'
 WMII_FONT='xft:Monofur-10'
 
 status(){
