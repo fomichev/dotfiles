@@ -48,5 +48,5 @@ set print_split = yes
 source $alias_file
 source ~/.mutt/bindings
 source ~/.mutt/lists
-source ~/local/.mutt/pwd
+source ~/local/.mutt/pwd # set imap_pass = '<password>'
 source ~/.mutt/mutt-colors-solarized/mutt-colors-solarized-dark-16.muttrc
