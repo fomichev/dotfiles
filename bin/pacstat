@@ -16,5 +16,7 @@ if [ $outdated != "0" ]; then
 	echo $(pacman -Qu)
 fi
 
-#echo "-> Explicit by group:"
-#pacman -Qg #list all packages grouped
+if [ "x$1" = "x-a" ]; then
+	echo "-> Explicit by group:"
+	pacman -Qg
+fi
