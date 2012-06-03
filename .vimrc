@@ -146,7 +146,7 @@ set imsearch=0
 set iminsert=0
 
 " highlight trailing white spaces
-	highlight TrailWhitespace ctermbg=red guibg=red
+highlight TrailWhitespace ctermbg=red guibg=red
 match TrailWhitespace /\s\+$\| \+\ze\t/
 
 " 1}}}
@@ -670,10 +670,12 @@ endfunction
 
 " 1}}}
 " Abbreviations {{{1
+
 ia sf Stanislav Fomichev
 ia br Best regards,
 ia wtbr With the best regards,
 ia kr Kind regards,
+
 " }}}1
 " Local configuration {{{1
 
