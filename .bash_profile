@@ -1,5 +1,5 @@
 . ~/.bashrc
 
 if [ $TERM != "screen" ]; then
-	( (tmux has-session -t $USER && tmux attach-session -t $USER) || (tmux new-session -s $USER) ) && exit 0
+	( (tmux -q has-session && tmux attach-session -d) || (tmux new-session -s "$USER@$HOSTNAME") ) && exit 0
 fi
