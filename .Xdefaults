@@ -1,10 +1,9 @@
 # urxvt
-URxvt*saveLines: 65535
+*font: xft:Anonymous Pro-13
+*boldFont: xft:Anonymous Pro-13
+*letterSpace: -1
 
-URxvt*font: xft:monofur:pixelsize=16:antialias=true:hinting=true
-URxvt*boldFont: xft:monofur:pixelsize=16:antialias=true:hinting=true
-
-URxvt*scrollBar: false
+*scrollBar: false
 
 # urxvt solarized
 *background: #002b36

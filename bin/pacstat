@@ -1,5 +1,9 @@
 #!/bin/sh
 
+if [ "x$1" = "x-y" ]; then
+	sudo pacman -Sy
+fi
+
 echo "-> Installed: $(pacman -Q | wc -l)"
 echo "-> Explicit : $(pacman -Qe | wc -l)"
 echo "-> Foreign  : $(pacman -Qm | wc -l)"
