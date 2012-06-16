@@ -3,10 +3,16 @@ set input-meta on
 set output-meta on
 set convert-meta off
 
+set bell-style none
+
 set editing-mode vi
 set keymap vi
 
-set bell-style none
+"k": history-search-backward
+"j": history-search-forward
+
+"\C-k": previous-history
+"\C-j": next-history
 
 set keymap vi-insert
 "\C-l": clear-screen
