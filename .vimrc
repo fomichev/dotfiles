@@ -245,6 +245,19 @@ nnoremap <C-k> <C-w>k
 nnoremap <C-l> <C-w>l
 
 " 2}}}
+" Tabs {{{2
+
+map <Leader>1 1gt
+map <Leader>2 2gt
+map <Leader>3 3gt
+map <Leader>4 4gt
+map <Leader>5 5gt
+map <Leader>6 6gt
+map <Leader>7 7gt
+map <Leader>8 8gt
+map <Leader>9 9gt
+
+" 2}}}
 " Folding {{{2
 
 " use space to open/close folds
