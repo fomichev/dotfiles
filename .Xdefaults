@@ -1,7 +1,7 @@
 # urxvt
-*font: xft:Anonymous Pro-13
-*boldFont: xft:Anonymous Pro-13
-*letterSpace: -1
+URxvt*font: xft:Anonymous Pro-13
+URxvt*boldFont: xft:Anonymous Pro-13
+URxvt*letterSpace: -1
 
 *scrollBar: false
 
