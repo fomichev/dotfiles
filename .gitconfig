@@ -3,7 +3,7 @@
 	email = s@fomichev.me
 
 [alias]
-	st = status
+	st = status -sb
 	ci = commit
 	co = checkout
 	pom = push origin master
@@ -12,6 +12,7 @@
 	br = branch
 	glog = log --graph
 	sm = submodule
+	l = log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit
 
 [color]
 	diff = auto
