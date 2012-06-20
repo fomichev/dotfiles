@@ -3,7 +3,7 @@
 	email = s@fomichev.me
 
 [alias]
-	st = status
+	st = status -sb
 	ci = commit
 	co = checkout
 	pom = push origin master
