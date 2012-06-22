@@ -9,6 +9,7 @@ else
 endif
 
 " remove toolbar
+set guioptions-=T
 " remove menubar
 set guioptions-=m
 " use text tabs
