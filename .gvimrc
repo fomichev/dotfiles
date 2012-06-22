@@ -2,14 +2,13 @@ if has('win32')
 	set guifont=Lucida_Console:h10
 else
 	if has("gui_macvim")
-		set guifont=Anonymous:h13
+		set guifont=Anonymous\ Pro:h13
 	else
 		set guifont=Anonymous\ Pro\ 13
 	endif
 endif
 
 " remove toolbar
-set guioptions-=T
 " remove menubar
 set guioptions-=m
 " use text tabs
