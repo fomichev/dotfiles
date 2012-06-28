@@ -22,12 +22,6 @@
 [submodule ".bundle/dircolors-solarized"]
 	path = .bundle/dircolors-solarized
 	url = git://github.com/seebi/dircolors-solarized.git
-[submodule ".bundle/gnome-terminal-colors-solarized"]
-	path = .bundle/gnome-terminal-colors-solarized
-	url = git://github.com/sigurdga/gnome-terminal-colors-solarized.git
-[submodule ".vim/bundle/tagbar"]
-	path = .vim/bundle/tagbar
-	url = git://github.com/majutsushi/tagbar.git
 [submodule ".vim/bundle/ctrlp.vim"]
 	path = .vim/bundle/ctrlp.vim
 	url = git://github.com/kien/ctrlp.vim.git

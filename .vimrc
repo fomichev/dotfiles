@@ -294,11 +294,6 @@ noremap <silent> <Leader>sr :call TrimSpaces()<CR>
 noremap <Leader>g :Ack!<space>
 
 " 2}}}
-" Cocoa.vim {{{2
-
-nmap <silent> <Leader>x :w<bar>call g:RunInXcode()<CR>
-
-" }}}2
 " Clang complete {{{2
 
 let g:clang_complete_copen = 1
@@ -333,46 +328,6 @@ let g:ctrlp_cache_dir = $HOME.'/.vim/tmp/ctrlp'
 nnoremap <leader>. :CtrlPMRUFiles<cr>
 
 " 2}}}
-" Tagbar {{{2
-
-" add a definition for Objective-C to tagbar
-let g:tagbar_type_objc = {
-	\ 'ctagstype' : 'ObjectiveC',
-	\ 'kinds'     : [
-		\ 'i:interface',
-		\ 'I:implementation',
-		\ 'p:Protocol',
-		\ 'm:Object_method',
-		\ 'c:Class_method',
-		\ 'v:Global_variable',
-		\ 'F:Object field',
-		\ 'f:function',
-		\ 'p:property',
-		\ 't:type_alias',
-		\ 's:type_structure',
-		\ 'e:enumeration',
-		\ 'M:preprocessor_macro',
-	\ ],
-	\ 'sro'        : ' ',
-	\ 'kind2scope' : {
-		\ 'i' : 'interface',
-		\ 'I' : 'implementation',
-		\ 'p' : 'Protocol',
-		\ 's' : 'type_structure',
-		\ 'e' : 'enumeration'
-	\ },
-	\ 'scope2kind' : {
-		\ 'interface'      : 'i',
-		\ 'implementation' : 'I',
-		\ 'Protocol'       : 'p',
-		\ 'type_structure' : 's',
-		\ 'enumeration'    : 'e'
-	\ }
-\ }
-
-nnoremap <silent> <Leader>b :TagbarToggle<CR>
-
-" 2}}}
 " Alternative (header/source) {{{2
 
 nnoremap <silent> <Leader>a :A<CR>
@@ -380,11 +335,11 @@ nnoremap <silent> <Leader>a :A<CR>
 " 2}}}
 " Netrw {{{2
 
-let g:netrw_fastbrowse=2
-let g:netrw_banner=0
-let g:netrw_home=expand($HOME) . '/local/.vim'
-let g:netrw_special_syntax=1
-let g:netrw_browse_split=0
+let g:netrw_fastbrowse = 2
+let g:netrw_banner = 0
+let g:netrw_home = expand($HOME) . '/local/.vim'
+let g:netrw_special_syntax = 1
+let g:netrw_browse_split = 0
 
 " 2}}}
 " Matchit {{{2
@@ -680,14 +635,6 @@ function! BufChange()
 endfunction
 
 " 1}}}
-" Abbreviations {{{1
-
-ia sf Stanislav Fomichev
-ia br Best regards,
-ia wtbr With the best regards,
-ia kr Kind regards,
-
-" }}}1
 " Local configuration {{{1
 
 " execute local configuration
