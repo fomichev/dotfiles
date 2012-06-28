@@ -22,6 +22,14 @@ else
 	alias v='gvim --remote-silent'
 fi
 
+function e() {
+	if [ $# -eq 0 ]; then
+		vi .
+	else
+		vi $*
+	fi
+}
+
 # }}}
 # mutt {{{
 
@@ -47,28 +55,10 @@ alias ....='cd ../../..'
 alias -- -='cd -'
 
 # }}}
-# package management {{{
-
-if which yum &>/dev/null; then
-	alias install='sudo yum install'
-	alias search='sudo yum list -C | grep '
-	alias remove='sudo yum erase'
-	alias upgrade='sudo yum upgrade --skip-broken'
-elif which apt-get &>/dev/null; then
-	alias install='sudo apt-get install'
-	alias search='apt-cache search'
-	alias remove='sudo apt-get remove'
-	alias upgrade='sudo apt-get update && sudo apt-get dist-upgrade'
-elif which brew &>/dev/null; then
-	alias install='brew install'
-	alias search='brew search'
-	alias remove='brew remove'
-	alias upgrade='brew update && brew upgrade'
-fi
-
-# }}}
 # other {{{
+
 alias w='w -sh | sort'
 alias df='df -h'
 alias info='info --vi-keys'
+
 # }}}
