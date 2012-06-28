@@ -46,3 +46,6 @@
 [submodule ".config/awesome/vicious"]
 	path = .config/awesome/vicious
 	url = http://git.sysphere.org/vicious
+[submodule ".vim/bundle/DirDiff.vim"]
+	path = .vim/bundle/DirDiff.vim
+	url = git://github.com/vim-scripts/DirDiff.vim.git

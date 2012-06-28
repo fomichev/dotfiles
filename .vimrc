@@ -384,6 +384,11 @@ runtime macros/matchit.vim
 let g:fakeclip_terminal_multiplexer_type = "tmux"
 
 " }}}2
+" DirDiff {{{2
+
+let g:DirDiffExcludes = ".hg,.git,*.o,*.a"
+
+" 2}}}
 " 1}}}
 " Filetypes {{{1
 " C {{{2
@@ -543,13 +548,6 @@ augroup ft_markdown
 	autocmd BufRead,BufNewFile *.md setlocal filetype=markdown
 augroup END
 " }}}2
-" Text files {{{2
-augroup ft_txt
-	au!
-
-	autocmd BufRead,BufNewFile *.txt setlocal filetype=markdown
-augroup END
-" 2}}}
 " LaTeX {{{2
 
 augroup ft_latex
