@@ -17,10 +17,16 @@ else
 fi
 
 if which mvim &>/dev/null; then
-	alias v='mvim --remote-silent'
-else
-	alias v='gvim --remote-silent'
+	alias gvim=mvim
 fi
+
+function E() {
+	if [ $# -eq 0 ]; then
+		gvim .
+	else
+		gvim $*
+	fi
+}
 
 function e() {
 	if [ $# -eq 0 ]; then
