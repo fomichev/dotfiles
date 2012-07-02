@@ -43,6 +43,11 @@ shopt -s histappend
 shopt -s no_empty_cmd_completion
 # don't save matching lines
 export HISTCONTROL=ignoreboth
+# an argument to the cd builtin command that is not a directory is assumed
+# to be the name of a variable whose value is the directory to change to
+shopt -s cdable_vars
+
+dotfiles=~/dotfiles
 
 # enable completion
 if [ -f /etc/bash_completion ]; then
@@ -80,18 +85,6 @@ export GREP_OPTIONS='--color=auto'
 
 # add some color to man
 export LESS_TERMCAP_md=$(tput setaf 4)
-
-# }}}
-# Bookmarks {{{
-
-function bookmark() {
-	name=$1
-	path=$2
-
-	eval "alias cd-$name='cd $path && pwd'"
-}
-
-bookmark dotfiles ~/dotfiles
 
 # }}}
 # Include local settings {{{
