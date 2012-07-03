@@ -9,7 +9,7 @@ unset uname
 # }}}
 # Modify PATH {{{
 
-export PATH=/usr/local/bin:~/bin:~/local/bin:$PATH
+export PATH=/usr/local/bin:~/bin:$PATH
 
 if [ -d /opt/vim ]; then
 	export PATH=/opt/vim/bin:$PATH
@@ -24,6 +24,9 @@ if [ $os = 'darwin' ]; then
 		export PATH=`brew --prefix ruby`/bin:$PATH
 	fi
 fi
+
+# local bin gets precedence over evertything
+export PATH=~/local/bin:$PATH
 
 # }}}
 # Include aliases {{{

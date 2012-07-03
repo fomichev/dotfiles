@@ -11,9 +11,9 @@ alias j='jobs -l'
 # vim {{{
 
 if which cvim &>/dev/null; then
-	alias vi='cvim'
+	alias vim='cvim'
 else
-	alias vi='vim'
+	alias vim='vim'
 fi
 
 if which mvim &>/dev/null; then
@@ -30,9 +30,9 @@ function E() {
 
 function e() {
 	if [ $# -eq 0 ]; then
-		vi .
+		vim .
 	else
-		vi $*
+		vim $*
 	fi
 }
 
