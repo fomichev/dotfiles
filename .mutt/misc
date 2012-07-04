@@ -42,7 +42,7 @@ set move = no
 
 # printer setup
 set print = yes
-set print_command="muttprint --printer TO_FILE:$HOME/mutt.ps"
+set print_command="muttprint -p - | ps2pdf - $HOME/tmp/muttprint.pdf"
 set print_split = yes
 
 source $alias_file
