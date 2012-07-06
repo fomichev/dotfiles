@@ -38,7 +38,10 @@ set mark_old = no
 # save attachments into home dir
 macro attach s <save-entry><bol>~/
 
+# don't bother me with prompting for deletion and moving
 set move = no
+set delete = yes
+set confirmappend = no
 
 # printer setup
 set print = yes

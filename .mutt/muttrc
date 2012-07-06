@@ -5,11 +5,12 @@ set imap_user = "s@fomichev.me"
 
 set smtp_url = "smtp://s@fomichev.me@smtp.gmail.com:587/"
 set folder = "imaps://imap.gmail.com:993/"
-set spoolfile = "+INBOX"
-set postponed = "+[Gmail]/Черновики"
+set spoolfile = "=INBOX"
+set postponed = "=[Gmail]/Черновики"
 set record="=INBOX"
 
 mailboxes =INBOX =[Gmail]/Отправленные =mephi =saved
+save-hook . =[Gmail/Вся почта
 
 set alias_file = "~/.mutt/aliases"
 
