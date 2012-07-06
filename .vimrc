@@ -308,8 +308,8 @@ inoremap <silent> <S-Tab> <C-x><C-o>
 " 2}}}
 " Ctrl-p {{{2
 
-" don't search by full path
-let g:ctrlp_by_filename = 1
+" search by full path
+let g:ctrlp_by_filename = 0
 " don't manage working directory
 let g:ctrlp_working_path_mode = 0
 " don't search for dotfiles
@@ -324,6 +324,8 @@ let g:ctrlp_dont_split = 'netrw\|help\|quickfix'
 let g:ctrlp_map = '<Leader>,'
 " store cache along with other temporary files
 let g:ctrlp_cache_dir = $HOME.'/.vim/tmp/ctrlp'
+" only jump to the buffer if it's opened in the current tab
+let g:ctrlp_switch_buffer = 1
 
 nnoremap <leader>. :CtrlPMRUFiles<cr>
 
