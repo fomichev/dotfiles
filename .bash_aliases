@@ -54,9 +54,11 @@ alias decrypt='gpg --decrypt'
 # }}}
 # cd {{{
 
-alias ..='cd ..'
-alias ...='cd ../..'
-alias ....='cd ../../..'
+alias .='cd ..'
+alias ..='cd ../..'
+alias ...='cd ../../..'
+alias ....='cd ../../../..'
+alias .....='cd ../../../../..'
 alias -- -='cd -'
 
 # }}}
