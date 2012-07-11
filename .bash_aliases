@@ -44,8 +44,7 @@ alias rmutt='mutt -R'
 # }}}
 # make {{{
 
-alias nake='nice -10 make'
-alias jake='make -j8'
+alias m='make'
 
 # }}}
 # gpg {{{
