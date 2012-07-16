@@ -37,3 +37,8 @@ URxvt*color14: #93a1a1
 
 URxvt*color7: #eee8d5
 URxvt*color15: #fdf6e3
+
+# clickable links
+URxvt.perl-ext-common : default,matcher
+URxvt.urlLauncher     : chromium
+URxvt.matcher.button  : 1
