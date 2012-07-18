@@ -45,7 +45,7 @@ set lazyredraw
 set showcmd
 
 " key word definition
-set iskeyword=a-z,A-Z,48-57,_
+set iskeyword=@,48-57,_
 
 " show the cursor position all the time
 set ruler
