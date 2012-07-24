@@ -13,6 +13,7 @@
 	glog = log --graph
 	sm = submodule
 	l = log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit
+	out = push --dry-run
 
 [color]
 	diff = auto
