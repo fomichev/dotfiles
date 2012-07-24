@@ -20,7 +20,7 @@ if which mvim &>/dev/null; then
 	alias gvim=mvim
 fi
 
-function E() {
+E() {
 	if [ $# -eq 0 ]; then
 		gvim .
 	else
@@ -28,7 +28,7 @@ function E() {
 	fi
 }
 
-function e() {
+e() {
 	if [ $# -eq 0 ]; then
 		vim .
 	else
