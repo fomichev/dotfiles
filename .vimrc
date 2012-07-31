@@ -133,7 +133,7 @@ endif
 
 " show tabs and trailing spaces
 set list
-set listchars=tab:▸\ ,trail:·
+set listchars=tab:¦\ ,trail:·
 
 " enable spell check
 set spelllang=en_us,ru
@@ -191,11 +191,10 @@ colorscheme solarized
 " Color scheme enhancements {{{2
 
 " highlight trailing white spaces
-highlight TrailWhitespace ctermbg=red ctermfg=white guibg=red guifg=white
-match TrailWhitespace /\s\+$\| \+\ze\t/
+match ErrorMsg /\s\+$\| \+\ze\t/
 
 " don't highlight tabs/spaces background
-highlight! SpecialKey term=bold cterm=bold gui=bold guibg=NONE ctermbg=NONE
+highlight SpecialKey cterm=NONE gui=NONE ctermbg=NONE ctermfg=11 guibg=NONE guifg=#586e75
 
 " 2}}}
 " 1}}}
