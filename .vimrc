@@ -133,7 +133,7 @@ endif
 
 " show tabs and trailing spaces
 set list
-set listchars=tab:¬\ ,trail:·
+set listchars=tab:▸\ ,trail:·
 
 " enable spell check
 set spelllang=en_us,ru
@@ -144,10 +144,6 @@ set spell
 set keymap=russian-jcukenwin
 set imsearch=0
 set iminsert=0
-
-" highlight trailing white spaces
-highlight TrailWhitespace ctermbg=red guibg=red
-match TrailWhitespace /\s\+$\| \+\ze\t/
 
 " 1}}}
 " Vim 7.3 specific {{{1
@@ -179,19 +175,29 @@ if &term == "screen"
 endif
 
 " 2}}}
-" Solarized {{{2
+" Solarized settings {{{2
 
 let g:solarized_underline = 0
 let g:solarized_bold = 1
 let g:solarized_italic = 1
 
-" }}}2
+" 2}}}
 
 syntax enable
 set t_Co=16
 set background=dark
 colorscheme solarized
 
+" Color scheme enhancements {{{2
+
+" highlight trailing white spaces
+highlight TrailWhitespace ctermbg=red ctermfg=white guibg=red guifg=white
+match TrailWhitespace /\s\+$\| \+\ze\t/
+
+" don't highlight tabs/spaces background
+highlight! SpecialKey term=bold cterm=bold gui=bold guibg=NONE ctermbg=NONE
+
+" 2}}}
 " 1}}}
 " Folding {{{1
 
@@ -353,7 +359,7 @@ runtime macros/matchit.vim
 
 let g:fakeclip_terminal_multiplexer_type = "tmux"
 
-" }}}2
+" 2}}}
 " DirDiff {{{2
 
 let g:DirDiffExcludes = ".hg,.git,*.o,*.a"
@@ -403,7 +409,7 @@ augroup ft_cpp
 augroup END
 
 "
-" }}}2
+" 2}}}
 " Objective-C {{{2
 
 augroup ft_objc
@@ -517,7 +523,7 @@ augroup ft_markdown
 
 	autocmd BufRead,BufNewFile *.md setlocal filetype=markdown
 augroup END
-" }}}2
+" 2}}}
 " LaTeX {{{2
 
 augroup ft_latex
