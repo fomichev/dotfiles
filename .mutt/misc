@@ -48,6 +48,10 @@ set print = yes
 set print_command="muttprint -p - | ps2pdf - $HOME/tmp/muttprint.pdf"
 set print_split = yes
 
+# sort messages by last received in thread
+set sort=threads
+set sort_aux=last-date-received
+
 source $alias_file
 source ~/.mutt/bindings
 source ~/.mutt/lists
