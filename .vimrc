@@ -474,6 +474,20 @@ augroup ft_python
 augroup END
 
 " 2}}}
+" Ruby {{{2
+
+augroup ft_ruby
+	au!
+
+	au FileType ruby setlocal autoindent
+
+	au FileType ruby setlocal shiftwidth=2
+	au FileType ruby setlocal softtabstop=2
+	au FileType ruby setlocal tabstop=2
+	au FileType ruby setlocal expandtab
+augroup END
+
+" 2}}}
 " Java {{{2
 
 augroup ft_java
