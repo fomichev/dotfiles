@@ -22,9 +22,9 @@ fi
 
 E() {
 	if [ $# -eq 0 ]; then
-		gvim .
+		gvim --remote-silent .
 	else
-		gvim $*
+		gvim --remote-silent $*
 	fi
 }
 
@@ -35,6 +35,8 @@ e() {
 		vim $*
 	fi
 }
+
+alias scratch='vim ~/scratch.txt'
 
 # }}}
 # mutt {{{
