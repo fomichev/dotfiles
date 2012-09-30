@@ -235,7 +235,7 @@ vnoremap <F1> <ESC>
 
 " don't jump on * & #
 nnoremap * /\C\<<C-r><C-w>\><CR>N
-nnoremap # /\C\<<C-r><C-w>\><CR>N
+nnoremap # ?\C\<<C-r><C-w>\><CR>N
 
 " use sudo to save file
 cmap w!! w !sudo tee % > /dev/null
