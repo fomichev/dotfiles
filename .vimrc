@@ -122,7 +122,7 @@ let c_minlines=100
 
 " mappings
 let mapleader = ","
-let maplocalleader = "\\"
+noremap \ ,
 
 " place all auxiliary files under one directory
 if has('win32')
