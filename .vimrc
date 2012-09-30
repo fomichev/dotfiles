@@ -114,6 +114,9 @@ set foldlevelstart=0
 " support only root fold for syntax
 set foldnestmax=1
 
+" keep more Ex history items
+set history=200
+
 " cache more lines
 let c_minlines=100
 
