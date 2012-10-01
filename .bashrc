@@ -1,3 +1,5 @@
+[ -z $PS1 ] && return
+
 # Detect OS type {{{
 
 uname=`uname`
