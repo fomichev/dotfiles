@@ -147,7 +147,8 @@ set iminsert=0
 
 " use homegrown grep wrapper
 set grepprg=g\ --no-pager\ $*
-noremap <Leader>g :grep<space><space>\|cope<left><left><left><left><left><left>
+noremap <Leader>g :Grep<space>
+command! -nargs=+ Grep execute 'silent grep! <args>' | botright copen | redraw!
 
 " 1}}}
 " Vim 7.3 specific {{{1
@@ -224,6 +225,14 @@ set foldtext=MyFoldText()
 
 " 1}}}
 " Mappings {{{1
+" Quickfix {{{2
+
+augroup quickfix
+	au!
+	au BufWinEnter quickfix nnoremap <buffer> q :close<CR>
+augroup END
+
+" 2}}}
 " Common {{{2
 
 " disable search highlight
