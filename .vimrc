@@ -114,12 +114,15 @@ set foldlevelstart=0
 " support only root fold for syntax
 set foldnestmax=1
 
+" keep more Ex history items
+set history=200
+
 " cache more lines
 let c_minlines=100
 
 " mappings
 let mapleader = ","
-let maplocalleader = "\\"
+noremap \ ,
 
 " place all auxiliary files under one directory
 if has('win32')
@@ -234,8 +237,8 @@ nnoremap <F1> <ESC>
 vnoremap <F1> <ESC>
 
 " don't jump on * & #
-nnoremap * *<c-o>
-nnoremap # #<c-o>
+nnoremap * /\C\<<C-r><C-w>\><CR>N
+nnoremap # ?\C\<<C-r><C-w>\><CR>N
 
 " use sudo to save file
 cmap w!! w !sudo tee % > /dev/null
@@ -319,12 +322,10 @@ let g:ctrlp_by_filename = 0
 let g:ctrlp_working_path_mode = 0
 " don't search for dotfiles
 let g:ctrlp_dotfiles = 0
-" don't split when open
-let g:ctrlp_split_window = 0
 " open new file in current window
 let g:ctrlp_open_new_file = 'r'
 " let ctrl-p replace netrw buffer
-let g:ctrlp_dont_split = 'netrw\|help\|quickfix'
+let g:ctrlp_reuse_window = 'netrw\|help\|quickfix'
 " use ,, to invoke
 let g:ctrlp_map = '<Leader>,'
 " store cache along with other temporary files
@@ -458,6 +459,20 @@ augroup ft_xml
 augroup END
 
 " 2}}}
+" YAML {{{2
+
+augroup ft_yaml
+	au!
+
+	au FileType yaml setlocal autoindent
+
+	au FileType yaml setlocal shiftwidth=2
+	au FileType yaml setlocal softtabstop=2
+	au FileType yaml setlocal tabstop=2
+	au FileType yaml setlocal expandtab
+augroup END
+
+" 2}}}
 " Python {{{2
 
 augroup ft_python
@@ -485,6 +500,17 @@ augroup ft_ruby
 	au FileType ruby setlocal softtabstop=2
 	au FileType ruby setlocal tabstop=2
 	au FileType ruby setlocal expandtab
+augroup END
+
+augroup ft_rdoc
+	au!
+
+	au BufNewFile,BufRead *.rdoc set filetype=rdoc
+
+	au FileType rdoc setlocal shiftwidth=8
+	au FileType rdoc setlocal softtabstop=8
+	au FileType rdoc setlocal tabstop=8
+	au FileType rdoc setlocal noexpandtab
 augroup END
 
 " 2}}}
