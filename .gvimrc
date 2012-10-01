@@ -1,10 +1,10 @@
 if has('win32')
-	set guifont=Lucida_Console:h10
+	set guifont=Anonymous\ Pro:h13
 else
 	if has("gui_macvim")
-		set guifont=Inconsolata:h18
+		set guifont=Anonymous\ Pro:h16
 	else
-		set guifont=Inconsolata 13
+		set guifont=Anonymous\ Pro\ 13
 	endif
 endif
 
