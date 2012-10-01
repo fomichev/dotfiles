@@ -1,0 +1,35 @@
+#!/bin/sh
+
+[ $# -eq 0 ] && exit
+
+args=
+opts=$(cat <<END
+--exclude '*.swp' \
+--exclude '*~' \
+--exclude-dir .git \
+--exclude-dir .hg \
+--exclude-dir .svn \
+--binary-files=without-match \
+--devices=skip \
+-n \
+-R
+END)
+
+pager="| less -r"
+pager_opts="--color=always"
+
+while [ $# -gt 0 ]; do
+	if [ $(echo $1 | sed -e 's/^-//') = "$1" ]; then
+		break
+	else
+		if [ $1 = "--no-pager" ]; then
+			pager_opts="--color=never"
+			pager=
+		else
+			args="$args $1"
+		fi
+		shift
+	fi
+done
+
+sh -c "grep $opts $pager_opts $args '$*' . $pager 2>/dev/null"

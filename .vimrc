@@ -145,6 +145,10 @@ set keymap=russian-jcukenwin
 set imsearch=0
 set iminsert=0
 
+" use homegrown grep wrapper
+set grepprg=g\ --no-pager\ $*
+noremap <Leader>g :grep<space><space>\|cope<left><left><left><left><left><left>
+
 " 1}}}
 " Vim 7.3 specific {{{1
 
@@ -294,11 +298,6 @@ noremap <silent> <Leader>sr :call TrimSpaces()<CR>
 " 2}}}
 " 1}}}
 " Plugins {{{1
-" Ack {{{2
-
-noremap <Leader>g :Ack!<space>
-
-" 2}}}
 " Clang complete {{{2
 
 let g:clang_complete_copen = 1
