@@ -36,7 +36,7 @@ set number
 set laststatus=2
 
 " customize status line
-set statusline=%<%m\ %f\ [%{&fileformat}]\ %r%=%c:%l/%L\ %P
+set statusline=%<%m\ %f\ [%{&fileformat}]\ %r%=%b\ \ %c:%l/%L\ %P
 
 " speedup macros
 set lazyredraw
