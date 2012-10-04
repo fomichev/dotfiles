@@ -5,7 +5,6 @@
 [ $os = "linux" ] && { alias ls='ls --color=auto'; }
 alias la='ls -lah'
 alias l='ls -AF'
-alias j='jobs -l'
 
 # }}}
 # vim {{{
@@ -63,11 +62,21 @@ alias .....='cd ../../../..'
 alias ......='cd ../../../../..'
 alias -- -='cd -'
 
+c() { builtin cd $* &>/dev/null && colorify "echo $(pwd):" && l; }
+complete -o filenames -o nospace -F _cd c
+
+# }}}
+# find {{{
+
+f() { find . -name "$*" -print; }
+
 # }}}
 # other {{{
 
+alias j='jobs -l'
 alias w='w -sh | sort'
 alias df='df -h'
+alias du='du -h'
 alias info='info --vi-keys'
 
 # }}}
