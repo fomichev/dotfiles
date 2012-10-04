@@ -3,39 +3,84 @@
 [ $# -eq 0 ] && exit
 
 args=
-opts=$(cat <<END
---exclude '*.swp' \
---exclude '*~' \
---exclude '*.a' \
---exclude '*.o' \
---exclude tags \
---exclude-dir 'ipkg-*' \
---exclude-dir .deps \
---exclude-dir autom4te.cache \
---exclude-dir .git \
---exclude-dir .hg \
---exclude-dir .svn \
---binary-files=without-match \
---devices=skip \
--n \
--R
-END)
-
+variant=""
 pager="| less -r"
-pager_opts="--color=always"
+pattern=
 
 while [ $# -gt 0 ]; do
 	if [ $(echo $1 | sed -e 's/^-//') = "$1" ]; then
 		break
 	else
-		if [ $1 = "--no-pager" ]; then
-			pager_opts="--color=never"
-			pager=
-		else
-			args="$args $1"
-		fi
+		case $1 in
+			--no-pager)
+				pager=""
+				;;
+
+			--git)
+				variant="git"
+				;;
+			--gnu)
+				variant="gnu"
+				;;
+			*)
+				args="$args $1"
+				;;
+		esac
 		shift
 	fi
 done
+pattern=$*
 
-sh -c "grep $opts $pager_opts $args '$*' . $pager" 2>/dev/null
+git_grep() {
+	$(git rev-parse --show-toplevel &>/dev/null)
+	[ ! $? -eq 0 ] && return
+
+	opts=$(cat <<-END
+		-n \
+		-I \
+		-E
+		END)
+
+	if [ -z "$pager" ]; then
+		export GIT_PAGER=''
+	else
+		pager_opts="--color=always"
+	fi
+
+	exec git grep $opts $pager_opts $args "$pattern"
+}
+
+gnu_grep() {
+	opts=$(cat <<-END
+		--exclude '*.swp' \
+		--exclude '*~' \
+		--exclude '*.a' \
+		--exclude '*.o' \
+		--exclude tags \
+		--exclude-dir 'ipkg-*' \
+		--exclude-dir .deps \
+		--exclude-dir autom4te.cache \
+		--exclude-dir .git \
+		--exclude-dir .hg \
+		--exclude-dir .svn \
+		--binary-files=without-match \
+		--devices=skip \
+		-n \
+		-E \
+		-R
+		END)
+
+	if [ -z "$pager" ]; then
+		pager_opts="--color=never"
+	else
+		pager_opts="--color=always"
+	fi
+
+	exec sh -c "grep $opts $pager_opts $args '$pattern' . $pager" 2>/dev/null
+}
+
+case $variant in
+	git) git_grep ;;
+	gnu) gnu_grep ;;
+	*) git_grep; gnu_grep ;;
+esac
