@@ -40,11 +40,8 @@ shopt -s histappend
 shopt -s no_empty_cmd_completion
 # don't save matching lines
 export HISTCONTROL=ignoreboth
-# an argument to the cd builtin command that is not a directory is assumed
-# to be the name of a variable whose value is the directory to change to
-shopt -s cdable_vars
-
-dotfiles=~/dotfiles
+# the search path for the `cd' command
+export CDPATH='.'
 
 # enable completion
 if [ -f /etc/bash_completion ]; then
