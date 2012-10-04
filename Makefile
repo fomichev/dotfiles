@@ -1,17 +1,19 @@
 files := $(shell find $(CURDIR) \
 	-mindepth 1 -maxdepth 1 \
-	-not -name dotfiles-install \
-	-not -name dotfiles-submodules-update \
 	-not -name Makefile \
+	-not -name README \
 	-not -name .git \
 	)
 
+dbg := #echo
+
 define InstallFile
-	[ -e $2 ] && [ ! "$1" = "$(shell readlink $2)" ] && { echo mv $2 $2.bak; }; \
-	echo "ln -sf $1 $2";
+	[ -e $2 ] && [ ! "$1" = "$(shell readlink $2)" ] && { $(dbg) mv $2 $2.bak; }; \
+	$(dbg) rm "$2"; \
+	$(dbg) ln -s "$1" "$2";
 endef
 
-all: install
+all: install update
 
 install:
 	@$(foreach file,$(files),$(call InstallFile,$(file),$(HOME)/$(notdir $(file))))
