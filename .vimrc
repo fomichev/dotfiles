@@ -119,6 +119,7 @@ let c_minlines=100
 
 " mappings
 let mapleader = ","
+" use \ instead of , (because , is map leader now)
 noremap \ ,
 
 " place all auxiliary files under one directory
@@ -250,6 +251,10 @@ vnoremap <F1> <ESC>
 nnoremap * /\C\<<C-r><C-w>\><CR>N
 nnoremap # ?\C\<<C-r><C-w>\><CR>N
 
+" use convenient regular expressions
+nnoremap / /\v
+nnoremap ? /\v
+
 " use sudo to save file
 cmap w!! w !sudo tee % > /dev/null
 
@@ -284,25 +289,6 @@ vnoremap <Space> za
 
 " make zO work no matter where the cursor is
 nnoremap zO zCzO
-
-" 2}}}
-" Spaces {{{2
-
-function! ShowSpaces()
-	let @/='\v(\s+$)|( +\ze\t)'
-endfunction
-
-function! TrimSpaces()
-	let l:winview = winsaveview()
-	silent! %s/\s\+$//
-	call winrestview(l:winview)
-endfunction
-
-" show trailing spaces
-noremap <silent> <Leader>ss :call ShowSpaces()<CR>
-
-" remove trailing spaces
-noremap <silent> <Leader>sr :call TrimSpaces()<CR>
 
 " 2}}}
 " 1}}}
@@ -371,320 +357,11 @@ let g:DirDiffExcludes = ".hg,.git,*.o,*.a"
 
 " 2}}}
 " 1}}}
-" Filetypes {{{1
-" C {{{2
-
-let c_space_errors=1
-let c_curly_error=1
-let c_bracket_error=1
-let c_gnu=1
-" treat .h files as C files
-let g:c_syntax_for_h=1
-
-augroup ft_c
-	au!
-
-	au FileType c let g:clang_auto_user_options = 'path, .clang_complete'
-
-	au FileType c setlocal foldmethod=syntax
-	au FileType c setlocal cindent
-
-	au FileType c setlocal shiftwidth=8
-	au FileType c setlocal softtabstop=8
-	au FileType c setlocal tabstop=8
-	au FileType c setlocal noexpandtab
-	au FileType c setlocal cinoptions=>s,e0,n0,f0,{0,}0,^0,:0,=s,l0,b0,gs,hs,ps,t0,is,+s,c3,C0,(0
-augroup END
-
-" 2}}}
-" C++ {{{2
-
-augroup ft_cpp
-	au!
-
-	au FileType cpp let g:clang_auto_user_options = 'path, .clang_complete'
-
-	au FileType cpp setlocal foldmethod=syntax
-	au FileType cpp setlocal cindent
-
-	au FileType cpp setlocal shiftwidth=4
-	au FileType cpp setlocal softtabstop=4
-	au FileType cpp setlocal tabstop=4
-	au FileType cpp setlocal expandtab
-augroup END
-
-"
-" 2}}}
-" Objective-C {{{2
-
-augroup ft_objc
-	au!
-
-	au FileType objc let g:clang_auto_user_options = '.clang_complete'
-
-	au FileType objc setlocal foldmethod=syntax
-	au FileType objc setlocal smartindent
-
-	au FileType objc setlocal shiftwidth=2
-	au FileType objc setlocal softtabstop=2
-	au FileType objc setlocal tabstop=2
-	au FileType objc setlocal expandtab
-	au FileType objc setlocal cinoptions=>s,e0,n0,f0,{0,}0,^0,:0,=s,l0,b0,gs,hs,ps,t0,is,+s,c3,C0,(0
-
-	au FileType objc map <Leader>tp :call UpdateTags('--language-force=ObjectiveC')<CR>
-augroup END
-
-" 2}}}
-" Vim {{{2
-
-augroup ft_vim
-	au!
-
-	au FileType vim setlocal foldmethod=marker
-	au FileType vim setlocal autoindent
-
-	au FileType vim setlocal shiftwidth=4
-	au FileType vim setlocal softtabstop=4
-	au FileType vim setlocal tabstop=4
-	au FileType vim setlocal noexpandtab
-augroup END
-
-" 2}}}
-" XML {{{2
-
-augroup ft_xml
-	au!
-
-	au FileType xml setlocal autoindent
-
-	au FileType xml setlocal shiftwidth=4
-	au FileType xml setlocal softtabstop=4
-	au FileType xml setlocal tabstop=4
-	au FileType xml setlocal noexpandtab
-augroup END
-
-" 2}}}
-" YAML {{{2
-
-augroup ft_yaml
-	au!
-
-	au FileType yaml setlocal autoindent
-
-	au FileType yaml setlocal shiftwidth=2
-	au FileType yaml setlocal softtabstop=2
-	au FileType yaml setlocal tabstop=2
-	au FileType yaml setlocal expandtab
-augroup END
-
-" 2}}}
-" Python {{{2
-
-augroup ft_python
-	au!
-
-	au FileType python setlocal autoindent
-
-	au FileType python setlocal shiftwidth=4
-	au FileType python setlocal softtabstop=4
-	au FileType python setlocal tabstop=4
-	au FileType python setlocal expandtab
-
-	au FileType python setlocal completeopt+=preview
-augroup END
-
-" 2}}}
-" Ruby {{{2
-
-augroup ft_ruby
-	au!
-
-	au FileType ruby setlocal autoindent
-
-	au FileType ruby setlocal shiftwidth=2
-	au FileType ruby setlocal softtabstop=2
-	au FileType ruby setlocal tabstop=2
-	au FileType ruby setlocal expandtab
-augroup END
-
-augroup ft_rdoc
-	au!
-
-	au BufNewFile,BufRead *.rdoc set filetype=rdoc
-
-	au FileType rdoc setlocal shiftwidth=8
-	au FileType rdoc setlocal softtabstop=8
-	au FileType rdoc setlocal tabstop=8
-	au FileType rdoc setlocal noexpandtab
-augroup END
-
-" 2}}}
-" Java {{{2
-
-augroup ft_java
-	au!
-
-	au FileType java setlocal autoindent
-
-	au FileType java setlocal shiftwidth=4
-	au FileType java setlocal softtabstop=4
-	au FileType java setlocal tabstop=4
-	au FileType java setlocal expandtab
-augroup END
-
-" 2}}}
-" Text files {{{2
-
-" For all text files set 'textwidth' to 78 characters.
-autocmd FileType text setlocal textwidth=78
-
-" 2}}}
-" Mutt {{{2
-
-augroup ft_mutt
-	autocmd BufRead,BufNewFile *mutt-* setfiletype mail
-augroup END
-
-" 2}}}
-" Shell {{{2
-
-augroup ft_sh
-	au!
-
-	au FileType sh setlocal foldmethod=marker
-	au FileType sh setlocal autoindent
-
-	au FileType sh setlocal shiftwidth=8
-	au FileType sh setlocal softtabstop=8
-	au FileType sh setlocal tabstop=8
-	au FileType sh setlocal noexpandtab
-augroup END
-
-" 2}}}
-" Markdown {{{2
-augroup ft_markdown
-	au!
-
-	autocmd BufRead,BufNewFile *.md setlocal filetype=markdown
-augroup END
-" 2}}}
-" LaTeX {{{2
-
-augroup ft_latex
-	au!
-
-	au FileType tex setlocal shiftwidth=2
-	au FileType tex setlocal softtabstop=2
-	au FileType tex setlocal tabstop=2
-	au FileType tex setlocal expandtab
-
-	autocmd BufRead,BufNewFile *.cls setlocal filetype=tex
-augroup END
-
-" 2}}}
-" 1}}}
-" Ctags {{{1
-" Current directory (tags should include ./tags) {{{2
-
-function! UpdateTags(opts)
-	let l:path = fnamemodify(".",":ph")
-	let l:tags_path = l:path . 'tags'
-
-	call UpdateCustomTags(a:opts, tags_path, path)
-
-	set tags+=l:tags_path
-endfunction
-
-map <Leader>tp :call UpdateTags('')<CR>
-
-" 2}}}
-" Custom directory (don't include in tags) {{{2
-
-function! UpdateCustomTags(opts, tags_path, path)
-	let l:ctags_opts='--format=2 --excmd=pattern --fields=+iaS --extra=+q'
-	let l:ctags_exclude='--exclude=*.o --exclude=build_linux --exclude=tags'
-
-	exec system('ctags -R -f ' . a:tags_path . ' ' . l:ctags_opts . ' ' . l:ctags_exclude . ' ' . a:opts . ' ' . a:path)
-endfunction
-
-" 2}}}
-" System directory (and add to tags) {{{2
-
-function! UpdateSystemTags(path)
-	if a:path == ''
-		let l:path='/usr/include/'
-	else
-		let l:path = a:path . '/'
-	endif
-
-	call UpdateCustomTags('', '$HOME/.vim/tmp/system_tags', l:path)
-endfunction
-
-map <Leader>ts :call UpdateSystemTags('')<CR>
-
-set tags+=$HOME/.vim/tmp/system_tags
-
-" 2}}}
-" Linux directory (and add to tags) {{{2
-
-function! UpdateLinuxTags(path)
-	if a:path == ''
-		let l:path = fnamemodify(".",":ph")
-	else
-		let l:path = a:path . '/'
-	endif
-
-	let l:ctags_opts =
-				\ '-I __initdata,__exitdata,__acquires,__releases ' .
-				\ '-I __read_mostly,____cacheline_aligned ' .
-				\ '-I ____cacheline_aligned_in_smp ' .
-				\ '-I ____cacheline_internodealigned_in_smp ' .
-				\ '-I DEFINE_TRACE,EXPORT_TRACEPOINT_SYMBOL ' .
-				\ '-I EXPORT_TRACEPOINT_SYMBOL_GPL ' .
-				\ '-I EXPORT_SYMBOL,EXPORT_SYMBOL_GPL ' .
-				\ '--regex-asm=''/^ENTRY\(([^)]*)\).*/\1/'' ' .
-				\ '--regex-c=''/^SYSCALL_DEFINE[[:digit:]]?\(([^,)]*).*/sys_\1/'' ' .
-				\ '--regex-c++=''/^TRACE_EVENT\(([^,)]*).*/trace_\1/'' ' .
-				\ '--regex-c++=''/^DEFINE_EVENT\(([^,)]*).*/trace_\1/'' ' .
-				\ '--c-kinds=-m+px ' .
-				\ '--fields=+S'
-
-	let l:path_dirs =
-				\ l:path . 'arch/x86 ' .
-				\ l:path . 'block ' .
-				\ l:path . 'crypto ' .
-				\ l:path . 'fs ' .
-				\ l:path . 'include ' .
-				\ l:path . 'init ' .
-				\ l:path . 'ipc ' .
-				\ l:path . 'kernel ' .
-				\ l:path . 'lib ' .
-				\ l:path . 'mm ' .
-				\ l:path . 'net ' .
-				\ l:path . 'security ' .
-				\ l:path . 'virt'
-
-	call UpdateCustomTags(l:ctags_opts, '$HOME/.vim/tmp/linux_tags', l:path_dirs)
-endfunction
-
-map <Leader>tl :call UpdateLinuxTags('')<CR>
-
-set tags+=$HOME/.vim/tmp/linux_tags
-
-" 2}}}
-" 1}}}
-" Auxiliary functions {{{1
-
-" change word under cursor in each buffer
-function! BufChange()
-	let from=expand("<cword>")
-
-	let to=input("Change " . from . " in all buffers to: ")
-
-	if strlen(to) > 0
-		exe "bufdo! %s/\\<" . from . "\\>/" . to . "/g | update"
-	endif
-endfunction
+" Associations {{{1
+
+autocmd BufRead,BufNewFile *mutt-* setfiletype mail
+autocmd BufRead,BufNewFile *.md setlocal filetype=markdown
+autocmd BufRead,BufNewFile *.cls setlocal filetype=tex
 
 " 1}}}
 " Local configuration {{{1
