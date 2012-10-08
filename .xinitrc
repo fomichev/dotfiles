@@ -5,7 +5,11 @@ setxkbmap -layout "us, ru" -option "grp:ctrl_shift_toggle"
 xscreensaver -nosplash &
 VBoxClient-all &
 dropboxd &
-xmodmap ~/.Xmodmap &
+
+[ -e ~/local/.Xmodmap ] && \
+	xmodmap_file=~/local/.Xmodmap || \
+	xmodmap_file=~/.Xmodmap
+xmodmap $xmodmap_file &
 
 fnmode=/sys/module/hid_apple/parameters/fnmode
 [ -e $fnmode ] && {
