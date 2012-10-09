@@ -9,7 +9,7 @@ dbg := #echo
 
 define InstallFile
 	[ -e $2 ] && [ ! "$1" = "$(shell readlink $2)" ] && { $(dbg) mv $2 $2.bak; }; \
-	$(dbg) rm "$2"; \
+	$(dbg) rm -f "$2"; \
 	$(dbg) ln -s "$1" "$2";
 endef
 
