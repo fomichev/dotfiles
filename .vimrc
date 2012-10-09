@@ -114,6 +114,9 @@ set foldlevelstart=0
 " support only root fold for syntax
 set foldnestmax=1
 
+" don't use swap files
+set noswapfile
+
 " cache more lines
 let c_minlines=100
 
