@@ -1,7 +1,11 @@
 #!/bin/sh
 
-[ -z $COLOR ] && { COLOR=3; }
+if [ -t 1 ]; then
+	[ -z $COLOR ] && { COLOR=3; }
 
-tput setaf $COLOR
-$*
-tput sgr0
+	tput setaf $COLOR
+	$*
+	tput sgr0
+else
+	$*
+fi
