@@ -6,9 +6,12 @@ args=
 variant=""
 pager="| less -r"
 pattern=
+grc=
+
+[ -r ~/.grc ] && { grc="$(cat ~/.grc | tr '\n' ' ')"; }
 
 while [ $# -gt 0 ]; do
-	if [ $(echo $1 | sed -e 's/^-//') = "$1" ]; then
+	if [ "$(echo "$1" | sed -e 's/^-//')" = "$1" ]; then
 		break
 	else
 		case $1 in
@@ -52,23 +55,18 @@ git_grep() {
 
 gnu_grep() {
 	opts=$(cat <<-END
-		--exclude '*.swp' \
-		--exclude '*~' \
-		--exclude '*.a' \
-		--exclude '*.o' \
-		--exclude tags \
-		--exclude-dir 'ipkg-*' \
-		--exclude-dir .deps \
-		--exclude-dir autom4te.cache \
-		--exclude-dir .git \
-		--exclude-dir .hg \
-		--exclude-dir .svn \
-		--binary-files=without-match \
-		--devices=skip \
-		-n \
-		-E \
-		-R
-		END)
+! -path '*.swp' \
+! -path '*~' \
+! -path '*.a' \
+! -path '*.o' \
+! -path '*/tags' \
+! -path '*/ipkg-*' \
+! -path '*/.deps' \
+! -path '*/autom4te.cache' \
+! -path '*/.git*' \
+! -path '*/.hg*' \
+! -path '*/.svn*'
+END)
 
 	if [ -z "$pager" ]; then
 		pager_opts="--color=never"
@@ -76,7 +74,7 @@ gnu_grep() {
 		pager_opts="--color=always"
 	fi
 
-	exec sh -c "grep $opts $pager_opts $args '$pattern' . $pager" 2>/dev/null
+	exec sh -c "find . -type f $opts $grc -print0 | xargs --null grep -nE $pager_opts '$pattern' $pager 2>/dev/null"
 }
 
 case $variant in
