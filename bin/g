@@ -5,6 +5,7 @@ usage() {
 Usage: g [options] [--] [pattern...]
 
 Options:
+  -l            Print only names of files containing matches
   -i            Ignore case
   -v            Invert match: select only non-matched lines
   -w            Match the pattern only at word boundary
@@ -33,7 +34,7 @@ else
 	export GIT_PAGER=''
 fi
 
-ARGS=`getopt -o 'ivwgp:h' -n 'g' -- "$@"`
+ARGS=`getopt -o 'livwgp:h' -n 'g' -- "$@"`
 [ ! $? -eq 0 ] && { exit $?; }
 eval set -- $ARGS
 
@@ -44,6 +45,12 @@ while true; do
 	--)
 		shift
 		break
+		;;
+
+	-l)
+		grep_opts="$grep_opts -l"
+		git_grep_opts="$git_grep_opts -l"
+		shift
 		;;
 
 	-w)
