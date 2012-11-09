@@ -100,7 +100,7 @@ git_grep() {
 }
 
 system_grep() {
-	exec sh -c "find . -type f $find_opts -print0 | xargs --null grep $grep_opts -e \"$grep_pattern\" $pager 2>/dev/null"
+	exec sh -c "find . -type f $find_opts -print0 | xargs --null grep $grep_opts -e \"$grep_pattern\" 2>/dev/null $pager"
 }
 
 case $grep_variant in
