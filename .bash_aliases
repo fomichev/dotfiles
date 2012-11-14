@@ -71,6 +71,11 @@ complete -o filenames -o nospace -F _cd c
 f() { find . -name "$*" -print; }
 
 # }}}
+# surfraw {{{
+
+alias sr='surfraw -browser=w3m'
+
+# }}}
 # other {{{
 
 alias j='jobs -l'
