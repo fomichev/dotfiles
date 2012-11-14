@@ -47,7 +47,7 @@ alias rmutt='mutt -R'
 # }}}
 # make {{{
 
-alias m='make'
+alias m='make -s V=9'
 
 # }}}
 # gpg {{{
