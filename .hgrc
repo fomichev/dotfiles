@@ -1,0 +1,48 @@
+[ui]
+username = Stanislav Fomichev <s@fomichev.me>
+merge = internal:merge
+commitsubrepos = False
+
+[alias]
+show = log -pvr
+
+[extensions]
+record =
+hgk =
+graphlog =
+rebase =
+color =
+pager =
+purge =
+mq =
+transplant =
+
+[color]
+status.modified = magenta bold
+status.added = green bold
+status.removed = red bold
+status.deleted = cyan bold
+status.unknown = blue bold
+status.ignored = black bold
+
+qseries.applied = blue
+qseries.unapplied = blue bold
+qseries.missing = red bold
+qseries.guarded = green bold
+
+qguard.negative = red
+qguard.positive = red
+qguard.unguarded = red
+
+[pager]
+pager = LESS='FSRX' less
+
+[autopager]
+ignore = version, help, update, pull, push
+
+[diff]
+git = True
+nodates = True
+showfunc = True
+
+%include ~/local/.hgrc

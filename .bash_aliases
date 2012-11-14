@@ -9,14 +9,16 @@ alias l='ls -AF'
 # }}}
 # vim {{{
 
-if which cvim &>/dev/null; then
-	alias vim='cvim'
-else
-	alias vim='vim'
-fi
 
 if which mvim &>/dev/null; then
-	alias gvim=mvim
+	alias gvim='mvim'
+	alias vim='mvim -v'
+else
+	if which cvim &>/dev/null; then
+		alias vim='cvim'
+	else
+		alias vim='vim'
+	fi
 fi
 
 E() {
@@ -45,7 +47,7 @@ alias rmutt='mutt -R'
 # }}}
 # make {{{
 
-alias m='make'
+alias m='make -s V=9'
 
 # }}}
 # gpg {{{

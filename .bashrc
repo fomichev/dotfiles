@@ -15,8 +15,8 @@ unset uname
 [ -d ~/local/vim ] && { export PATH=~/local/vim/bin:$PATH; }
 
 if [ $os = 'darwin' ]; then
-	if [ -d `brew --prefix ruby`/bin ]; then
-		export PATH=`brew --prefix ruby`/bin:$PATH
+	if [ -d `brew --prefix`/bin ]; then
+		export PATH=`brew --prefix`/bin:$PATH
 	fi
 fi
 

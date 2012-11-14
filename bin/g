@@ -1,84 +1,109 @@
 #!/bin/sh
 
-[ $# -eq 0 ] && exit
+usage() {
+	cat <<END
+Usage: g [options] [--] [pattern...]
 
-args=
-variant=""
-pager="| less -r"
-pattern=
-grc=
+Options:
+  -l            Print only names of files containing matches
+  -i            Ignore case
+  -v            Invert match: select only non-matched lines
+  -w            Match the pattern only at word boundary
+  -g            Use regular grep even in git repository
+  -p <pattern>  Search files that match given pattern
+END
+}
 
-[ -r ~/.grc ] && { grc="$(cat ~/.grc | tr '\n' ' ')"; }
+git_grep_opts='-nI'
+git_grep_pathspec=''
+find_opts="! -path '*.swp' ! -path '*~' ! -path '*.a' ! -path '*.o' ! -path '*/tags' ! -path '*/ipkg-*' ! -path '*/.deps' ! -path '*/autom4te.cache' ! -path '*/.git*' ! -path '*/.hg*' ! -path '*/.svn*'"
+grep_opts='-nI'
+grep_variant=
 
-while [ $# -gt 0 ]; do
-	if [ "$(echo "$1" | sed -e 's/^-//')" = "$1" ]; then
-		break
-	else
-		case $1 in
-			--no-pager)
-				pager=""
-				;;
+if [ -t 1 ]; then
+	[ -z $PAGER ] && { PAGER='less -r'; }
 
-			--git)
-				variant="git"
-				;;
-			--gnu)
-				variant="gnu"
-				;;
-			*)
-				args="$args $1"
-				;;
-		esac
+	pager="| $PAGER"
+	export GIT_PAGER=$PAGER
+	git_grep_opts="$git_grep_opts --color=always"
+	grep_opts="$grep_opts --color=always"
+else
+	pager=
+	grep_opts="$grep_opts --color=never"
+	git_grep_opts="$git_grep_opts --color=never"
+	export GIT_PAGER=''
+fi
+
+ARGS=`getopt -o 'livwgp:h' -n 'g' -- "$@"`
+[ ! $? -eq 0 ] && { exit $?; }
+eval set -- $ARGS
+
+[ -r ~/.grc ] && { . ~/.grc; }
+
+while true; do
+	case "$1" in
+	--)
 		shift
-	fi
+		break
+		;;
+
+	-l)
+		grep_opts="$grep_opts -l"
+		git_grep_opts="$git_grep_opts -l"
+		shift
+		;;
+
+	-w)
+		grep_opts="$grep_opts -w"
+		git_grep_opts="$git_grep_opts -w"
+		shift
+		;;
+
+	-i)
+		grep_opts="$grep_opts -i"
+		git_grep_opts="$git_grep_opts -i"
+		shift
+		;;
+
+	-v)
+		grep_opts="$grep_opts -v"
+		git_grep_opts="$git_grep_opts -v"
+		shift
+		;;
+
+	-p)
+		find_opts="-path './$2'"
+		git_grep_pathspec="-- '$2'"
+		shift
+		shift
+		;;
+
+	-g)
+		grep_variant=system
+		shift
+		;;
+
+	*|-h)
+		usage
+		exit
+		;;
+	esac
 done
-pattern=$*
+
+grep_pattern=$@
 
 git_grep() {
-	$(git rev-parse --show-toplevel &>/dev/null)
+	`git rev-parse --show-toplevel &>/dev/null`
 	[ ! $? -eq 0 ] && return
 
-	opts=$(cat <<-END
-		-n \
-		-I \
-		-E
-		END)
-
-	if [ -z "$pager" ]; then
-		export GIT_PAGER=''
-	else
-		pager_opts="--color=always"
-	fi
-
-	exec git grep $opts $pager_opts $args "$pattern"
+	exec git grep $git_grep_opts -e "$grep_pattern" $git_grep_pathspec
 }
 
-gnu_grep() {
-	opts=$(cat <<-END
-! -path '*.swp' \
-! -path '*~' \
-! -path '*.a' \
-! -path '*.o' \
-! -path '*/tags' \
-! -path '*/ipkg-*' \
-! -path '*/.deps' \
-! -path '*/autom4te.cache' \
-! -path '*/.git*' \
-! -path '*/.hg*' \
-! -path '*/.svn*'
-END)
-
-	if [ -z "$pager" ]; then
-		pager_opts="--color=never"
-	else
-		pager_opts="--color=always"
-	fi
-
-	exec sh -c "find . -type f $opts $grc -print0 | xargs --null grep -nE $pager_opts '$pattern' $pager 2>/dev/null"
+system_grep() {
+	exec sh -c "find . -type f $find_opts -print0 | xargs --null grep $grep_opts -e \"$grep_pattern\" 2>/dev/null $pager"
 }
 
-case $variant in
-	git) git_grep ;;
-	gnu) gnu_grep ;;
-	*) git_grep; gnu_grep ;;
+case $grep_variant in
+	system) system_grep ;;
+	*) git_grep; system_grep ;;
 esac
