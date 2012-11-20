@@ -1,0 +1,72 @@
+#!/usr/bin/env ruby
+
+def usage
+  puts <<-END
+Usage: n NUMBER [OPERATION NUMBER...]
+END
+
+  exit 1
+end
+
+# convert number to string with given base
+def to_base(number, base)
+  prefix = ''
+  suffix = ''
+
+  prefix = '0x' if base == 16
+  prefix = '0' if base == 8
+
+  z = number.to_s(base).reverse.scan(/.{1,4}/)
+  z = z.map { |e| e.reverse }
+
+  prefix + z.reverse.join('_')
+end
+
+# convert string to number using its prefix/suffix as base indication
+def to_dec(number)
+  return number unless number =~ %r{\A[\d\w]+\z}
+
+  number = number.gsub(/_/, '')
+  ibase = 10
+
+  # try to deduce base from prefix
+  case number
+  when /^0x/
+    ibase = 16
+  when /^0\d/
+    ibase = 8
+  end
+
+  # suffix takes precedence
+  case number
+  when /h$/
+    ibase = 16
+  when /o$/
+    ibase = 8
+  when /d$/
+    ibase = 10
+  when /b$/
+    ibase = 2
+  end
+
+  number.to_i(ibase)
+end
+
+usage if ARGV.size == 0 || ARGV[0] == '-h'
+
+args = ARGV.join.scan(/[\d\w]+|[-+*\/%()^&|!]|<<|>>/)
+args = args.map { |e| to_dec(e) }
+
+case args.size
+when 0
+  usage
+when 1
+  n = to_dec(args[0])
+else
+  n = eval(args.join)
+end
+
+converted = [ to_base(n, 2), to_base(n, 8), to_base(n, 10), to_base(n, 16) ]
+len = converted.map { |e| e.length }.max
+
+converted.each { |e| puts e.rjust(len) }
