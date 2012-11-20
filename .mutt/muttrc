@@ -1,17 +1,12 @@
 set from = "s@fomichev.me"
 
-# imap setup
-set imap_user = "s@fomichev.me"
-
-set smtp_url = "smtp://s@fomichev.me@smtp.gmail.com:587/"
-set folder = "imaps://imap.gmail.com:993/"
-set spoolfile = "=INBOX"
-set postponed = "=[Gmail]/Черновики"
-set record="=INBOX"
-
-mailboxes =INBOX =[Gmail]/Отправленные =mephi =saved
-save-hook . =[Gmail/Вся почта
-
 set alias_file = "~/.mutt/aliases"
+source ~/.mutt/settings
 
-source ~/.mutt/misc
+set spoolfile = +fomichev.me/inbox
+set record = +fomichev.me/inbox
+set mbox = +fomichev.me/inbox
+set postponed = +fomichev.me/drafts
+
+mailboxes +fomichev.me/inbox +fomichev.me/archive +fomichev.me/drafts +fomichev.me/mephi +fomichev.me/later
+save-hook . +fomichev.me/archive

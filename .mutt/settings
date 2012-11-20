@@ -1,12 +1,17 @@
 set realname = "Stanislav Fomichev"
 set signature = ~/.mutt/signature
 
+set sendmail = msmtp
+set envelope_from
+set mbox_type = Maildir
+set folder = "~/mail"
+
 # threaded sort
 set sort = threads
 
 # check regulary
-set timeout = 300
-set mail_check = 300
+set timeout = 5
+set mail_check = 5
 
 # keep internal data in home dir
 set header_cache = ~/.mutt/cache/
@@ -38,6 +43,12 @@ set mark_old = no
 # save attachments into home dir
 macro attach s <save-entry><bol>~/
 
+# receive new mail
+macro index S "<shell-escape>mbsync all<enter>"
+
+# toggle threads collapsing
+bind index <space> collapse-thread
+
 # don't bother me with prompting for deletion and moving
 set move = no
 set delete = yes
@@ -55,5 +66,4 @@ set sort_aux=last-date-received
 source $alias_file
 source ~/.mutt/bindings
 source ~/.mutt/lists
-source ~/local/.mutt/pwd # set imap_pass = '<password>'
 source ~/.mutt/mutt-colors-solarized/mutt-colors-solarized-dark-16.muttrc

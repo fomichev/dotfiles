@@ -5,6 +5,7 @@ usage() {
 Usage: g [options] [--] [pattern...]
 
 Options:
+  -s            Skip ~/.grc and ./.grc loading
   -l            Print only names of files containing matches
   -i            Ignore case
   -v            Invert match: select only non-matched lines
@@ -16,7 +17,7 @@ END
 
 git_grep_opts='-nI'
 git_grep_pathspec=''
-find_opts="! -path '*.swp' ! -path '*~' ! -path '*.a' ! -path '*.o' ! -path '*/tags' ! -path '*/ipkg-*' ! -path '*/.deps' ! -path '*/autom4te.cache' ! -path '*/.git*' ! -path '*/.hg*' ! -path '*/.svn*'"
+find_opts="! -path '*.o.cmd' ! -path '*.swp' ! -path '*~' ! -path '*.a' ! -path '*.o' ! -path '*/tags' ! -path '*/ipkg-*' ! -path '*/.deps' ! -path '*/autom4te.cache*' ! -path '*/.git*' ! -path '*/.hg*' ! -path '*/.svn*'"
 grep_opts='-nI'
 grep_variant=
 
@@ -34,17 +35,22 @@ else
 	export GIT_PAGER=''
 fi
 
-ARGS=`getopt -o 'livwgp:h' -n 'g' -- "$@"`
+ARGS=`getopt -o 'slivwgp:h' -n 'g' -- "$@"`
 [ ! $? -eq 0 ] && { exit $?; }
 eval set -- $ARGS
 
-[ -r ~/.grc ] && { . ~/.grc; }
+load_rc=1
 
 while true; do
 	case "$1" in
 	--)
 		shift
 		break
+		;;
+
+	-s)
+		load_rc=0
+		shift
 		;;
 
 	-l)
@@ -89,6 +95,16 @@ while true; do
 		;;
 	esac
 done
+
+# Some kind of 'API' which can be safely used in .grc {{{
+find_exclude() { find_opts="$find_opts ! -path '$1'"; }
+force_grep_variant() { grep_variant=$1; }
+# }}}
+
+if [ $load_rc -eq 1 ]; then
+	[ -r ~/.grc ] && { . ~/.grc; }
+	[ -r ./.grc ] && { . ./.grc; }
+fi
 
 grep_pattern=$@
 

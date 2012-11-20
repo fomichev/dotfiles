@@ -1,0 +1,49 @@
+Sync PullNew Push
+Expunge Slave
+Create Slave
+Trash Trash
+
+IMAPAccount google
+Host smtp.gmail.com
+Port 587
+
+MaildirStore s_l
+Path ~/mail/s/
+Inbox ~/mail/s/
+
+ImapStore s_r
+Account google
+User s@fomichev.me
+Pass PASSWORD
+
+Channel s_inbox
+Master :s_r:Входящие
+Slave :s_l:inbox
+
+Channel s_archive
+Master :s_r:Вся\ почта
+Slave :s_l:archive
+
+Channel s_mephi
+Master :s_r:mephi
+Slave :s_l:mephi
+
+Channel s_saved
+Master :s_r:saved
+Slave :s_l:saved
+
+MaildirStore kernel_l
+Path ~/mail/kernel/
+Inbox ~/mail/kernel/
+
+ImapStore kernel_r
+Account google
+User kernel@fomichev.me
+Pass PASSWORD
+
+Channel kernel
+Master :kernel_r:
+Slave :kernel_l:
+
+Group all
+Channels s_inbox s_archive s_mephi s_saved kernel
