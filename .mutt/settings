@@ -4,7 +4,7 @@ set signature = ~/.mutt/signature
 set sendmail = msmtp
 set envelope_from
 set mbox_type = Maildir
-set folder = "~/mail"
+set folder = "~/.mail"
 
 # threaded sort
 set sort = threads
@@ -62,6 +62,12 @@ set print_split = yes
 # sort messages by last received in thread
 set sort=threads
 set sort_aux=last-date-received
+
+# pager: don't go to next message automatically
+set pager_stop
+
+# pager: pad blank lines with ~
+set tilde
 
 source $alias_file
 source ~/.mutt/bindings
