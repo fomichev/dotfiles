@@ -7,10 +7,18 @@ files := $(shell find $(CURDIR) \
 
 dbg := #echo
 
+define Ignored
+$(shell [ -r $(CURDIR)/ignore ] && grep -q $(shell echo "$1" | sed -e 's@$(CURDIR)/@@') $(CURDIR)/ignore && echo 1 || echo 0)
+endef
+
 define InstallFile
-	[ -e $2 ] && [ ! "$1" = "$(shell readlink $2)" ] && { $(dbg) mv $2 $2.bak; }; \
-	$(dbg) rm -f "$2"; \
-	$(dbg) ln -s "$1" "$2";
+	[ $(call Ignored,$1) -eq 0 ] && { \
+		[ -e $2 ] && \
+			[ ! "$1" = "$(shell readlink $2)" ] && \
+			{ $(dbg) mv $2 $2.bak; }; \
+		$(dbg) rm -f "$2"; \
+		$(dbg) ln -s "$1" "$2"; \
+	};
 endef
 
 all: install update
