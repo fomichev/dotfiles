@@ -15,11 +15,39 @@ Options:
 END
 }
 
+# Some kind of 'API' which can be safely used in .grc {{{
+find_exclude() { [ -z "$find_excl_opts" ] && { find_excl_opts="-path '*/$1'"; } || { find_excl_opts="$find_excl_opts -o -path '*/$1'"; }; }
+find_include() { [ -z "$find_incl_opts" ] && { find_incl_opts="-path '*/$1'"; } || { find_incl_opts="$find_incl_opts -o -path '*/$1'"; }; }
+force_grep_variant() { grep_variant=$1; }
+# }}}
+
 git_grep_opts='-nI'
 git_grep_pathspec=''
-find_opts="! -path '*.o.cmd' ! -path '*.swp' ! -path '*~' ! -path '*.a' ! -path '*.o' ! -path '*/tags' ! -path '*/ipkg-*' ! -path '*/.deps' ! -path '*/autom4te.cache*' ! -path '*/.git*' ! -path '*/.hg*' ! -path '*/.svn*'"
+find_excl_opts=''
+find_incl_opts=''
 grep_opts='-nI'
 grep_variant=
+
+find_exclude '*~'
+find_exclude '*.swp'
+find_exclude '*.a'
+find_exclude '*.o'
+find_exclude '*.o.d'
+find_exclude '*.o.cmd'
+
+find_exclude 'autom4te.cache/*'
+find_exclude 'config.log'
+find_exclude 'config.status'
+
+find_exclude 'tags'
+find_exclude 'ipkg-*'
+
+find_exclude '.deps/*'
+find_exclude '*.a.deps'
+
+find_exclude '.git/*'
+find_exclude '.hg/*'
+find_exclude '.svn/*'
 
 if [ -t 1 ]; then
 	[ -z $PAGER ] && { PAGER='less -r'; }
@@ -78,12 +106,11 @@ while true; do
 		;;
 
 	-p)
-		find_opts="-path './$2'"
+		find_include "$2"
 		git_grep_pathspec="-- '$2'"
 		shift
 		shift
 		;;
-
 	-g)
 		grep_variant=system
 		shift
@@ -95,11 +122,6 @@ while true; do
 		;;
 	esac
 done
-
-# Some kind of 'API' which can be safely used in .grc {{{
-find_exclude() { find_opts="$find_opts ! -path '$1'"; }
-force_grep_variant() { grep_variant=$1; }
-# }}}
 
 if [ $load_rc -eq 1 ]; then
 	[ -r ~/.grc ] && { . ~/.grc; }
@@ -116,7 +138,10 @@ git_grep() {
 }
 
 system_grep() {
-	exec sh -c "find . -type f $find_opts -print0 | xargs --null grep $grep_opts -e \"$grep_pattern\" 2>/dev/null $pager"
+	local find_opts=''
+	[ -z "$find_incl_opts" ] && { find_opts="\( $find_excl_opts \) -prune -o \( -type f -print0 \)"; } || { find_opts="-type f $find_incl_opts -print0"; }
+
+	exec sh -c "find . $find_opts | xargs --null grep $grep_opts -e \"$grep_pattern\" 2>/dev/null $pager"
 }
 
 case $grep_variant in
