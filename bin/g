@@ -53,7 +53,7 @@ if [ -t 1 ]; then
 	[ -z $PAGER ] && { PAGER='less -r'; }
 
 	pager="| $PAGER"
-	export GIT_PAGER=$PAGER
+	export GIT_PAGER="$PAGER"
 	git_grep_opts="$git_grep_opts --color=always"
 	grep_opts="$grep_opts --color=always"
 else
@@ -131,7 +131,7 @@ fi
 grep_pattern=$@
 
 git_grep() {
-	`git rev-parse --show-toplevel &>/dev/null`
+	`git rev-parse --show-toplevel -q` 2>/dev/null
 	[ ! $? -eq 0 ] && return
 
 	exec git grep $git_grep_opts -e "$grep_pattern" $git_grep_pathspec
