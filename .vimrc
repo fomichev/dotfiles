@@ -364,6 +364,7 @@ let g:DirDiffExcludes = ".hg,.git,*.o,*.a"
 
 autocmd BufRead,BufNewFile *mutt-* setfiletype mail
 autocmd BufRead,BufNewFile *.md setlocal filetype=markdown
+autocmd BufRead,BufNewFile */notes/* setlocal filetype=markdown
 autocmd BufRead,BufNewFile *.cls setlocal filetype=tex
 
 " 1}}}
