@@ -150,9 +150,9 @@ set imsearch=0
 set iminsert=0
 
 " use homegrown grep wrapper
-set grepprg=g\ --no-pager\ $*
+set grepprg=g\ $*
 noremap <Leader>g :Grep<space>
-command! -nargs=+ Grep execute 'silent grep! <args>' | botright copen | redraw!
+command! -nargs=+ Grep execute 'silent grep <args>' | botright copen | redraw!
 
 " 1}}}
 " Vim 7.3 specific {{{1

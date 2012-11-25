@@ -1,9 +1,28 @@
 #!/bin/sh
 
-if [ -t 1 ]; then
-	[ -z $COLOR ] && { COLOR=3; }
+if [ -z $COLOR ]; then
+	case "$1" in
+		# reg
+		-r) color=1; shift ;;
+		# green
+		-g) color=2; shift ;;
+		# yellow
+		-y) color=3; shift ;;
+		# blue
+		-b) color=4; shift ;;
+		# purple
+		-p) color=5; shift ;;
+		# cyan
+		-c) color=6; shift ;;
+		# yellow by default
+		*) color=3 ;;
+	esac
+else
+	color=$COLOR
+fi
 
-	tput setaf $COLOR
+if [ -t 1 ]; then
+	tput setaf $color
 	$*
 	tput sgr0
 else

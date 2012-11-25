@@ -8,3 +8,4 @@
 .newsbeuter/cache.db.lock
 .newsbeuter/pwd
 .local/share/recently-used.xbel
+ignore

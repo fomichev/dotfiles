@@ -4,7 +4,6 @@ setxkbmap -layout "us, ru" -option "grp:ctrl_shift_toggle"
 
 xscreensaver -nosplash &
 VBoxClient-all &
-dropboxd &
 
 [ -e ~/local/.Xmodmap ] && \
 	xmodmap_file=~/local/.Xmodmap || \
