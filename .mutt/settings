@@ -46,6 +46,9 @@ macro attach s <save-entry><bol>~/
 # receive new mail
 macro index S "<shell-escape>mbsync all<enter>"
 
+# mark all messages as read
+macro index A "T~U<enter><tag-prefix><clear-flag>N<untag-pattern>.<enter>" "mark all messages as read"
+
 # toggle threads collapsing
 bind index <space> collapse-thread
 
