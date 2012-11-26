@@ -37,3 +37,6 @@
 [submodule ".vim/bundle/DirDiff.vim"]
 	path = .vim/bundle/DirDiff.vim
 	url = git://github.com/vim-scripts/DirDiff.vim.git
+[submodule ".vim/bundle/vim-markdown-folding"]
+	path = .vim/bundle/vim-markdown-folding
+	url = git://github.com/nelstrom/vim-markdown-folding.git
