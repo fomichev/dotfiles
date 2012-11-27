@@ -1,10 +1,23 @@
 #!/usr/bin/env ruby
 
-def usage
-  puts <<-END
-Usage: n NUMBER [OPERATION NUMBER...]
+require 'optparse'
+
+$plain = false
+$opts = OptionParser.new do |opts|
+  opts.banner = <<-END
+Usage: n [options] number [operation number...]
+
+Options:
 END
 
+  opts.on("-p", "--plain", "Don't add underscores for readability") do |v|
+    $plain = true
+  end
+end
+$opts.parse!
+
+def usage
+  puts $opts.help
   exit 1
 end
 
@@ -16,10 +29,14 @@ def to_base(number, base)
   prefix = '0x' if base == 16
   prefix = '0' if base == 8
 
-  z = number.to_s(base).reverse.scan(/.{1,4}/)
-  z = z.map { |e| e.reverse }
+  if $plain
+    prefix + number.to_s(base)
+  else
+    z = number.to_s(base).reverse.scan(/.{1,4}/)
+    z = z.map { |e| e.reverse }
 
-  prefix + z.reverse.join('_')
+    prefix + z.reverse.join('_')
+  end
 end
 
 # convert string to number using its prefix/suffix as base indication
@@ -52,6 +69,27 @@ def to_dec(number)
   number.to_i(ibase)
 end
 
+# convert to given units
+def humanify(n, power, units)
+  unit = 0
+  mod = 0
+
+  mod_power = power / 10
+  mod_power += 1 if power % 10 != 0
+
+  while n >= power and unit < units.size - 1
+    mod = n % power
+    n = n / power
+    unit += 1
+  end
+
+  if mod != 0
+    "#{n}.#{mod / mod_power}#{units[unit]}"
+  else
+    "#{n}#{units[unit]}"
+  end
+end
+
 usage if ARGV.size == 0 || ARGV[0] == '-h'
 
 args = ARGV.join.scan(/[\d\w]+|[-+*\/%()^&|!]|<<|>>/)
@@ -66,7 +104,23 @@ else
   n = eval(args.join)
 end
 
-converted = [ to_base(n, 2), to_base(n, 8), to_base(n, 10), to_base(n, 16) ]
-len = converted.map { |e| e.length }.max
+converted = {
+  bin: to_base(n, 2),
+  oct: to_base(n, 8),
+  dec: to_base(n, 10),
+  hex: to_base(n, 16)
+}
 
-converted.each { |e| puts e.rjust(len) }
+bp =  humanify(n, 1024, [ '', 'KiB', 'MiB', 'GiB', 'TiB', 'PiB', 'EiB', 'ZiB', 'YiB' ])
+dp =  humanify(n, 1000, [ '', 'kB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB' ])
+
+len = converted.map { |k, v| v.length }.max
+
+converted.each do |k, v|
+  case k
+  when :dec
+    puts "#{converted[:dec].rjust(len)} #{bp} #{dp}"
+  else
+    puts converted[k].rjust(len)
+  end
+end
