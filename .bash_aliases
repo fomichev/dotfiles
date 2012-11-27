@@ -67,6 +67,8 @@ alias -- -='cd -'
 c() { builtin cd $* &>/dev/null && colorify "echo $(pwd):" && l; }
 complete -o filenames -o nospace -F _cd c
 
+alias p='pwd'
+
 # }}}
 # find {{{
 
