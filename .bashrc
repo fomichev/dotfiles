@@ -11,12 +11,16 @@ unset uname
 # }}}
 # Modify PATH {{{
 
+[ $os = 'darwin' ] && export PATH=/usr/bin:/bin:/usr/sbin:/sbin:/opt/X11/bin:/usr/texbin
+[ $os = 'linux' ] && export PATH=/bin:/usr/bin:/usr/local/bin
+
 [ -d /opt/vim ] && { export PATH=/opt/vim/bin:$PATH; }
 [ -d ~/local/vim ] && { export PATH=~/local/vim/bin:$PATH; }
 
 if [ $os = 'darwin' ]; then
-	if [ -d `brew --prefix`/bin ]; then
-		export PATH=`brew --prefix`/bin:$PATH
+	if [ -d `/usr/local/bin/brew --prefix`/bin ]; then
+		export PATH=`/usr/local/bin/brew --prefix`/bin:$PATH
+		export PATH=`/usr/local/bin/brew --prefix ruby`/bin:$PATH
 	fi
 fi
 
