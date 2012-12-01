@@ -25,7 +25,7 @@ E() {
 	if [ $# -eq 0 ]; then
 		gvim --remote-silent .
 	else
-		gvim --remote-silent $*
+		gvim --remote-silent "$@"
 	fi
 }
 
@@ -33,7 +33,7 @@ e() {
 	if [ $# -eq 0 ]; then
 		vim .
 	else
-		vim $*
+		vim "$@"
 	fi
 }
 
@@ -64,13 +64,8 @@ alias .....='cd ../../../..'
 alias ......='cd ../../../../..'
 alias -- -='cd -'
 
-d() { builtin cd $* &>/dev/null && colorify "echo $(pwd):" && l; }
+d() { builtin cd "$@" &>/dev/null && echo "$(p):" && l; }
 complete -o filenames -o nospace -F _cd d
-
-# }}}
-# find {{{
-
-f() { find . -name "$*" -print; }
 
 # }}}
 # surfraw {{{
