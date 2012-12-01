@@ -64,7 +64,7 @@ alias .....='cd ../../../..'
 alias ......='cd ../../../../..'
 alias -- -='cd -'
 
-d() { builtin cd "$@" &>/dev/null && echo "$(p):" && l; }
+d() { builtin cd "$@" &>/dev/null && colorify "echo $(pwd):" && l; }
 complete -o filenames -o nospace -F _cd d
 
 # }}}

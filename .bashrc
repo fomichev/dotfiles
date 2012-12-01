@@ -34,7 +34,7 @@ export PATH=~/bin:~/local/bin:$PATH
 # }}}
 # Bash settings {{{
 
-PS1='$ '
+PS1='\$ '
 
 # keep the same multi line history entries in one entry
 shopt -s cmdhist
