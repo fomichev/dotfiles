@@ -66,7 +66,12 @@ def to_dec(number)
     ibase = 2
   end
 
-  number.to_i(ibase)
+  begin
+    Integer(number, ibase)
+  rescue Exception
+    puts 'Invalid number'
+    exit 2
+  end
 end
 
 # convert to given units
@@ -101,7 +106,12 @@ when 0
 when 1
   n = to_dec(args[0])
 else
-  n = eval(args.join)
+  begin
+    n = eval(args.join)
+  rescue Exception
+    puts 'Invalid expression'
+    exit 1
+  end
 end
 
 converted = {
