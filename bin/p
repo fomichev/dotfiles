@@ -1,0 +1,33 @@
+#!/bin/sh
+
+dir="$(pwd)"
+
+green="$(tput setaf 2)"
+yellow="$(tput setaf 3)"
+purple="$(tput setaf 5)"
+reset="$(tput sgr0)"
+
+git rev-parse --git-dir &> /dev/null
+if [ $? -eq 0 ]; then
+	branch=$(git rev-parse --abbrev-ref HEAD)
+
+	if [ -z "$(git status --porcelain)" ]; then
+		modified=
+	else
+		modified="${green}?"
+	fi
+
+	# TODO: tags
+fi
+
+
+hg root &> /dev/null
+if [ $? -eq 0 ]; then
+	# TODO: branch status
+	echo >/dev/null
+fi
+
+dir_status="${yellow}${dir}${reset}"
+[ ! -z "$branch" ] && { branch_status=" on ${purple}${branch}${modified}${reset}"; }
+
+exec echo "${dir_status}${branch_status}${tags_status}"
