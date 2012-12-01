@@ -7,7 +7,7 @@
 	ci = commit
 	co = checkout
 	pom = push origin master
-	plom = pull origin master
+	plom = pull --rebase origin master
 	tip = log -1
 	br = branch
 	glog = log --graph
