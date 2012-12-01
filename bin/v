@@ -1,0 +1,14 @@
+#!/bin/sh
+
+git rev-parse --git-dir &> /dev/null
+if [ $? -eq 0 ]; then
+	exec git "$@"
+fi
+
+
+hg root &> /dev/null
+if [ $? -eq 0 ]; then
+	exec hg "$@"
+fi
+
+exec echo Not in the repository
