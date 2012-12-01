@@ -3,7 +3,7 @@
 # ls {{{
 
 [ $os = "linux" ] && { alias ls='ls --color=auto'; }
-alias la='ls -lah'
+alias a='ls -lah'
 alias l='ls -AF'
 
 # }}}

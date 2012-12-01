@@ -3,3 +3,15 @@ Beware the crocodiles
 Anonymous Pro http://www.ms-studio.com/FontSales/anonymouspro.html
 
 */5 *  *   *   *     /usr/bin/mbsync -c /home/sdf/.mbsyncrc all
+
+# Aliases and tools
+* d - change directory and print its contents
+* c - calculator
+* g - smart grep replacement
+* v - version control (hg or git depending on current directory)
+* p - print current directory and version control information
+* l - ls
+* a - ls -l
+* f - find by name
+* e - run editor
+* m - make
