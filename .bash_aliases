@@ -2,7 +2,7 @@
 
 # ls {{{
 
-[ $os = "linux" ] && { alias ls='ls --color=auto'; }
+on_linux && { alias ls='ls --color=auto'; }
 alias a='ls -lah'
 alias l='ls -AF'
 

@@ -2,29 +2,32 @@
 
 # Detect OS type {{{
 
-uname=`uname`
-os='unknown'
-[ $uname = 'Linux' ] && { os='linux'; }
-[ $uname = 'Darwin' ] && { os='darwin'; }
-unset uname
+uname=$(uname)
+on_darwin() { test $uname = 'Darwin'; }
+on_linux() { test $uname = 'Linux'; }
+brew_prefix() { echo $(/usr/local/bin/brew --prefix $1); }
 
 # }}}
 # Modify PATH {{{
 
-[ $os = 'darwin' ] && export PATH=/usr/bin:/bin:/usr/sbin:/sbin:/opt/X11/bin:/usr/texbin
-[ $os = 'linux' ] && export PATH=/bin:/usr/bin:/usr/local/bin
+path_append() { [ -e $1 ] && { export PATH=$PATH:$1; }; }
+path_prepend() { [ -e $1 ] && { export PATH=$1:$PATH; }; }
 
-[ -d /opt/vim ] && { export PATH=/opt/vim/bin:$PATH; }
-[ -d ~/local/vim ] && { export PATH=~/local/vim/bin:$PATH; }
+on_darwin && { export PATH=/usr/bin:/bin:/usr/sbin:/sbin:/opt/X11/bin:/usr/texbin; }
+on_linux && { export PATH=/bin:/usr/bin:/usr/local/bin; }
 
-if [ $os = 'darwin' ]; then
-	if [ -d `/usr/local/bin/brew --prefix`/bin ]; then
-		export PATH=`/usr/local/bin/brew --prefix`/bin:$PATH
-		export PATH=`/usr/local/bin/brew --prefix ruby`/bin:$PATH
+path_prepend /opt/vim/bin
+path_prepend ~/local/vim/bin
+
+on_darwin && {
+	if [ -d $(brew_prefix)/bin ]; then
+		path_prepend $(brew_prefix)/bin
+		path_prepend $(brew_prefix ruby)/bin
 	fi
-fi
+}
 
-export PATH=~/bin:~/local/bin:$PATH
+path_prepend ~/local/bin
+path_prepend ~/bin
 
 # }}}
 # Include aliases {{{
@@ -45,28 +48,28 @@ shopt -s no_empty_cmd_completion
 # don't save matching lines
 export HISTCONTROL=ignoreboth
 # the search path for the `cd' command
-export CDPATH='.'
+export CDPATH='.:~/src:~/Dropbox/src'
 
 # enable completion
-if [ -f /etc/bash_completion ]; then
+if [ -r /etc/bash_completion ]; then
 	. /etc/bash_completion
 fi
 
-if [ $os = 'darwin' ]; then
-	if [ -f `brew --prefix`/etc/bash_completion ]; then
-		. `brew --prefix`/etc/bash_completion
+on_darwin && {
+	if [ -r $(brew_prefix)/etc/bash_completion ]; then
+		. $(brew_prefix)/etc/bash_completion
 	fi
-fi
+}
 
 # }}}
 # OS dependent settings {{{
 
-[ $os = 'linux' ] && {
+on_linux && {
 	# enable ls colors
-	eval `dircolors ~/.dir_colors`
+	eval $(dircolors ~/.dir_colors)
 }
 
-[ $os = 'darwin' ] && {
+on_darwin && {
 	# enable ls colors
 	export CLICOLOR=
 }
@@ -87,9 +90,7 @@ export LESS_TERMCAP_md=$(tput setaf 4)
 # }}}
 # Include local settings {{{
 
-if [ -e ~/local/.bashrc ]; then
-	source ~/local/.bashrc
-fi
+[ -e ~/local/.bashrc ] && { . ~/local/.bashrc; }
 
 # }}}
 # Cowsay {{{
