@@ -10,21 +10,11 @@ reset="$(tput sgr0)"
 git rev-parse --git-dir &> /dev/null
 if [ $? -eq 0 ]; then
 	branch=$(git rev-parse --abbrev-ref HEAD)
-
-	if [ -z "$(git status --porcelain)" ]; then
-		modified=
-	else
-		modified="${green}?"
+else
+	hg root &> /dev/null
+	if [ $? -eq 0 ]; then
+		branch=$(hg branch)
 	fi
-
-	# TODO: tags
-fi
-
-
-hg root &> /dev/null
-if [ $? -eq 0 ]; then
-	# TODO: branch status
-	echo >/dev/null
 fi
 
 dir_status="${yellow}${dir}${reset}"
