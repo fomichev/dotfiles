@@ -73,6 +73,11 @@ complete -o filenames -o nospace -F _cd d
 alias sr='surfraw -browser=w3m'
 
 # }}}
+# quilt {{{
+
+alias q='quilt'
+
+#}}}
 # other {{{
 
 alias j='jobs -l'
