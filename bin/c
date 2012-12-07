@@ -54,6 +54,8 @@ def to_dec(number)
     ibase = 8
   end
 
+  number = number.sub(/^[0][x]/, '')
+
   # suffix takes precedence
   case number
   when /h$/
@@ -65,6 +67,8 @@ def to_dec(number)
   when /b$/
     ibase = 2
   end
+
+  number = number.sub(/[hodb]$/, '')
 
   begin
     Integer(number, ibase)
