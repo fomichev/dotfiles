@@ -131,7 +131,7 @@ fi
 grep_pattern=$@
 
 git_grep() {
-	`git rev-parse --show-toplevel -q` 2>/dev/null
+	$(git rev-parse --show-toplevel -q &>/dev/null)
 	[ ! $? -eq 0 ] && return
 
 	exec git grep $git_grep_opts -e "$grep_pattern" $git_grep_pathspec
