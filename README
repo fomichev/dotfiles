@@ -5,16 +5,16 @@ Anonymous Pro http://www.ms-studio.com/FontSales/anonymouspro.html
 */5 *  *   *   *     /usr/bin/mbsync -c /home/sdf/.mbsyncrc all
 
 # Aliases and tools
-* d - change directory and print its contents
-* c - calculator
-* g - smart grep replacement
-* v - version control (hg or git depending on current directory)
-* p - print current directory and version control information
-* l - ls
 * a - ls -l
-* f - find by name
+* c - calculator
+* d - change directory and print its contents
 * e - run editor
-* m - make
-* q - quilt
+* f - find by name
+* g - smart grep replacement
 * j - list jobs
+* l - ls
+* m - make
+* p - print current directory and version control information
+* q - quilt
+* v - version control (hg or git depending on current directory)
 * w - sorted w
