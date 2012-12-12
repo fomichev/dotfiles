@@ -3,5 +3,5 @@ WMII_TERM='urxvt -e bash -c "tmux -q has-session && exec tmux attach-session -d 
 WMII_FONT='xft:Monospace-8'
 
 status(){
-	echo -n "$(conky) | $(dropbox status) | $(xkblayout-state print '%s')"
+	echo -n "$(conky) | $(dropbox status | tr "\n" " ")| $(xkblayout-state print '%s')"
 }
