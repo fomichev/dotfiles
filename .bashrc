@@ -13,8 +13,17 @@ brew_prefix() { echo $(/usr/local/bin/brew --prefix $1); }
 path_append() { [ -e $1 ] && { export PATH=$PATH:$1; }; }
 path_prepend() { [ -e $1 ] && { export PATH=$1:$PATH; }; }
 
-on_darwin && { export PATH=/usr/bin:/bin:/usr/sbin:/sbin:/opt/X11/bin:/usr/texbin; }
-on_linux && { export PATH=/bin:/usr/bin:/usr/local/bin; }
+export PATH=
+path_prepend /bin
+path_prepend /usr/bin
+path_prepend /usr/local/bin
+path_prepend /sbin
+path_prepend /usr/sbin
+
+on_darwin && {
+	path_prepend /opt/X11/bin
+	path_prepend /usr/texbin
+}
 
 path_prepend /opt/vim/bin
 path_prepend ~/local/vim/bin
