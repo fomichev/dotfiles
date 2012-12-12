@@ -85,5 +85,6 @@ alias w='w -sh | sort'
 alias df='df -h'
 alias du='du -h'
 alias info='info --vi-keys'
+alias _='sudo'
 
 # }}}
