@@ -1,4 +1,3 @@
-
 [Added Associations]
 text/x-readme=gvim.desktop;
 text/x-log=gvim.desktop;
@@ -29,6 +28,7 @@ application/x-extension-shtml=firefox.desktop;
 application/xhtml+xml=firefox.desktop;
 application/x-extension-xhtml=firefox.desktop;
 application/x-extension-xht=firefox.desktop;
+image/png=eog.desktop;
 
 [Default Applications]
 audio/x-vorbis+ogg=rhythmbox.desktop
@@ -54,6 +54,7 @@ application/x-extension-xhtml=firefox.desktop
 application/x-extension-xht=firefox.desktop
 x-scheme-handler/about=google-chrome.desktop
 x-scheme-handler/unknown=google-chrome.desktop
+image/png=eog.desktop
 
 [Removed Associations]
 text/plain=gedit.desktop;
