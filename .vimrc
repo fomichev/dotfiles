@@ -359,6 +359,11 @@ let g:fakeclip_terminal_multiplexer_type = "tmux"
 let g:DirDiffExcludes = ".hg,.git,*.o,*.a"
 
 " 2}}}
+" Gitv {{{2
+
+let g:Gitv_DoNotMapCtrlKey = 1
+
+" 2}}}
 " 1}}}
 " Associations {{{1
 
