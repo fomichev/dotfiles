@@ -10,11 +10,13 @@ Anonymous Pro http://www.ms-studio.com/FontSales/anonymouspro.html
 * c - calculator
 * d - change directory and print its contents
 * e - run editor
+* ediff - run diff in vim
 * f - find by name
 * g - smart grep replacement
 * j - list jobs
 * l - ls
 * m - make
+* o - open file in associated application
 * p - print current directory and version control information
 * q - quilt
 * v - version control (hg or git depending on current directory)

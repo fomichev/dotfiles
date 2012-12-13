@@ -1,14 +1,19 @@
 #!/bin/sh
 
+# open {{{
+
+on_linux && { alias o='xdg-open'; }
+on_darwin && { alias o='open'; }
+
+# }}}
 # ls {{{
 
 on_linux && { alias ls='ls --color=auto'; }
 alias a='ls -lah'
-alias l='ls -AF'
+alias l='ls -AF --group-directories-first'
 
 # }}}
 # vim {{{
-
 
 if which mvim &>/dev/null; then
 	alias gvim='mvim'
@@ -36,6 +41,14 @@ e() {
 		vim "$@"
 	fi
 }
+
+__diff() {
+	[ -z "$2" -o -z "$3" ] && { return; }
+	[ -d "$2" -o -d "$3" ] && { $1 -c "DirDiff $2 $3"; } || { $1 $2 $3; }
+}
+
+ediff() { __diff vim "$1" "$2"; }
+Ediff() { __diff gvim "$1" "$2"; }
 
 alias scratch='vim ~/scratch.txt'
 
