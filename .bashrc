@@ -2,9 +2,10 @@
 
 # Detect OS type {{{
 
-uname=$(uname)
-on_darwin() { test $uname = 'Darwin'; }
-on_linux() { test $uname = 'Linux'; }
+uname=$(uname -o)
+on_darwin() { test "$uname" = 'Darwin'; }
+on_linux() { test "$uname" = 'GNU/Linux'; }
+on_cygwin() { test "$uname" = 'Cygwin' -o "$uname" = "Msys"; }
 brew_prefix() { echo $(/usr/local/bin/brew --prefix $1); }
 
 # }}}
@@ -25,8 +26,10 @@ on_darwin && {
 	path_prepend /usr/texbin
 }
 
-path_prepend /opt/vim/bin
-path_prepend ~/local/vim/bin
+on_cygwin || {
+	path_prepend /opt/vim/bin
+	path_prepend ~/local/vim/bin
+}
 
 on_darwin && {
 	if [ -d $(brew_prefix)/bin ]; then
@@ -93,8 +96,10 @@ export BROWSER=w3m
 # enable grep colors
 export GREP_OPTIONS='--color=auto'
 
-# add some color to man
-export LESS_TERMCAP_md=$(tput setaf 4)
+on_cygwin || {
+	# add some color to man
+	export LESS_TERMCAP_md=$(tput setaf 4)
+}
 
 # }}}
 # Include local settings {{{
