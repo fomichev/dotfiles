@@ -36,7 +36,7 @@ qguard.unguarded = red
 
 [pager]
 pager = LESS='FSRX' less
-attend = show glog log diff tags
+attend = show glog log diff tags help
 
 [autopager]
 ignore = version, help, update, pull, push
