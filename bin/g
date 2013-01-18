@@ -63,7 +63,7 @@ else
 	export GIT_PAGER=''
 fi
 
-ARGS=`getopt -o 'slivwgp:h' -n 'g' -- "$@"`
+ARGS=`getopt slivwgp:h "$@"`
 [ ! $? -eq 0 ] && { exit $?; }
 eval set -- $ARGS
 
@@ -128,7 +128,7 @@ if [ $load_rc -eq 1 ]; then
 	[ -r ./.grc ] && { . ./.grc; }
 fi
 
-grep_pattern=$@
+grep_pattern="$@"
 
 git_grep() {
 	$(git rev-parse --show-toplevel -q &>/dev/null)
@@ -141,7 +141,7 @@ system_grep() {
 	local find_opts=''
 	[ -z "$find_incl_opts" ] && { find_opts="\( $find_excl_opts \) -prune -o \( -type f -print0 \)"; } || { find_opts="-type f $find_incl_opts -print0"; }
 
-	exec sh -c "find . $find_opts | xargs --null grep $grep_opts -e \"$grep_pattern\" 2>/dev/null $pager"
+	exec sh -c "find . $find_opts | xargs -0 grep $grep_opts -e \"$grep_pattern\" 2>/dev/null $pager"
 }
 
 case $grep_variant in
