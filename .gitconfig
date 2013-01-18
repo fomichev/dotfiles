@@ -15,6 +15,7 @@
 	l = log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit
 	out = log --branches --not --remotes=origin
 	in = log --remotes=origin --not --branches
+	rollback = reset HEAD^
 
 [color]
 	diff = auto
