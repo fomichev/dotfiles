@@ -41,9 +41,6 @@ set statusline=%<%m\ %f\ [%{&fileformat}]\ %r%=%b\ \ %c:%l/%L\ %P
 " speedup macros
 set lazyredraw
 
-" show partial command on the last line
-set showcmd
-
 " key word definition
 set iskeyword=@,48-57,_
 
@@ -118,7 +115,10 @@ set foldnestmax=1
 set noswapfile
 
 " searching includes is too slow
-set complete -= i
+set complete-=i
+
+" try to show last line (at least partially)
+set display+=lastline
 
 " cache more lines
 let c_minlines=100
