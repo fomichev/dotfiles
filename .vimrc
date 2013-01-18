@@ -117,6 +117,9 @@ set foldnestmax=1
 " don't use swap files
 set noswapfile
 
+" searching includes is too slow
+set complete -= i
+
 " cache more lines
 let c_minlines=100
 
