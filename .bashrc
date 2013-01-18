@@ -5,7 +5,8 @@
 uname=$(uname)
 on_darwin() { test $uname = 'Darwin'; }
 on_linux() { test $uname = 'Linux'; }
-brew_prefix() { echo $(/usr/local/bin/brew --prefix $1); }
+brew_prefix() { echo $(/usr/local/bin/brew --prefix $1 2>/dev/null); }
+npm_prefix() { echo $(/usr/local/bin/npm prefix -g 2>/dev/null); }
 
 # }}}
 # Modify PATH {{{
@@ -29,10 +30,14 @@ path_prepend /opt/vim/bin
 path_prepend ~/local/vim/bin
 
 on_darwin && {
-	if [ -d $(brew_prefix)/bin ]; then
+	[ -d $(brew_prefix)/bin ] && {
 		path_prepend $(brew_prefix)/bin
 		path_prepend $(brew_prefix ruby)/bin
-	fi
+	}
+
+	[ -d $(npm_prefix)/bin ] && {
+		path_prepend $(npm_prefix)/bin
+	}
 }
 
 path_prepend ~/local/bin
