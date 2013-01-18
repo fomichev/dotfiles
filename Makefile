@@ -27,10 +27,12 @@ all: install update
 install:
 	@$(foreach file,$(files),$(call InstallFile,$(file),$(HOME)/$(notdir $(file))))
 
-update:
+init:
 	git submodule init && \
 	git submodule sync && \
-	git submodule update && \
+	git submodule update
+
+update:
 	git submodule foreach git fetch && \
 	git submodule foreach git reset --hard origin/master
 
