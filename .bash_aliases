@@ -10,7 +10,10 @@ on_darwin && { alias o='open'; }
 
 on_linux && { alias ls='ls --color=auto'; }
 alias a='ls -lah'
-alias l='ls -AF --group-directories-first'
+
+on_darwin && \
+	{ alias l='ls -AF'; } || \
+	{ alias l='ls -AF --group-directories-first'; }
 
 # }}}
 # vim {{{
