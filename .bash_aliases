@@ -94,6 +94,17 @@ alias sr='surfraw -browser=w3m'
 alias q='quilt'
 
 #}}}
+# n {{{
+
+_n() {
+    local cur IFS=$'\n'
+    cur="${COMP_WORDS[COMP_CWORD]}"
+
+    COMPREPLY=( $(compgen -W "$(n -l)" -- "${cur}") )
+}
+complete -o nospace -F _n n
+
+# }}}
 # other {{{
 
 alias j='jobs -l'

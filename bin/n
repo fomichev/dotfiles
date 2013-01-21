@@ -1,0 +1,56 @@
+#!/usr/bin/env ruby
+
+require 'optparse'
+
+edit = true
+
+OptionParser.new do |opts|
+  opts.banner = 'Usage: n [options] [name]'
+
+  # n --list
+  # n --grep something [--project health]
+  # n --add 'new note' [--project health]
+  # n --add 'new from clipboard' --clipboard
+
+  opts.on('-l', '--list', 'List all notes') do |v|
+    edit = false
+  end
+
+  opts.on('-g', '--grep', 'Grep through notes') do |v|
+    # TODO
+  end
+
+  opts.on('-a', '--add', 'Add new note') do |v|
+    # TODO
+  end
+
+  opts.on('-p', '--project', 'Add or search for note in the given project') do |v|
+    # TODO
+  end
+
+  opts.on('-c', '--clipboard', 'Get note contents from the clipboard') do |v|
+    # TODO
+  end
+end.parse!
+
+root = File.join(ENV['HOME'], 'Dropbox', 'notes')
+ext = 'txt'
+
+$files = Dir.glob(File.join(root, '**', '*.txt')).map do
+  |p| [ File.basename(p).sub(/\.#{ext}$/, '').downcase, p ]
+end
+
+def command_edit(name)
+  file, = $files.select { |e| e[0] == name }
+  system("$EDITOR '#{file[1]}'")
+end
+
+def command_list
+  $files.each { |e| puts e[0] }
+end
+
+if edit
+  command_edit(ARGV.join(' '))
+else
+  command_list
+end
