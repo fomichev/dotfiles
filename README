@@ -2,11 +2,13 @@ Beware the crocodiles
 
 Anonymous Pro http://www.ms-studio.com/FontSales/anonymouspro.html
 
+# Cron job to update mailbox
 */5 *  *   *   *     /usr/bin/mbsync -c /home/sdf/.mbsyncrc all
 
 # Aliases and tools
 * _ - sudo
 * a - ls -l
+* b - start browser
 * c - calculator
 * d - change directory and print its contents
 * e - run editor
@@ -21,3 +23,4 @@ Anonymous Pro http://www.ms-studio.com/FontSales/anonymouspro.html
 * q - quilt
 * v - version control (hg or git depending on current directory)
 * w - sorted w
+* x - extract archive
