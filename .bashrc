@@ -65,15 +65,11 @@ export HISTCONTROL=ignoreboth
 export CDPATH='.:~/src:~/Dropbox/src'
 
 # enable completion
-if [ -r /etc/bash_completion ]; then
-	. /etc/bash_completion
-fi
+[ -r /etc/bash_completion ] && { . /etc/bash_completion; }
 
-on_darwin && {
-	if [ -r $(brew_prefix)/etc/bash_completion ]; then
-		. $(brew_prefix)/etc/bash_completion
-	fi
-}
+on_darwin && \
+	[ -r $(brew_prefix)/etc/bash_completion ] && \
+	{ . $(brew_prefix)/etc/bash_completion; }
 
 # }}}
 # OS dependent settings {{{
