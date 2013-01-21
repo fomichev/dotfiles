@@ -22,7 +22,7 @@ define InstallFile
 	};
 endef
 
-all: install update
+all: install init update
 
 install:
 	@$(foreach file,$(files),$(call InstallFile,$(file),$(HOME)/$(notdir $(file))))
