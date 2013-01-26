@@ -14,34 +14,25 @@ npm_prefix() { echo $(/usr/local/bin/npm prefix -g 2>/dev/null); }
 path_append() { [ -e $1 ] && { export PATH=$PATH:$1; }; }
 path_prepend() { [ -e $1 ] && { export PATH=$1:$PATH; }; }
 
-export PATH=
-path_prepend /bin
-path_prepend /usr/bin
-path_prepend /usr/local/bin
-path_prepend /sbin
-path_prepend /usr/sbin
-
-on_darwin && {
-	path_prepend /opt/X11/bin
-	path_prepend /usr/texbin
-}
-
 path_prepend /opt/vim/bin
 path_prepend ~/local/vim/bin
 
 on_darwin && {
-	[ -d $(brew_prefix)/bin ] && {
-		path_prepend $(brew_prefix)/bin
-		path_prepend $(brew_prefix ruby)/bin
-	}
-
 	[ -d $(npm_prefix)/bin ] && {
 		path_prepend $(npm_prefix)/bin
 	}
 }
 
+path_prepend /usr/local/bin
+path_prepend /usr/local/share/python
 path_prepend ~/local/bin
 path_prepend ~/bin
+path_prepend ~/.rvm/bin
+
+# }}}
+# Include RVM {{{
+
+[ -s ~/.rvm/scripts/rvm ] && . ~/.rvm/scripts/rvm
 
 # }}}
 # Include aliases {{{
