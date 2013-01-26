@@ -32,7 +32,7 @@ init:
 	git submodule sync && \
 	git submodule update
 
-update:
+submodules:
 	git submodule foreach git fetch && \
 	git submodule foreach git reset --hard origin/master
 
