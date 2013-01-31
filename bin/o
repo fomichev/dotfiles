@@ -1,0 +1,9 @@
+#!/bin/sh
+
+[ $(uname) = 'Darwin' ] && { open $@ && exit; }
+
+file="$(pwd)/$@"
+
+[ -e "$file" ] && { xdg-open "file://$file" && exit; }
+
+xdg-open "$@"

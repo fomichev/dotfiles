@@ -1,11 +1,5 @@
 #!/bin/sh
 
-# open {{{
-
-on_linux && { alias o='xdg-open'; }
-on_darwin && { alias o='open'; }
-
-# }}}
 # ls {{{
 
 on_linux && { alias ls='ls --color=auto'; }
