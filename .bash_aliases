@@ -41,7 +41,7 @@ e() {
 
 __diff() {
 	[ -z "$2" -o -z "$3" ] && { return; }
-	[ -d "$2" -o -d "$3" ] && { $1 -c "DirDiff $2 $3"; } || { $1 $2 $3; }
+	[ -d "$2" -o -d "$3" ] && { $1 -c "DirDiff $2 $3"; } || { ${1}diff $2 $3; }
 }
 
 ediff() { __diff vim "$1" "$2"; }
@@ -67,12 +67,12 @@ alias decrypt='gpg --decrypt'
 # }}}
 # cd {{{
 
-alias ..='cd ..'
-alias ...='cd ../..'
-alias ....='cd ../../..'
-alias .....='cd ../../../..'
-alias ......='cd ../../../../..'
-alias -- -='cd -'
+alias ..='cd .. && p'
+alias ...='cd ../.. && p'
+alias ....='cd ../../.. && p'
+alias .....='cd ../../../.. && p'
+alias ......='cd ../../../../.. && p'
+alias -- -='cd - && p'
 
 d() { builtin cd "$@" &>/dev/null && colorify "echo $(pwd):" && l; }
 complete -o filenames -o nospace -F _cd d
