@@ -21,6 +21,7 @@
 	diff = auto
 	status = auto
 	branch = auto
+	interactive = auto
 
 [sendemail]
 	aliasesfile = /home/sdf/.mutt/aliases
