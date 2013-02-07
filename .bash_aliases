@@ -40,8 +40,11 @@ e() {
 }
 
 __diff() {
+	a=$(echo "$2" | sed -e 's/ /\\ /g')
+	b=$(echo "$3" | sed -e 's/ /\\ /g')
+
 	[ -z "$2" -o -z "$3" ] && { return; }
-	[ -d "$2" -o -d "$3" ] && { $1 -c "DirDiff $2 $3"; } || { ${1}diff $2 $3; }
+	[ -d "$2" -o -d "$3" ] && { $1 -c "DirDiff $a $b"; } || { ${1}diff "$2" "$3"; }
 }
 
 ediff() { __diff vim "$1" "$2"; }
