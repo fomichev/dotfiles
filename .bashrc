@@ -89,6 +89,9 @@ export GREP_OPTIONS='--color=auto'
 # add some color to man
 export LESS_TERMCAP_md=$(tput setaf 4)
 
+# disable start/stop (Ctrl-S/Ctrl-Q) functionality
+stty -ixon
+
 # }}}
 # Include local settings {{{
 
