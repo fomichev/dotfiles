@@ -16,6 +16,7 @@ path_prepend() { [ -e $1 ] && { export PATH=$1:$PATH; }; }
 
 path_prepend /opt/vim/bin
 path_prepend ~/local/vim/bin
+path_prepend ~/local/llvm/bin
 
 on_darwin && {
 	[ -d $(npm_prefix)/bin ] && {
