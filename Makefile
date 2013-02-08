@@ -37,7 +37,7 @@ submodules:
 	git submodule foreach git reset --hard origin/master
 
 alias:
-	cat ~/.bash_history | awk '{print $$1}' | awk 'BEGIN {FS="|"}{print $$1}' | sort | uniq -c | sort -n | tail | sort -nr
+	cat ~/.bash_history | cut -d' ' -f1 | cut -d'|' -f1 | sort | uniq -c | sort -n | sort -nr
 
 ~/src/vim:
 	mkdir -p ~/src && \
