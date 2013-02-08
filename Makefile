@@ -38,3 +38,46 @@ submodules:
 
 alias:
 	cat ~/.bash_history | awk '{print $$1}' | awk 'BEGIN {FS="|"}{print $$1}' | sort | uniq -c | sort -n | tail | sort -nr
+
+~/src/vim:
+	mkdir -p ~/src && \
+	cd ~/src && \
+	hg clone https://code.google.com/p/vim/
+
+VIM_DIR:=$(HOME)/local/vim
+vim: ~/src/vim
+	cd ~/src/vim && \
+	find -name configure -exec chmod +x {} \; && \
+	find -name which.sh -exec chmod +x {} \; && \
+	./configure --with-features=huge \
+		    --disable-nls \
+		    --disable-acl \
+		    --disable-gpm \
+		    --disable-sysmouse \
+		    --enable-rubyinterp \
+		    --enable-pythoninterp \
+		    --enable-perlinterp \
+		    --with-x \
+		    --with-gnome \
+		    --enable-multibyte \
+		    --enable-cscope \
+		    --prefix=$(VIM_DIR) && \
+	make && make install && \
+	cp -a runtime/keymap $(VIM_DIR)/share/vim/vim73/
+
+~/src/llvm:
+	mkdir -p ~/src && \
+	cd ~/src && \
+	curl -O http://llvm.org/releases/3.2/llvm-3.2.src.tar.gz && \
+	curl -O http://llvm.org/releases/3.2/clang-3.2.src.tar.gz && \
+	tar xf llvm-3.2.src.tar.gz && \
+	tar xf clang-3.2.src.tar.gz && \
+	mv llvm-3.2.src llvm && \
+	mv clang-3.2.src llvm/tools/clang
+
+LLVM_DIR:=$(HOME)/local/llvm
+llvm:
+	cd ~/src/llvm && \
+	./configure --with-clang \
+		    --prefix=$(LLVM_DIR) && \
+	make && make install
