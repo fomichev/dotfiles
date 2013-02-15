@@ -39,14 +39,15 @@ submodules:
 alias:
 	cat ~/.bash_history | cut -d' ' -f1 | cut -d'|' -f1 | sort | uniq -c | sort -n | sort -nr
 
-~/src/vim:
-	mkdir -p ~/src && \
+VIM_SRC:=$(HOME)/src/vim
+VIM_DIR:=$(HOME)/local/vim
+
+$(VIM_SRC):
 	cd ~/src && \
 	hg clone https://code.google.com/p/vim/
 
-VIM_DIR:=$(HOME)/local/vim
-vim: ~/src/vim
-	cd ~/src/vim && \
+vim: $(VIM_SRC)
+	cd $(VIM_SRC) && \
 	find -name configure -exec chmod +x {} \; && \
 	find -name which.sh -exec chmod +x {} \; && \
 	./configure --with-features=huge \
@@ -65,8 +66,10 @@ vim: ~/src/vim
 	make && make install && \
 	cp -a runtime/keymap $(VIM_DIR)/share/vim/vim73/
 
-~/src/llvm:
-	mkdir -p ~/src && \
+LLVM_SRC:=$(HOME)/src/llvm
+LLVM_DIR:=$(HOME)/local/llvm
+
+$(LLVM_SRC):
 	cd ~/src && \
 	curl -O http://llvm.org/releases/3.2/llvm-3.2.src.tar.gz && \
 	curl -O http://llvm.org/releases/3.2/clang-3.2.src.tar.gz && \
@@ -75,9 +78,21 @@ vim: ~/src/vim
 	mv llvm-3.2.src llvm && \
 	mv clang-3.2.src llvm/tools/clang
 
-LLVM_DIR:=$(HOME)/local/llvm
-llvm:
-	cd ~/src/llvm && \
+llvm: $(LLVM_SRC)
+	cd $(LLVM_SRC) && \
 	./configure --with-clang \
 		    --prefix=$(LLVM_DIR) && \
+	make && make install
+
+RUBY_SRC:=$(HOME)/src/ruby
+RUBY_DIR:=$(HOME)/local/ruby
+
+$(RUBY_SRC):
+	cd ~/src && \
+	curl -O http://ftp.ruby-lang.org/pub/ruby/ruby-1.9-stable.tar.gz && \
+	tar xf ruby-1.9-stable.tar.gz && \
+	mv ruby-1.9.?-p??? ruby
+
+ruby: $(RUBY_SRC)
+	cd $(RUBY_SRC) && \
 	make && make install
