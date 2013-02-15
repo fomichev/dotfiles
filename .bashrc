@@ -14,21 +14,21 @@ npm_prefix() { echo $(/usr/local/bin/npm prefix -g 2>/dev/null); }
 path_append() { [ -e $1 ] && { export PATH=$PATH:$1; }; }
 path_prepend() { [ -e $1 ] && { export PATH=$1:$PATH; }; }
 
-path_prepend /opt/vim/bin
-path_prepend ~/local/vim/bin
-path_prepend ~/local/llvm/bin
-
 on_darwin && {
 	[ -d $(npm_prefix)/bin ] && {
 		path_prepend $(npm_prefix)/bin
 	}
 }
 
-path_prepend /usr/local/bin
-path_prepend /usr/local/share/python
+path_prepend ~/local/vim/bin
+path_prepend ~/local/llvm/bin
+path_prepend ~/local/ruby/bin
 path_prepend ~/local/bin
 path_prepend ~/bin
 path_prepend ~/.rvm/bin
+
+path_prepend /usr/local/bin
+path_prepend /usr/local/share/python
 
 # }}}
 # Include RVM {{{
