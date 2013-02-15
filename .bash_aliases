@@ -60,7 +60,7 @@ alias rmutt='mutt -R'
 # }}}
 # make {{{
 
-alias m='make -s V=9'
+alias m='make -s'
 
 # }}}
 # gpg {{{
@@ -100,6 +100,17 @@ _n() {
     COMPREPLY=( $(compgen -W "$(n -l)" -- "${cur}") )
 }
 complete -o nospace -F _n n
+
+# }}}
+# notify {{{
+
+notify() {
+	$@
+	tmux display-message "#I:#W <$?>"
+}
+
+alias ?='notify'
+alias ??='tmux show-messages'
 
 # }}}
 # other {{{
