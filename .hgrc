@@ -5,6 +5,7 @@ commitsubrepos = False
 
 [alias]
 show = log -pvr
+h = glog -p
 
 [extensions]
 record =
@@ -36,7 +37,7 @@ qguard.unguarded = red
 
 [pager]
 pager = LESS='FSRX' less
-attend = show glog log diff tags help incoming outgoing annotate
+attend = show glog log diff tags help incoming outgoing annotate h
 
 [diff]
 git = True
