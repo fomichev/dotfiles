@@ -30,6 +30,9 @@ find_exclude '*.o'
 find_exclude '*.o.d'
 find_exclude '*.o.cmd'
 
+find_exclude '*.map'
+find_exclude '*.dis'
+
 find_exclude 'autom4te.cache/*'
 find_exclude 'config.log'
 find_exclude 'config.status'
