@@ -3,6 +3,8 @@
 	email = s@fomichev.me
 
 [alias]
+	a = add
+	d = diff
 	st = status -sb
 	ci = commit
 	co = checkout
