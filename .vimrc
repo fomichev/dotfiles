@@ -120,6 +120,9 @@ set complete-=i
 " try to show last line (at least partially)
 set display+=lastline
 
+" 
+set clipboard=
+
 " cache more lines
 let c_minlines=100
 
@@ -374,6 +377,7 @@ autocmd BufRead,BufNewFile *mutt-* setfiletype mail
 autocmd BufRead,BufNewFile *.md setlocal filetype=markdown
 autocmd BufRead,BufNewFile */notes/* setlocal filetype=markdown
 autocmd BufRead,BufNewFile *.cls setlocal filetype=tex
+autocmd BufRead,BufNewFile *.h setlocal filetype=c
 
 " 1}}}
 " Local configuration {{{1
