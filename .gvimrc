@@ -25,6 +25,8 @@ set guioptions-=b
 set guioptions-=h
 " use console dialogs
 set guioptions+=c
+" don't touch system clipboard
+set guioptions-=a
 
 if has("gui_macvim")
 	macmenu &Tools.Make key=<nop>
