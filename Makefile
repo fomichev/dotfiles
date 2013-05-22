@@ -66,17 +66,17 @@ vim: $(VIM_SRC)
 	make && make install && \
 	cp -a runtime/keymap $(VIM_DIR)/share/vim/vim73/
 
-LLVM_SRC:=$(HOME)/src/llvm
+LLVM_VER:=3.2.src
+LLVM_SRC:=$(HOME)/src/llvm-$(LLVM_VER)
 LLVM_DIR:=$(HOME)/local/llvm
 
 $(LLVM_SRC):
 	cd ~/src && \
-	curl -O http://llvm.org/releases/3.2/llvm-3.2.src.tar.gz && \
-	curl -O http://llvm.org/releases/3.2/clang-3.2.src.tar.gz && \
-	tar xf llvm-3.2.src.tar.gz && \
-	tar xf clang-3.2.src.tar.gz && \
-	mv llvm-3.2.src llvm && \
-	mv clang-3.2.src llvm/tools/clang
+	curl -O http://llvm.org/releases/$(LLVM_VER)/llvm-$(LLVM_VER).src.tar.gz && \
+	curl -O http://llvm.org/releases/$(LLVM_VER)/clang-$(LLVM_VER).src.tar.gz && \
+	tar xf llvm-$(LLVM_VER).tar.gz && \
+	tar xf clang-$(LLVM_VER).tar.gz && \
+	mv clang-$(LLVM_VER) llvm-$(LLVM_VER)/tools/clang
 
 llvm: $(LLVM_SRC)
 	cd $(LLVM_SRC) && \
@@ -84,15 +84,16 @@ llvm: $(LLVM_SRC)
 		    --prefix=$(LLVM_DIR) && \
 	make && make install
 
-RUBY_SRC:=$(HOME)/src/ruby
+RUBY_VER:=2.0.0-p195
+RUBY_SRC:=$(HOME)/src/ruby-$(RUBY_VER)
 RUBY_DIR:=$(HOME)/local/ruby
 
 $(RUBY_SRC):
 	cd ~/src && \
-	curl -O http://ftp.ruby-lang.org/pub/ruby/ruby-1.9-stable.tar.gz && \
-	tar xf ruby-1.9-stable.tar.gz && \
-	mv ruby-1.9.?-p??? ruby
+	curl -O http://ftp.ruby-lang.org/pub/ruby/ruby-$(RUBY_VER).tar.gz && \
+	tar xf ruby-$(RUBY_VER).tar.gz &&
 
 ruby: $(RUBY_SRC)
 	cd $(RUBY_SRC) && \
+	./configure --prefix=$(RUBY_DIR) && \
 	make && make install
