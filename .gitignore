@@ -8,4 +8,5 @@
 .newsbeuter/cache.db.lock
 .newsbeuter/pwd
 .local/share/recently-used.xbel
+.config/gtk-2.0/
 ignore
