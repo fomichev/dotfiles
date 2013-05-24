@@ -55,13 +55,12 @@ vim: $(VIM_SRC)
 		    --disable-acl \
 		    --disable-gpm \
 		    --disable-sysmouse \
-		    --enable-rubyinterp \
-		    --enable-pythoninterp \
-		    --enable-perlinterp \
+		    --disable-netbeans \
+		    --enable-rubyinterp=yes \
+		    --enable-pythoninterp=yes \
 		    --with-x \
 		    --with-gnome \
 		    --enable-multibyte \
-		    --enable-cscope \
 		    --prefix=$(VIM_DIR) && \
 	make && make install && \
 	cp -a runtime/keymap $(VIM_DIR)/share/vim/vim73/
