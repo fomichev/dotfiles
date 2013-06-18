@@ -1,3 +1,5 @@
+[ -z "$PS1" ] && return
+
 . ~/.bashrc
 
 [ -z "$TMUX" ] && [ ! "$TERM" = "screen" ] && tmux -V &>/dev/null && {
