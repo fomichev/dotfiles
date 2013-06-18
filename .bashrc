@@ -37,6 +37,15 @@ path_prepend /usr/local/share/python
 [ -s ~/.rvm/scripts/rvm ] && . ~/.rvm/scripts/rvm
 
 # }}}
+# Include Tmuxifier {{{
+
+[ -e ~/.bundle/tmuxifier/bin/tmuxifier ] && {
+	export TMUXIFIER_LAYOUT_PATH=~/.tmuxifier
+	path_prepend ~/.bundle/tmuxifier/bin
+	eval "$(tmuxifier init -)"
+}
+
+# }}}
 # Include aliases {{{
 
 . ~/.bash_aliases
