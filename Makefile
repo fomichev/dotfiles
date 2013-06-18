@@ -65,7 +65,7 @@ vim: $(VIM_SRC)
 	make && make install && \
 	cp -a runtime/keymap $(VIM_DIR)/share/vim/vim73/
 
-LLVM_VER:=3.2.src
+LLVM_VER:=3.3.src
 LLVM_SRC:=$(HOME)/src/llvm-$(LLVM_VER)
 LLVM_DIR:=$(HOME)/local/llvm
 
