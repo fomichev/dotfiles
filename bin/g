@@ -11,8 +11,14 @@ Options:
   -v            Invert match: select only non-matched lines
   -w            Match the pattern only at word boundary
   -p <pattern>  Search files that match given pattern
+
+  -C            Same as -p '*.c'
+  -H            Same as -p '*.h'
 END
 }
+
+# Disable shell globbing
+set -f
 
 # Some kind of 'API' which can be safely used in .grc {{{
 find_exclude() { [ -z "$find_excl_opts" ] && { find_excl_opts="-path '*/$1'"; } || { find_excl_opts="$find_excl_opts -o -path '*/$1'"; }; }
@@ -57,7 +63,7 @@ else
 	grep_opts="$grep_opts --color=never"
 fi
 
-ARGS=`getopt slivwp:h "$@"`
+ARGS=`getopt slivwp:hHC "$@"`
 [ ! $? -eq 0 ] && { exit $?; }
 eval set -- $ARGS
 
@@ -101,6 +107,16 @@ while true; do
 		shift
 		;;
 
+	-H)
+		find_include "*.h"
+		shift
+		;;
+
+	-C)
+		find_include "*.c"
+		shift
+		;;
+
 	*|-h)
 		usage
 		exit
@@ -118,6 +134,6 @@ grep_pattern="$@"
 find_opts=''
 [ -z "$find_incl_opts" ] && \
 	{ find_opts="\( $find_excl_opts \) -prune -o \( -type f -print0 \)"; } || \
-	{ find_opts="-type f $find_incl_opts -print0"; }
+	{ find_opts="-type f \( $find_incl_opts \) -print0"; }
 
 exec sh -c "find . $find_opts | xargs -0 grep $grep_opts -e \"$grep_pattern\" 2>/dev/null $pager"
