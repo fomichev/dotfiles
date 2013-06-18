@@ -1,11 +1,12 @@
 [ui]
 username = Stanislav Fomichev <s@fomichev.me>
 merge = internal:merge
-commitsubrepos = False
+commitsubrepos = True
 
 [alias]
 show = log -pvr
 h = glog -p
+d = diff
 
 [extensions]
 record =
