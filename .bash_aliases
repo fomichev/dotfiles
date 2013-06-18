@@ -50,7 +50,8 @@ __diff() {
 ediff() { __diff vim "$1" "$2"; }
 Ediff() { __diff gvim "$1" "$2"; }
 
-alias scratch='vim ~/scratch.txt'
+alias s='vim ~/s'
+alias scratch='s'
 
 # }}}
 # mutt {{{

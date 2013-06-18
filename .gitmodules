@@ -49,3 +49,6 @@
 [submodule ".vim/bundle/vim-rsi"]
 	path = .vim/bundle/vim-rsi
 	url = git://github.com/tpope/vim-rsi.git
+[submodule ".bundle/tmuxifier"]
+	path = .bundle/tmuxifier
+	url = https://github.com/jimeh/tmuxifier.git
