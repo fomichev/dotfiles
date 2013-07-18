@@ -23,8 +23,8 @@ fi
 
 if [ -t 1 ]; then
 	tput setaf $color
-	$*
+	cat
 	tput sgr0
 else
-	$*
+	cat
 fi
