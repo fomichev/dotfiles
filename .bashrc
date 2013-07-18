@@ -9,6 +9,8 @@ on_cygwin() { test $uname = 'MINGW32_NT-5.1'; }
 brew_prefix() { echo $(/usr/local/bin/brew --prefix $1 2>/dev/null); }
 npm_prefix() { echo $(/usr/local/bin/npm prefix -g 2>/dev/null); }
 
+on_cygwin && return # do nothing on cygwin
+
 # }}}
 # Modify PATH {{{
 
@@ -100,7 +102,7 @@ export GREP_OPTIONS='--color=auto'
 export LESS_TERMCAP_md=$(tput setaf 4)
 
 # disable start/stop (Ctrl-S/Ctrl-Q) functionality
-on_cygwin || stty -ixon
+stty -ixon
 
 # }}}
 # Include local settings {{{
