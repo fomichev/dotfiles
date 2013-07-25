@@ -35,8 +35,8 @@ set number
 " always show status line
 set laststatus=2
 
-" customize status line
-set statusline=%<%m\ %f\ [%{&fileformat}]\ %r%=%b\ \ %c:%l/%L\ %P
+" don't show default mode inficator
+set noshowmode
 
 " speedup macros
 set lazyredraw
@@ -368,6 +368,14 @@ let g:DirDiffExcludes = ".hg,.git,*.o,*.a"
 " Gitv {{{2
 
 let g:Gitv_DoNotMapCtrlKey = 1
+
+" 2}}}
+" Airline {{{2
+
+
+let g:airline_theme='solarized'
+let g:airline_powerline_fonts = 1
+
 
 " 2}}}
 " 1}}}

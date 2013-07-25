@@ -52,3 +52,6 @@
 [submodule ".bundle/tmuxifier"]
 	path = .bundle/tmuxifier
 	url = https://github.com/jimeh/tmuxifier.git
+[submodule ".vim/bundle/vim-airline"]
+	path = .vim/bundle/vim-airline
+	url = https://github.com/bling/vim-airline.git
