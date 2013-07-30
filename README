@@ -21,6 +21,7 @@ Anonymous Pro http://www.ms-studio.com/FontSales/anonymouspro.html
 * o - open file in associated application
 * p - print current directory and version control information
 * q - quilt
-* v - version control (hg or git depending on current directory)
+* v - git
+* vv - hg
 * w - sorted w
 * x - extract archive

@@ -114,6 +114,12 @@ alias ?='notify'
 alias ??='tmux show-messages'
 
 # }}}
+# version control {{{
+
+alias v="git"
+alias vv='hg'
+
+# }}}
 # other {{{
 
 alias j='jobs -l'
