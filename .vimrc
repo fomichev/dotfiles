@@ -300,6 +300,11 @@ vnoremap <Space> za
 nnoremap zO zCzO
 
 " 2}}}
+" Ctags {{{2
+nnoremap <c-]> <c-]>zvz<cr>
+nnoremap <c-\> :tab split<cr><c-]>zMzvz<cr>
+"nnoremap <c-\> <c-w>v<c-]>zMzvz<cr>
+" 2}}}
 " 1}}}
 " Plugins {{{1
 " Clang complete {{{2
