@@ -386,6 +386,7 @@ autocmd BufRead,BufNewFile *.md setlocal filetype=markdown
 autocmd BufRead,BufNewFile */notes/* setlocal filetype=markdown
 autocmd BufRead,BufNewFile *.cls setlocal filetype=tex
 autocmd BufRead,BufNewFile *.h setlocal filetype=c
+autocmd BufRead,BufNewFile *.taskpaper setlocal filetype=taskpaper
 
 " 1}}}
 " Local configuration {{{1
