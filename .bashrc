@@ -66,7 +66,7 @@ shopt -s no_empty_cmd_completion
 # don't save matching lines
 export HISTCONTROL=ignoreboth
 # the search path for the `cd' command
-export CDPATH='.:~/src:~/Dropbox/src'
+export CDPATH='.:~/src:~/Dropbox/src:~/y/src'
 
 # enable completion
 [ -r /etc/bash_completion ] && { . /etc/bash_completion; }
