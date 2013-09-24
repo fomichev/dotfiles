@@ -1,17 +1,22 @@
 set realname = "Stanislav Fomichev"
 set signature = ~/.mutt/signature
 
-set sendmail = msmtp
 set envelope_from
-set mbox_type = Maildir
-set folder = "~/.mail"
+
+# imap settings
+unset imap_passive
+set imap_check_subscribed
+
+#set sendmail = msmtp
+#set mbox_type = Maildir
+#set folder = "~/.mail"
 
 # threaded sort
 set sort = threads
 
 # check regulary
-set timeout = 5
-set mail_check = 5
+set timeout = 15
+set mail_check = 60
 
 # keep internal data in home dir
 set header_cache = ~/.mutt/cache/
