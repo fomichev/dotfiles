@@ -22,7 +22,7 @@ else
 fi
 
 if [ -t 1 ]; then
-	trap 'tput sgr0' SIGINT
+	trap 'tput sgr0' 2 #SIGINT
 	tput setaf $color
 	cat
 	tput sgr0
