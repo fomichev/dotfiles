@@ -12,17 +12,26 @@ OptionParser.new do |opts|
   end
 end.parse!
 
-root = File.join(ENV['HOME'], 'Dropbox', 'notes')
+dirs = [ File.join(ENV['HOME'], 'Dropbox', 'notes'),
+         File.join(ENV['HOME'], 'Yandex.Disk', 'notes'),
+         File.join(ENV['HOME'], 'yadisk', 'notes'),
+         File.join(ENV['HOME'], 'notes') ]
+
+$root = dirs.detect { |d| Dir.exist?(d) }
+abort "Notes directory is not found!" unless $root
+
 ext = 'txt'
 
-$files = Dir.glob(File.join(root, '**', '*.txt')).map do
+$files = Dir.glob(File.join($root, '**', '*.txt')).map do
   |p| [ File.basename(p).sub(/\.#{ext}$/, '').downcase, p ]
 end
 
 def command_edit(name)
   file, = $files.select { |e| e[0] == name }
 
-  abort "Note '#{name}' does not exist" unless file
+  unless file
+    file = ['', File.join($root, "#{name}.txt") ]
+  end
 
   system("$EDITOR '#{file[1]}'")
 end
