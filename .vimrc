@@ -377,10 +377,8 @@ let g:Gitv_DoNotMapCtrlKey = 1
 " 2}}}
 " Airline {{{2
 
-
 let g:airline_theme='solarized'
 let g:airline_powerline_fonts = 1
-
 
 " 2}}}
 " 1}}}
@@ -388,7 +386,7 @@ let g:airline_powerline_fonts = 1
 
 autocmd BufRead,BufNewFile *mutt-* setfiletype mail
 autocmd BufRead,BufNewFile *.md setlocal filetype=markdown
-autocmd BufRead,BufNewFile */notes/* setlocal filetype=markdown
+"autocmd BufRead,BufNewFile */notes/* setlocal filetype=markdown
 autocmd BufRead,BufNewFile *.cls setlocal filetype=tex
 autocmd BufRead,BufNewFile *.h setlocal filetype=c
 autocmd BufRead,BufNewFile *.taskpaper setlocal filetype=taskpaper
