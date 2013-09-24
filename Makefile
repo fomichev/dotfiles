@@ -2,7 +2,9 @@ files := $(shell find $(CURDIR) \
 	-mindepth 1 -maxdepth 1 \
 	-not -name Makefile \
 	-not -name README \
-	-not -name '.git*' \
+	-not -name '.git' \
+	-not -name '.gitignore' \
+	-not -name '.gitmodules' \
 	-not -name ignore \
 	)
 
