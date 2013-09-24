@@ -53,6 +53,10 @@ find_exclude '.git/*'
 find_exclude '.hg/*'
 find_exclude '.svn/*'
 
+find_exclude 'modules.symbols'
+find_exclude 'Module.symvers'
+find_exclude 'debian/*'
+
 if [ -t 1 ]; then
 	[ -z $PAGER ] && { PAGER='less -r'; }
 
