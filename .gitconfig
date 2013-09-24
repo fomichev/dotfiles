@@ -6,7 +6,7 @@
 	a = add
 	d = diff
 	st = status -sb
-	ci = commit
+	ci = commit -s
 	co = checkout
 	pom = push origin master
 	plom = pull --rebase origin master
@@ -38,3 +38,9 @@
 
 [merge]
 	renamelimit = 0
+
+[push]
+	default = simple
+
+[include]
+	path = ~/local/.gitconfig
