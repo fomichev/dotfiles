@@ -7,6 +7,9 @@
 .newsbeuter/cache.db
 .newsbeuter/cache.db.lock
 .newsbeuter/pwd
-.local/share/recently-used.xbel
-.config/gtk-2.0/
+.local/share/
+!.local/share/applications/mimeapps.list
+.config/
+!.config/fontconfig/fonts.conf
+.cmus/
 ignore
