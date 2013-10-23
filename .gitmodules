@@ -26,10 +26,6 @@
 	branch = master
 	path = .vim/bundle/ctrlp.vim
 	url = git://github.com/kien/ctrlp.vim.git
-[submodule ".vim/bundle/clang_complete"]
-	branch = master
-	path = .vim/bundle/clang_complete
-	url = git://github.com/Rip-Rip/clang_complete.git
 [submodule ".vim/bundle/cocoa.vim"]
 	branch = master
 	path = .vim/bundle/cocoa.vim
