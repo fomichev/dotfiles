@@ -30,6 +30,7 @@ set cpoptions+=$
 set norelativenumber
 
 " enable line numbers
+set relativenumber
 set number
 
 " always show status line
@@ -303,7 +304,7 @@ nnoremap zO zCzO
 " Ctags {{{2
 nnoremap <c-]> <c-]>zvz<cr>
 nnoremap <c-\> :tab split<cr><c-]>zMzvz<cr>
-"nnoremap <c-\> <c-w>v<c-]>zMzvz<cr>
+nnoremap <c-_> <c-w>v<c-]>zMzvz<cr>
 " 2}}}
 " 1}}}
 " Plugins {{{1
