@@ -57,6 +57,9 @@ find_exclude 'modules.symbols'
 find_exclude 'Module.symvers'
 find_exclude 'debian/*'
 
+find_exclude '*.po'
+find_exclude '*.pot'
+
 if [ -t 1 ]; then
 	[ -z $PAGER ] && { PAGER='less -r'; }
 
