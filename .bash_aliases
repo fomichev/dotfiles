@@ -62,6 +62,7 @@ alias rmutt='mutt -R'
 # make {{{
 
 alias m='make -s'
+alias mm='make menuconfig'
 
 # }}}
 # gpg {{{
