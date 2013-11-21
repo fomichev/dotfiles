@@ -60,6 +60,10 @@ find_exclude 'debian/*'
 find_exclude '*.po'
 find_exclude '*.pot'
 
+find_exclude 'cscope.out'
+
+find_exclude '*.orig'
+
 if [ -t 1 ]; then
 	[ -z $PAGER ] && { PAGER='less -r'; }
 
