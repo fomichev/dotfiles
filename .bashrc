@@ -34,6 +34,12 @@ path_prepend /usr/local/bin
 path_prepend /usr/local/share/python
 
 # }}}
+# Go {{{
+
+export GOPATH=$HOME/go
+path_prepend $GOPATH/bin
+
+# }}}
 # Include RVM {{{
 
 [ -s ~/.rvm/scripts/rvm ] && . ~/.rvm/scripts/rvm
@@ -66,7 +72,7 @@ shopt -s no_empty_cmd_completion
 # don't save matching lines
 export HISTCONTROL=ignoreboth
 # the search path for the `cd' command
-export CDPATH='.:~/src:~/Dropbox/src:~/y/src'
+export CDPATH='.:~/src:~/Dropbox/src:~/y/src:~/go/src'
 
 # enable completion
 [ -r /etc/bash_completion ] && { . /etc/bash_completion; }
