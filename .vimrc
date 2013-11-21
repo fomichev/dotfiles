@@ -142,10 +142,6 @@ else
 	set backupdir=~/.vim/tmp
 endif
 
-" show tabs and trailing spaces
-set list
-set listchars=tab:¦\ ,trail:·
-
 " enable spell check
 set spelllang=en_us,ru
 set spellfile=$HOME/.vim/spell/all.add
@@ -208,9 +204,6 @@ colorscheme solarized
 
 " highlight trailing white spaces
 match ErrorMsg /\s\+$\| \+\ze\t/
-
-" don't highlight tabs/spaces background
-highlight SpecialKey cterm=NONE gui=NONE ctermbg=NONE ctermfg=11 guibg=NONE guifg=#586e75
 
 " 2}}}
 " 1}}}
@@ -308,18 +301,6 @@ nnoremap <c-_> <c-w>v<c-]>zMzvz<cr>
 " 2}}}
 " 1}}}
 " Plugins {{{1
-" Clang complete {{{2
-
-let g:clang_complete_copen = 1
-let g:clang_snippets = 1
-let g:clang_snippets_engine = 'clang_complete'
-let g:clang_complete_auto = 0
-let g:clang_use_library = 1
-
-noremap <silent> <Leader>c :call g:ClangUpdateQuickFix()<CR>
-inoremap <silent> <S-Tab> <C-x><C-o>
-
-" 2}}}
 " Ctrl-p {{{2
 
 " search by full path
@@ -359,11 +340,6 @@ let g:netrw_browse_split = 0
 " Matchit {{{2
 
 runtime macros/matchit.vim
-
-" 2}}}
-" Fakeclip {{{2
-
-let g:fakeclip_terminal_multiplexer_type = "tmux"
 
 " 2}}}
 " DirDiff {{{2
