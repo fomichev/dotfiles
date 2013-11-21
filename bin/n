@@ -27,6 +27,7 @@ $files = Dir.glob(File.join($root, '**', '*.txt')).map do
 end
 
 def command_edit(name)
+  name = 'scratch' if name == ''
   file, = $files.select { |e| e[0] == name }
 
   unless file
