@@ -4,6 +4,7 @@
 
 [alias]
 	a = add
+	au = add -u
 	ai = add --interactive
 	d = diff
 	dc = diff --cached
@@ -13,6 +14,7 @@
 	st = status -sb
 	ci = commit -s
 	co = checkout
+	cp = cherry-pick
 	b = branch
 	glog = log --graph
 	sm = submodule
@@ -26,6 +28,7 @@
 	rollback = reset HEAD^
 	lp = log -p
 	bl = blame -w
+	t = log --tags --simplify-by-decoration --pretty="format:%ai %d"
 
 [color]
 	diff = auto
