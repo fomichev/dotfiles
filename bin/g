@@ -11,6 +11,7 @@ Options:
   -v            Invert match: select only non-matched lines
   -w            Match the pattern only at word boundary
   -p <pattern>  Search files that match given pattern
+  -d <dir>      Search in specified directory
 
   -C            Same as -p '*.c'
   -H            Same as -p '*.h'
@@ -64,6 +65,8 @@ find_exclude 'cscope.out'
 
 find_exclude '*.orig'
 
+find_dir='.'
+
 if [ -t 1 ]; then
 	[ -z $PAGER ] && { PAGER='less -r'; }
 
@@ -74,7 +77,7 @@ else
 	grep_opts="$grep_opts --color=never"
 fi
 
-ARGS=`getopt slivwp:hHC "$@"`
+ARGS=`getopt slivwd:p:hHC "$@"`
 [ ! $? -eq 0 ] && { exit $?; }
 eval set -- $ARGS
 
@@ -118,6 +121,12 @@ while true; do
 		shift
 		;;
 
+	-d)
+		find_dir="$2"
+		shift
+		shift
+		;;
+
 	-H)
 		find_include "*.h"
 		shift
@@ -147,4 +156,4 @@ find_opts=''
 	{ find_opts="\( $find_excl_opts \) -prune -o \( -type f -print0 \)"; } || \
 	{ find_opts="-type f \( $find_incl_opts \) -print0"; }
 
-exec sh -c "find . $find_opts | xargs -0 grep $grep_opts -e \"$grep_pattern\" 2>/dev/null $pager"
+exec sh -c "find $find_dir $find_opts | xargs -0 grep $grep_opts -e \"$grep_pattern\" 2>/dev/null $pager"
