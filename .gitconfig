@@ -29,6 +29,7 @@
 	lp = log -p
 	bl = blame -w
 	t = log --tags --simplify-by-decoration --pretty="format:%ai %d"
+	f = fetch
 
 [color]
 	diff = auto
