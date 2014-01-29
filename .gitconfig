@@ -16,7 +16,7 @@
 	co = checkout
 	cp = cherry-pick
 	b = branch
-	glog = log --graph
+	gl = log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit
 	sm = submodule
 	l = log --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit
 	o = !git log $(git rev-parse --abbrev-ref HEAD) --not origin/$(git rev-parse --abbrev-ref HEAD) --
