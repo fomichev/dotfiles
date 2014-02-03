@@ -251,8 +251,8 @@ nnoremap <F1> <ESC>
 vnoremap <F1> <ESC>
 
 " don't jump on * & #
-nnoremap * /\C\<<C-r><C-w>\><CR>N
-nnoremap # ?\C\<<C-r><C-w>\><CR>N
+nnoremap <silent> * :let stay_star_view = winsaveview()<cr>*:call winrestview(stay_star_view)<cr>
+nnoremap <silent> # :let stay_hash_view = winsaveview()<cr>#:call winrestview(stay_hash_view)<cr>
 
 " use convenient regular expressions
 nnoremap / /\v
