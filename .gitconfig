@@ -58,3 +58,5 @@
 	path = ~/local/.gitconfig
 [core]
 	abbrev = 12
+[branch]
+	autosetuprebase = always
