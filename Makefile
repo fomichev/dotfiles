@@ -46,7 +46,8 @@ VIM_DIR:=$(HOME)/local/vim
 
 $(VIM_SRC):
 	cd ~/src && \
-	hg clone https://code.google.com/p/vim/
+	hg clone https://code.google.com/p/vim/ && \
+	(cd $(VIM_SRC) && hg pull -u)
 
 vim: $(VIM_SRC)
 	cd $(VIM_SRC) && \
@@ -67,7 +68,7 @@ vim: $(VIM_SRC)
 	make && make install && \
 	cp -a runtime/keymap $(VIM_DIR)/share/vim/vim73/
 
-LLVM_VER:=3.3.src
+LLVM_VER:=3.4
 LLVM_SRC:=$(HOME)/src/llvm-$(LLVM_VER)
 LLVM_DIR:=$(HOME)/local/llvm
 
@@ -85,16 +86,47 @@ llvm: $(LLVM_SRC)
 		    --prefix=$(LLVM_DIR) && \
 	make && make install
 
-RUBY_VER:=2.0.0-p195
+RUBY_VER:=2.1.0
 RUBY_SRC:=$(HOME)/src/ruby-$(RUBY_VER)
 RUBY_DIR:=$(HOME)/local/ruby
 
 $(RUBY_SRC):
 	cd ~/src && \
 	curl -O http://ftp.ruby-lang.org/pub/ruby/ruby-$(RUBY_VER).tar.gz && \
-	tar xf ruby-$(RUBY_VER).tar.gz &&
+	tar xf ruby-$(RUBY_VER).tar.gz
 
 ruby: $(RUBY_SRC)
 	cd $(RUBY_SRC) && \
 	./configure --prefix=$(RUBY_DIR) && \
 	make && make install
+
+MUTT_VER:=1.5.22
+MUTT_SRC:=$(HOME)/src/mutt-$(MUTT_VER)
+MUTT_DIR:=$(HOME)/local/mutt
+
+$(MUTT_SRC):
+	cd ~/src && \
+	curl -O ftp://ftp.mutt.org/mutt/devel/mutt-$(MUTT_VER).tar.gz && \
+	tar xf mutt-$(MUTT_VER).tar.gz && \
+	(cd $(MUTT_SRC) && \
+		curl -O https://raw2.github.com/nedos/mutt-sidebar-patch/master/mutt-sidebar.patch && \
+		patch -p1 < mutt-sidebar.patch)
+
+
+mutt: $(MUTT_SRC)
+	cd $(MUTT_SRC) && \
+	./configure --prefix=$(MUTT_DIR) \
+		    --enable-hcache \
+		    --disable-gpgme \
+		    --enable-imap \
+		    --enable-smtp \
+		    --enable-pop \
+		    --with-curses \
+		    --with-gnutls \
+		    --with-gss \
+		    --with-idn \
+		    --with-mixmaster \
+		    --with-sasl \
+		    --with-regex \
+		    --with-ssl && \
+	make && fakeroot make install

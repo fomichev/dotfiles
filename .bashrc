@@ -26,6 +26,7 @@ on_darwin && {
 path_prepend ~/local/vim/bin
 path_prepend ~/local/llvm/bin
 path_prepend ~/local/ruby/bin
+path_prepend ~/local/mutt/bin
 path_prepend ~/local/bin
 path_prepend ~/bin
 path_prepend ~/.rvm/bin
