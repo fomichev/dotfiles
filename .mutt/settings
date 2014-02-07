@@ -77,6 +77,10 @@ set pager_stop
 # pager: pad blank lines with ~
 set tilde
 
+set mailcap_path = ~/.mutt/mailcap
+auto_view text/html
+alternative_order text/plain text/html
+
 source $alias_file
 source ~/.mutt/bindings
 source ~/.mutt/lists
