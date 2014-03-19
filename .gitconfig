@@ -4,7 +4,7 @@
 
 [alias]
 	a = add
-	au = add -u
+	au = add -u :/
 	ai = add --interactive
 	d = diff
 	dc = diff --cached
