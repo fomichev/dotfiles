@@ -64,6 +64,7 @@ find_exclude '*.pot'
 find_exclude 'cscope.out'
 
 find_exclude '*.orig'
+find_exclude '*.i'
 
 find_dir='.'
 
