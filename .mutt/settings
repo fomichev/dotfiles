@@ -85,3 +85,12 @@ source $alias_file
 source ~/.mutt/bindings
 source ~/.mutt/lists
 source ~/.mutt/mutt-colors-solarized/mutt-colors-solarized-dark-16.muttrc
+
+# highlight patches
+color body brightcyan default "^diff \-.*"
+color body brightcyan default "^index [a-f0-9].*"
+color body brightcyan default "^[\-]{3} .*"
+color body brightcyan default "^[\+]{3} .*"
+color body green default "^[\+][^\+]+.*"
+color body red  default "^\-[^\-]+.*"
+color body cyan default "^@@ .*"
