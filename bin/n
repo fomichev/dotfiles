@@ -1,5 +1,7 @@
 #!/usr/bin/env ruby
 
+$0 = 'n'
+
 require 'optparse'
 
 edit = true
