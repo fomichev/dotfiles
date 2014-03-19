@@ -137,5 +137,6 @@ alias du='du -h'
 alias info='info --vi-keys'
 alias _='sudo'
 alias b="$BROWSER"
+alias serve="ruby -run -e httpd . -p 9090"
 
 # }}}
