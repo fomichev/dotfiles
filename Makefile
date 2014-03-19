@@ -112,7 +112,6 @@ $(MUTT_SRC):
 		curl -O https://raw2.github.com/nedos/mutt-sidebar-patch/master/mutt-sidebar.patch && \
 		patch -p1 < mutt-sidebar.patch)
 
-
 mutt: $(MUTT_SRC)
 	cd $(MUTT_SRC) && \
 	./configure --prefix=$(MUTT_DIR) \
@@ -130,3 +129,17 @@ mutt: $(MUTT_SRC)
 		    --with-regex \
 		    --with-ssl && \
 	make && fakeroot make install
+
+TMUX_VER:=1.9a
+TMUX_SRC:=$(HOME)/src/tmux-$(TMUX_VER)
+TMUX_DIR:=$(HOME)/local/tmux
+
+$(TMUX_SRC):
+	cd ~/src && \
+	curl -LO http://downloads.sourceforge.net/project/tmux/tmux/tmux-1.9/tmux-$(TMUX_VER).tar.gz && \
+	tar xf tmux-$(TMUX_VER).tar.gz
+
+tmux: $(TMUX_SRC)
+	cd $(TMUX_SRC) && \
+	./configure --prefix=$(TMUX_DIR) && \
+	make && make install
