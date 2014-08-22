@@ -24,12 +24,13 @@
 	out = log --branches --not --remotes=origin --
 	in = log --remotes=origin --not --branches --
 	fp = format-patch
-	s = show
+	s = show --pretty=fuller
 	rollback = reset HEAD^
 	lp = log -p
 	bl = blame -w
 	t = log --tags --simplify-by-decoration --pretty="format:%ai %d"
 	f = fetch
+	rpo = remote prune origin
 
 [color]
 	diff = auto
@@ -58,5 +59,6 @@
 	path = ~/local/.gitconfig
 [core]
 	abbrev = 12
-[branch]
-	autosetuprebase = always
+
+[diff "default"]
+	xfuncname = "^[[:alpha:]$_].*[^:]$"
