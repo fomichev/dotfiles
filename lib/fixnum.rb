@@ -78,6 +78,18 @@ class Fixnum
     nil
   end
 
+  def k
+    self * 1024
+  end
+
+  def m
+    self.k * 1024
+  end
+
+  def g
+    self.m * 1024
+  end
+
   # Convert number to string containing binary representation
   def b(split=false)
     Fixnum.to_base(self, 2, !split)
