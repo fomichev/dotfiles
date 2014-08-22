@@ -1,0 +1,43 @@
+#!/bin/bash
+
+set -e
+
+APP="$(basename $0)"
+
+usage() {
+	echo "usage: $APP [-S] [command]"
+	exit
+}
+
+set -- `getopt S $*`
+[ ! $? -eq 0 ] && { exit 1; }
+
+SUDO=0
+
+while [ ! "$1" = "--" ]; do
+	case "$1" in
+	-S)
+		SUDO=1
+		;;
+	*)
+		usage
+		;;
+	esac
+	shift
+done
+shift
+
+if [ $SUDO -eq 1 ]; then
+	read -s -p pass: pass
+fi
+
+for h in $(cat ~/hosts); do
+	if [ $SUDO -eq 1 ]; then
+		(ssh $h "echo $pass | sudo -p ' ' -S bash -c '$@'") &
+	else
+		(ssh $h "bash -c '$@'") &
+	fi
+done
+
+pass=''
+wait
