@@ -36,6 +36,8 @@ find_exclude '*.a'
 find_exclude '*.o'
 find_exclude '*.o.d'
 find_exclude '*.o.cmd'
+find_exclude '*.check.cmd'
+find_exclude '*.install.cmd'
 
 find_exclude '*.map'
 find_exclude '*.dis'
@@ -65,6 +67,8 @@ find_exclude 'cscope.out'
 
 find_exclude '*.orig'
 find_exclude '*.i'
+
+find_exclude 'CMakeFiles/*'
 
 find_dir='.'
 
