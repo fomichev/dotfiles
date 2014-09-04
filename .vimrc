@@ -121,7 +121,6 @@ set complete-=i
 " try to show last line (at least partially)
 set display+=lastline
 
-" 
 set clipboard=
 
 " cache more lines
@@ -180,7 +179,7 @@ endif
 " Color scheme {{{1
 " GNU Screen / Tmux {{{2
 
-if &term == "screen"
+if &term == "screen" || &term == "screen-256color"
 	set term=xterm
 	" problem with PuTTY
 	let g:solarized_termtrans = 1
@@ -260,6 +259,8 @@ nnoremap ? /\v
 
 " use sudo to save file
 cmap w!! w !sudo tee % > /dev/null
+
+imap jj <Esc>
 
 " 2}}}
 " Windows {{{2
