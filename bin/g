@@ -67,6 +67,7 @@ find_exclude 'cscope.out'
 
 find_exclude '*.orig'
 find_exclude '*.i'
+find_exclude '*.gcov'
 
 find_exclude 'CMakeFiles/*'
 
