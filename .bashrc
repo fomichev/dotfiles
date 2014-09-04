@@ -16,6 +16,7 @@ on_cygwin && return # do nothing on cygwin
 
 path_append() { [ -e $1 ] && { export PATH=$PATH:$1; }; }
 path_prepend() { [ -e $1 ] && { export PATH=$1:$PATH; }; }
+try_source() { [ -r $1 ] && { . $1; }; }
 
 on_darwin && {
 	[ -d $(npm_prefix)/bin ] && {
@@ -77,11 +78,10 @@ export HISTCONTROL=ignoreboth
 export CDPATH='.:~/src:~/Dropbox/src:~/y/src:~/go/src'
 
 # enable completion
-[ -r /etc/bash_completion ] && { . /etc/bash_completion; }
+try_source /etc/bash_completion
+try_source /etc/profile.d/bash_completion.sh
 
-on_darwin && \
-	[ -r $(brew_prefix)/etc/bash_completion ] && \
-	{ . $(brew_prefix)/etc/bash_completion; }
+on_darwin && $(brew_prefix)/etc/profile.d/bash_completion
 
 # }}}
 # OS dependent settings {{{
