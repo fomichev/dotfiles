@@ -1,6 +1,7 @@
 .vim/tmp/
 .mutt/cache/
 .w3m/history
+.w3m/cookie
 .wmii/history.progs
 .wmii/history.actions
 .wmii/history.tags
