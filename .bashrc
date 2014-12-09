@@ -1,5 +1,7 @@
 [ -z "$PS1" ] && return
 
+umask 027
+
 # Detect OS type {{{
 
 uname=$(uname)
