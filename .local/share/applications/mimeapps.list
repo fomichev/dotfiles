@@ -2,7 +2,7 @@
 text/x-readme=gvim.desktop;
 text/x-log=gvim.desktop;
 text/plain=gvim.desktop;
-text/x-csrc=gvim.desktop;
+text/x-csrc=gedit.desktop;gvim.desktop;
 text/x-chdr=gvim.desktop;
 text/x-sql=gvim.desktop;
 application/x-genesis-rom=gvim.desktop;
@@ -28,6 +28,7 @@ application/xhtml+xml=firefox.desktop;
 application/x-extension-xhtml=firefox.desktop;
 application/x-extension-xht=firefox.desktop;
 image/png=eog.desktop;
+text/x-patch=gedit.desktop;
 
 [Default Applications]
 audio/x-vorbis+ogg=vlc.desktop
