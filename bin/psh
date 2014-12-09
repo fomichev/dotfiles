@@ -3,16 +3,13 @@
 set -e
 
 APP="$(basename $0)"
-
-usage() {
-	echo "usage: $APP [-S] [command]"
-	exit
-}
+usage() { echo "usage: $APP [-S] [command]"; exit; }
 
 set -- `getopt S $*`
 [ ! $? -eq 0 ] && { exit 1; }
 
 SUDO=0
+LOCK=$(mktemp)
 
 while [ ! "$1" = "--" ]; do
 	case "$1" in
@@ -28,16 +25,27 @@ done
 shift
 
 if [ $SUDO -eq 1 ]; then
-	read -s -p pass: pass
+	read -s -p pass: pass 1>&2
+	echo 1>&2
 fi
 
-for h in $(cat ~/hosts); do
+OPTS="-o StrictHostKeyChecking=no"
+do_ssh() {
 	if [ $SUDO -eq 1 ]; then
-		(ssh $h "echo $pass | sudo -p ' ' -S bash -c '$@'") &
+		echo $pass | (ssh $OPTS $HOST "sudo -p ' ' -S bash -c '$@'") 2>/dev/null
 	else
-		(ssh $h "bash -c '$@'") &
+		(ssh $OPTS $HOST "bash -c '$@'")
 	fi
-done
+}
 
-pass=''
+touch $LOCK
+
+i=0
+for HOST in $(cat ~/hosts); do
+	i=$(($i + 1))
+	(ret=$(do_ssh "$@") && flock $LOCK -c "bash -c 'echo -n \"${HOST}: \" | colorify && echo -e \"$ret\"'") &
+	if [ $(($i % 10)) = 0 ]; then wait; fi
+done
 wait
+
+rm $LOCK
