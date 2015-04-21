@@ -139,5 +139,6 @@ alias _='sudo'
 sush() { local host="$1"; shift; ssh -t "$host" sudo -i "$@"; }
 alias b="$BROWSER"
 alias serve="ruby -run -e httpd . -p 9090"
+alias unssh="ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o LogLevel=quiet"
 
 # }}}
