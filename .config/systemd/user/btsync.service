@@ -1,0 +1,9 @@
+[Unit]
+Description=BitTorrent Sync
+
+[Service]
+Type=simple
+ExecStart=/usr/local/bin/btsync --nodaemon --config /home/stfomichev/.btsync/sync.conf
+
+[Install]
+WantedBy=basic.target
