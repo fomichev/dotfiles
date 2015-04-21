@@ -3,18 +3,35 @@
 set -e
 
 APP="$(basename $0)"
-usage() { echo "usage: $APP [-S] [command]"; exit; }
+usage() { echo "usage: $APP [-S] [-w <nr>] [-H <host>] [-C <command file>] [command]"; exit; }
 
-set -- `getopt S $*`
+set -- `getopt Sw:H:C: $*`
 [ ! $? -eq 0 ] && { exit 1; }
 
 SUDO=0
+cleanup() { wait; rm -f $LOCK; }
+trap cleanup EXIT
 LOCK=$(mktemp)
+MAX_WORKERS=100
+HOSTS=""
+CMD=""
 
 while [ ! "$1" = "--" ]; do
 	case "$1" in
 	-S)
 		SUDO=1
+		;;
+	-w)
+		MAX_WORKERS=$2
+		shift
+		;;
+	-H)
+		HOSTS="$HOSTS $(echo $2 | tr ',' ' ')"
+		shift
+		;;
+	-C)
+		CMD="$2"
+		shift
 		;;
 	*)
 		usage
@@ -24,28 +41,42 @@ while [ ! "$1" = "--" ]; do
 done
 shift
 
+[ -z "$HOSTS" ] && HOSTS="$(cat ~/hosts)"
+
 if [ $SUDO -eq 1 ]; then
 	read -s -p pass: pass 1>&2
 	echo 1>&2
 fi
 
-OPTS="-o StrictHostKeyChecking=no"
+OPTS="-T -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o LogLevel=quiet"
 do_ssh() {
 	if [ $SUDO -eq 1 ]; then
-		echo $pass | (ssh $OPTS $HOST "sudo -p ' ' -S bash -c '$@'") 2>/dev/null
+		if [ -z "$CMD" ]; then
+			echo $pass | ssh $OPTS $HOST "sudo -p ' ' -S bash -c 'echo; $@'" 2>&1
+		else
+			echo $pass | cat - $CMD | ssh $OPTS $HOST "sudo -p ' ' -S bash -" 2>&1
+		fi
 	else
-		(ssh $OPTS $HOST "bash -c '$@'")
+		if [ -z "$CMD" ]; then
+			ssh $OPTS $HOST "bash -c '$@'"
+		else
+			cat $CMD | ssh $OPTS $HOST "bash -"
+		fi
 	fi
 }
 
-touch $LOCK
+run() {
+	do_ssh "$@" 2>&1 | flock $LOCK -c "bash -c 'echo -n \"${HOST}:\" | colorify && cat'"
+}
 
-i=0
-for HOST in $(cat ~/hosts); do
-	i=$(($i + 1))
-	(ret=$(do_ssh "$@") && flock $LOCK -c "bash -c 'echo -n \"${HOST}: \" | colorify && echo -e \"$ret\"'") &
-	if [ $(($i % 10)) = 0 ]; then wait; fi
+running=0
+for HOST in $HOSTS; do
+	if [ $running -ge $MAX_WORKERS ]; then
+		wait -n
+		running=$(($running - 1))
+	fi
+
+	run "$@" &
+	running=$(($running + 1))
 done
 wait
-
-rm $LOCK
