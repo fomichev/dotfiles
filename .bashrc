@@ -105,9 +105,6 @@ export EDITOR=vim
 export BROWSER=w3m
 # export TERM=xterm
 
-# enable grep colors
-export GREP_OPTIONS='--color=auto'
-
 # add some color to man
 export LESS_TERMCAP_md=$(tput setaf 4)
 
