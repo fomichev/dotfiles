@@ -15,9 +15,14 @@ LOCK=$(mktemp)
 MAX_WORKERS=100
 HOSTS=""
 CMD=""
+TIMEO=60
 
 while [ ! "$1" = "--" ]; do
 	case "$1" in
+	-T)
+		TIMEO=$2
+		shift
+		;;
 	-S)
 		SUDO=1
 		;;
@@ -48,7 +53,7 @@ if [ $SUDO -eq 1 ]; then
 	echo 1>&2
 fi
 
-OPTS="-T -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o LogLevel=quiet"
+OPTS="-T -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o LogLevel=quiet -o ConnectTimeout=$TIMEO"
 do_ssh() {
 	if [ $SUDO -eq 1 ]; then
 		if [ -z "$CMD" ]; then
