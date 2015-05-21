@@ -1,0 +1,7 @@
+[Desktop Entry]
+Type=Application
+Exec=/home/stfomichev/src/dotfiles/watcher
+Hidden=false
+X-GNOME-Autostart-enabled=true
+Name=watcher
+Comment=

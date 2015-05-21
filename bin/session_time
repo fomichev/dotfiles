@@ -1,0 +1,16 @@
+#!/bin/bash
+
+set -e
+
+MAX_SESSION_TIME=60
+
+unlocked=$(cat /tmp/activity.log | grep UNLOCKED | tail -n1 | sed 's/ UNLOCKED//')
+
+begin=$(date --date="$unlocked" +"%s")
+now=$(date +"%s")
+diff=$(($now - $begin))
+min=$((diff / 60))
+
+[ $min -lt $MAX_SESSION_TIME ] && { color="green"; } || { color="red"; suffix=", go and rest"; }
+
+echo -en "#[fg=$color]$min min$suffix#[fg=default]"
