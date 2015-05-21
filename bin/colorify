@@ -2,7 +2,9 @@
 
 if [ -z $COLOR ]; then
 	case "$1" in
-		# reg
+		# normal
+		-n) color=8; shift ;;
+		# red
 		-r) color=1; shift ;;
 		# green
 		-g) color=2; shift ;;
