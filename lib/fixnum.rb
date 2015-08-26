@@ -1,4 +1,4 @@
-class Fixnum
+class Integer
   # Convert number to string with given base
   def self.to_base(number, base, plain)
     prefix = ''
@@ -40,12 +40,12 @@ class Fixnum
 
   # Return string representation of the number converted to IEC units
   def iec
-    Fixnum.humanify(self, 1024, [ '', 'KiB', 'MiB', 'GiB', 'TiB', 'PiB', 'EiB', 'ZiB', 'YiB' ])
+    Integer.humanify(self, 1024, [ '', 'KiB', 'MiB', 'GiB', 'TiB', 'PiB', 'EiB', 'ZiB', 'YiB' ])
   end
 
   # Return string representation of the number converted to SI units
   def si
-    Fixnum.humanify(self, 1000, [ '', 'kB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB' ])
+    Integer.humanify(self, 1000, [ '', 'kB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB' ])
   end
 
   # Print binary representation of a number and associated bit position
@@ -92,22 +92,22 @@ class Fixnum
 
   # Convert number to string containing binary representation
   def b(split=false)
-    Fixnum.to_base(self, 2, !split)
+    Integer.to_base(self, 2, !split)
   end
 
   # Convert number to string containing octal representation
   def o(split=false)
-    Fixnum.to_base(self, 8, !split)
+    Integer.to_base(self, 8, !split)
   end
 
   # Convert number to string containing decimal representation
   def d(split=false)
-    Fixnum.to_base(self, 10, !split)
+    Integer.to_base(self, 10, !split)
   end
 
   # Convert number to string containing hexadecimal representation
   def h(split=false)
-    Fixnum.to_base(self, 16, !split)
+    Integer.to_base(self, 16, !split)
   end
 
   # Print combined information about number
