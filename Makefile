@@ -151,14 +151,14 @@ $(MUTT_DIR)/bin/mutt: $(MUTT_SRC)
 
 mutt: $(MUTT_DIR)/bin/mutt
 
-TMUX_VER:=1.9a
+TMUX_VER:=2.0
 TMUX_SRC:=$(SRC)/tmux-$(TMUX_VER)
 TMUX_BIN:=$(BIN)/tmux
 TMUX_DIR:=$(PREFIX)/tmux
 
 $(TMUX_SRC):
 	cd $(dir $(TMUX_SRC)) && \
-	curl -LO http://downloads.sourceforge.net/project/tmux/tmux/tmux-1.9/tmux-$(TMUX_VER).tar.gz && \
+	curl -LO https://github.com/tmux/tmux/releases/download/$(TMUX_VER)/tmux-$(TMUX_VER).tar.gz && \
 	tar xf tmux-$(TMUX_VER).tar.gz
 
 $(TMUX_DIR)/bin/tmux: $(TMUX_SRC)
