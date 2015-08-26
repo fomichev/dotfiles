@@ -1,0 +1,66 @@
+#!/usr/bin/env ruby
+
+require 'time'
+
+log = "#{ENV['HOME']}/activity.log"
+
+dense = false
+ARGV.each { |arg| dense = true if arg == "-d" }
+
+f = File.open(log, "r")
+session = []
+login = nil
+f.each_line do |line|
+  unlocked = line.end_with? "UNLOCKED\n"
+
+  d, t = line.split(/\s/)
+  time = Time.parse("#{d} #{t}")
+
+  if unlocked
+    next if login
+    login = time
+  else
+    next unless login
+    session << [ login, time ]
+    login = nil
+  end
+end
+f.close
+
+if login
+  session << [ login, Time.now ]
+end
+
+class Time
+  def pretty
+    return self.strftime("%d/%m/%Y %H:%M")
+  end
+end
+
+def print_summary(start, stop, at_computer)
+    at_work = (stop - start) / 60 / 60
+    at_computer = at_computer / 60 / 60
+    puts "---- #{start.pretty} ... #{stop.pretty} #{at_work.round(2)} / #{at_computer.round(2)}"
+end
+
+prev_stop = nil
+day_start = nil
+at_computer = 0
+session.each do |s|
+  start, stop = s[0], s[1]
+
+  day_start = start unless day_start
+
+  if prev_stop and prev_stop + 8 * 60 * 60 < start
+    print_summary day_start, prev_stop, at_computer
+
+    day_start = start
+    at_computer = 0
+  end
+
+  puts "#{start.pretty} - #{stop.pretty} #{((stop - start) / 60).round(0)}" unless dense
+  prev_stop = stop
+  at_computer += stop - start
+end
+
+print_summary day_start, prev_stop, at_computer if day_start

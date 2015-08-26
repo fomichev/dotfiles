@@ -4,13 +4,14 @@ set -e
 
 MAX_SESSION_TIME=60
 
-unlocked=$(cat /tmp/activity.log | grep UNLOCKED | tail -n1 | sed 's/ UNLOCKED//')
+unlocked=$(cat /home/$USER/activity.log | grep UNLOCKED | tail -n1 | sed 's/ UNLOCKED//')
+[ -z "$unlocked" ] && { echo -en "#[fg=red]check watcher#[fg=default]"; exit 0; }
 
 begin=$(date --date="$unlocked" +"%s")
 now=$(date +"%s")
 diff=$(($now - $begin))
 min=$((diff / 60))
 
-[ $min -lt $MAX_SESSION_TIME ] && { color="green"; } || { color="red"; suffix=", go and rest"; }
+[ $min -lt $MAX_SESSION_TIME ] && { color="green"; } || { color="red"; }
 
-echo -en "#[fg=$color]$min min$suffix#[fg=default]"
+echo -en "#[fg=$color]$min min#[fg=default]"
