@@ -24,7 +24,7 @@ define InstallFile
 	};
 endef
 
-all: install init submodules $(BIN) $(SRC) vim llvm ruby mutt tmux
+all: install init submodules $(BUILD) $(SRC) vim llvm ruby mutt tmux
 
 install:
 	@$(foreach file,$(files),$(call InstallFile,$(file),$(HOME)/$(notdir $(file))))
@@ -42,14 +42,14 @@ alias:
 	cat ~/.bash_history | cut -d' ' -f1 | cut -d'|' -f1 | sort | uniq -c | sort -n | sort -nr
 
 SRC:=$(HOME)/tmp/src
-BIN:=$(HOME)/tmp/bin
+BUILD:=$(HOME)/tmp/build
 PREFIX:=$(HOME)/local
 
 $(SRC):
 	mkdir -p $(SRC)
 
-$(BIN):
-	mkdir -p $(BIN)
+$(BUILD):
+	mkdir -p $(BUILD)
 
 VIM_SRC:=$(SRC)/vim
 VIM_DIR:=$(PREFIX)/vim
@@ -82,7 +82,7 @@ vim: $(VIM_DIR)/bin/vim
 
 LLVM_VER:=3.4
 LLVM_SRC:=$(SRC)/llvm-$(LLVM_VER)
-LLVM_BIN:=$(BIN)/llvm
+LLVM_BIN:=$(BUILD)/llvm
 LLVM_DIR:=$(PREFIX)/llvm
 
 $(LLVM_SRC):
@@ -103,7 +103,7 @@ llvm: $(LLVM_DIR)/bin/llvm
 
 RUBY_VER:=2.1.0
 RUBY_SRC:=$(SRC)/ruby-$(RUBY_VER)
-RUBY_BIN:=$(BIN)/ruby
+RUBY_BIN:=$(BUILD)/ruby
 RUBY_DIR:=$(PREFIX)/ruby
 
 $(RUBY_SRC):
@@ -120,7 +120,7 @@ ruby: $(RUBY_DIR)/bin/ruby
 
 MUTT_VER:=1.5.22
 MUTT_SRC:=$(SRC)/mutt-$(MUTT_VER)
-MUTT_BIN:=$(BIN)/mutt
+MUTT_BIN:=$(BUILD)/mutt
 MUTT_DIR:=$(PREFIX)/mutt
 
 $(MUTT_SRC):
@@ -151,9 +151,9 @@ $(MUTT_DIR)/bin/mutt: $(MUTT_SRC)
 
 mutt: $(MUTT_DIR)/bin/mutt
 
-TMUX_VER:=2.0
+TMUX_VER:=2.1
 TMUX_SRC:=$(SRC)/tmux-$(TMUX_VER)
-TMUX_BIN:=$(BIN)/tmux
+TMUX_BIN:=$(BUILD)/tmux
 TMUX_DIR:=$(PREFIX)/tmux
 
 $(TMUX_SRC):
