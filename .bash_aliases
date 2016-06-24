@@ -117,8 +117,7 @@ alias ??='tmux show-messages'
 # }}}
 # version control {{{
 
-alias v="git"
-alias vv='hg'
+[ -e $HOME/local/bin/v ] || alias v="git"
 
 [ -e /usr/share/bash-completion/completions/git ] && {
 	. /usr/share/bash-completion/completions/git

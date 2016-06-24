@@ -26,11 +26,13 @@ on_darwin && {
 	}
 }
 
-path_prepend ~/local/vim/bin
-path_prepend ~/local/llvm/bin
-path_prepend ~/local/ruby/bin
-path_prepend ~/local/mutt/bin
-path_prepend ~/local/tmux/bin
+OPT_DIR=$HOME/opt
+
+path_prepend $OPT_DIR/vim/bin
+path_prepend $OPT_DIR/llvm/bin
+path_prepend $OPT_DIR/ruby/bin
+path_prepend $OPT_DIR/mutt/bin
+path_prepend $OPT_DIR/tmux/bin
 path_prepend ~/local/bin
 path_prepend ~/bin
 path_prepend ~/.rvm/bin
@@ -40,6 +42,9 @@ path_prepend /usr/local/share/python
 
 # }}}
 # Go {{{
+
+export GOROOT=$OPT_DIR/go
+path_prepend $GOROOT/bin
 
 export GOPATH=$HOME/go
 path_prepend $GOPATH/bin

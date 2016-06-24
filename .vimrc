@@ -1,8 +1,25 @@
-" Pathogen {{{1
+" Vundle {{{1
 
 set nocompatible
 filetype off
-call pathogen#infect()
+
+set rtp+=~/.vim/bundle/Vundle.vim
+call vundle#begin()
+
+Plugin 'vim-scripts/DirDiff.vim.git'
+Plugin 'kien/ctrlp.vim.git'
+Plugin 'bling/vim-airline.git'
+Plugin 'vim-airline/vim-airline-themes'
+Plugin 'altercation/vim-colors-solarized.git'
+Plugin 'tpope/vim-commentary.git'
+Plugin 'tpope/vim-fugitive.git'
+Plugin 'jnwhiteh/vim-golang.git'
+Plugin 'nelstrom/vim-markdown-folding.git'
+Plugin 'tpope/vim-rsi.git'
+Plugin 'tpope/vim-speeddating.git'
+Plugin 'bronson/vim-trailing-whitespace.git'
+
+call vundle#end()
 filetype plugin indent on
 
 "1}}}

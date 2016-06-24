@@ -1,3 +1,8 @@
+RUBY_VER:=2.3.1
+MUTT_VER:=1.6.1
+TMUX_VER:=2.2
+GOLANG_VER:=1.6.2
+
 files := $(shell find $(CURDIR) \
 	-mindepth 1 -maxdepth 1 \
 	-not -name Makefile \
@@ -24,7 +29,7 @@ define InstallFile
 	};
 endef
 
-all: install init submodules $(BUILD) $(SRC) vim llvm ruby mutt tmux
+all: install init submodules $(BUILD) $(SRC) vim ruby mutt tmux golang
 
 install:
 	@$(foreach file,$(files),$(call InstallFile,$(file),$(HOME)/$(notdir $(file))))
@@ -41,9 +46,9 @@ submodules:
 alias:
 	cat ~/.bash_history | cut -d' ' -f1 | cut -d'|' -f1 | sort | uniq -c | sort -n | sort -nr
 
-SRC:=$(HOME)/tmp/src
-BUILD:=$(HOME)/tmp/build
-PREFIX:=$(HOME)/local
+SRC:=$(HOME)/opt/tmp/src
+BUILD:=$(HOME)/opt/tmp/bld
+PREFIX:=$(HOME)/opt
 
 $(SRC):
 	mkdir -p $(SRC)
@@ -56,8 +61,7 @@ VIM_DIR:=$(PREFIX)/vim
 
 $(VIM_SRC):
 	cd $(dir $(VIM_SRC)) && \
-	hg clone https://code.google.com/p/vim/ && \
-	(cd $(VIM_SRC) && hg pull -u)
+	git clone https://github.com/vim/vim.git
 
 $(VIM_DIR)/bin/vim: $(VIM_SRC)
 	cd $(VIM_SRC) && \
@@ -80,59 +84,39 @@ $(VIM_DIR)/bin/vim: $(VIM_SRC)
 
 vim: $(VIM_DIR)/bin/vim
 
-LLVM_VER:=3.4
-LLVM_SRC:=$(SRC)/llvm-$(LLVM_VER)
-LLVM_BIN:=$(BUILD)/llvm
-LLVM_DIR:=$(PREFIX)/llvm
+vim_plugins:
+	vim +PluginInstall +qall
 
-$(LLVM_SRC):
-	cd $(dir $(LLVM_SRC)) && \
-	curl -O http://llvm.org/releases/$(LLVM_VER)/llvm-$(LLVM_VER).src.tar.gz && \
-	curl -O http://llvm.org/releases/$(LLVM_VER)/clang-$(LLVM_VER).src.tar.gz && \
-	tar xf llvm-$(LLVM_VER).src.tar.gz && \
-	tar xf clang-$(LLVM_VER).src.tar.gz && \
-	mv clang-$(LLVM_VER) llvm-$(LLVM_VER)/tools/clang
-
-$(LLVM_DIR)/bin/llvm: $(LLVM_SRC)
-	mkdir -p $(LLVM_BIN) && cd $(LLVM_DIR) && \
-	$(LLVM_SRC)/configure --with-clang \
-		    --prefix=$(LLVM_DIR) && \
-	make && make install
-
-llvm: $(LLVM_DIR)/bin/llvm
-
-RUBY_VER:=2.1.0
 RUBY_SRC:=$(SRC)/ruby-$(RUBY_VER)
 RUBY_BIN:=$(BUILD)/ruby
 RUBY_DIR:=$(PREFIX)/ruby
 
 $(RUBY_SRC):
 	cd $(dir $(RUBY_SRC)) && \
-	curl -O http://ftp.ruby-lang.org/pub/ruby/ruby-$(RUBY_VER).tar.gz && \
+	curl -LO http://ftp.ruby-lang.org/pub/ruby/ruby-$(RUBY_VER).tar.gz && \
 	tar xf ruby-$(RUBY_VER).tar.gz
 
 $(RUBY_DIR)/bin/ruby: $(RUBY_SRC)
-	mkdir -p $(RUBY_BIN) && cd $(RUBY_DIR) && \
+	mkdir -p $(RUBY_BIN) $(RUBY_DIR) && cd $(RUBY_BIN) && \
 	$(RUBY_SRC)/configure --prefix=$(RUBY_DIR) && \
 	make && make install
 
 ruby: $(RUBY_DIR)/bin/ruby
 
-MUTT_VER:=1.5.22
 MUTT_SRC:=$(SRC)/mutt-$(MUTT_VER)
 MUTT_BIN:=$(BUILD)/mutt
 MUTT_DIR:=$(PREFIX)/mutt
 
 $(MUTT_SRC):
 	cd $(dir $(MUTT_SRC)) && \
-	curl -O ftp://ftp.mutt.org/mutt/devel/mutt-$(MUTT_VER).tar.gz && \
+	curl -LO ftp://ftp.mutt.org/mutt/devel/mutt-$(MUTT_VER).tar.gz && \
 	tar xf mutt-$(MUTT_VER).tar.gz && \
 	(cd $(MUTT_SRC) && \
-		curl -O https://raw2.github.com/nedos/mutt-sidebar-patch/master/mutt-sidebar.patch && \
+		curl -LO https://raw2.github.com/nedos/mutt-sidebar-patch/master/mutt-sidebar.patch && \
 		patch -p1 < mutt-sidebar.patch)
 
 $(MUTT_DIR)/bin/mutt: $(MUTT_SRC)
-	mkdir -p $(MUTT_BIN) && cd $(MUTT_DIR) && \
+	mkdir -p $(MUTT_BIN) && cd $(MUTT_BIN) && \
 	$(MUTT_SRC)/configure --prefix=$(MUTT_DIR) \
 		    --enable-hcache \
 		    --disable-gpgme \
@@ -151,7 +135,6 @@ $(MUTT_DIR)/bin/mutt: $(MUTT_SRC)
 
 mutt: $(MUTT_DIR)/bin/mutt
 
-TMUX_VER:=2.1
 TMUX_SRC:=$(SRC)/tmux-$(TMUX_VER)
 TMUX_BIN:=$(BUILD)/tmux
 TMUX_DIR:=$(PREFIX)/tmux
@@ -167,3 +150,12 @@ $(TMUX_DIR)/bin/tmux: $(TMUX_SRC)
 	make && make install
 
 tmux: $(TMUX_DIR)/bin/tmux
+
+GOLANG_DIR:=$(PREFIX)/go
+
+$(GOLANG_DIR)/bin/go:
+	cd $(dir $(GOLANG_DIR)) && \
+	curl -LO https://storage.googleapis.com/golang/go${GOLANG_VER}.linux-amd64.tar.gz && \
+	tar xf go$(GOLANG_VER).linux-amd64.tar.gz
+
+golang: $(GOLANG_DIR)/bin/go
