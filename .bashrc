@@ -108,7 +108,6 @@ on_darwin && {
 
 export EDITOR=vim
 export BROWSER=w3m
-# export TERM=xterm
 
 # add some color to man
 export LESS_TERMCAP_md=$(tput setaf 4)

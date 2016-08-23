@@ -127,6 +127,11 @@ alias ??='tmux show-messages'
 }
 
 # }}}
+# tmux {{{
+
+alias ta='tmx attach -t 0'
+
+# }}}
 # other {{{
 
 alias j='jobs -l'

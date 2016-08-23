@@ -112,7 +112,7 @@ $(MUTT_SRC):
 	curl -LO ftp://ftp.mutt.org/mutt/devel/mutt-$(MUTT_VER).tar.gz && \
 	tar xf mutt-$(MUTT_VER).tar.gz && \
 	(cd $(MUTT_SRC) && \
-		curl -LO https://raw2.github.com/nedos/mutt-sidebar-patch/master/mutt-sidebar.patch && \
+		curl -LO https://github.com/nedos/mutt-sidebar-patch/raw/master/mutt-sidebar.patch && \
 		patch -p1 < mutt-sidebar.patch)
 
 $(MUTT_DIR)/bin/mutt: $(MUTT_SRC)
