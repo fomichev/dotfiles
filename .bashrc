@@ -28,6 +28,7 @@ on_darwin && {
 
 OPT_DIR=$HOME/opt
 
+path_prepend $OPT_DIR/bin
 path_prepend $OPT_DIR/vim/bin
 path_prepend $OPT_DIR/llvm/bin
 path_prepend $OPT_DIR/ruby/bin

@@ -129,7 +129,7 @@ alias ??='tmux show-messages'
 # }}}
 # tmux {{{
 
-alias ta='tmx attach -t 0'
+alias ta='tmux attach -d -t 0'
 
 # }}}
 # other {{{
