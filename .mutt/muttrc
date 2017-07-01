@@ -1,12 +1,12 @@
-set from = "s@fomichev.me"
+set from = "kernel@fomichev.me"
 
 set alias_file = "~/.mutt/aliases"
 source ~/.mutt/settings
 
-set spoolfile = +fomichev.me/inbox
-set record = +fomichev.me/inbox
-set mbox = +fomichev.me/inbox
-set postponed = +fomichev.me/drafts
+set spoolfile = +inbox
+set record = +inbox
+set mbox = +inbox
+set postponed = +drafts
 
-mailboxes +fomichev.me/inbox +fomichev.me/archive +fomichev.me/drafts +fomichev.me/mephi +fomichev.me/later
-save-hook . +fomichev.me/archive
+mailboxes +inbox +archive +drafts +later
+save-hook . +archive

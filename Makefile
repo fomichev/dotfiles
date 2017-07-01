@@ -29,7 +29,9 @@ define InstallFile
 	};
 endef
 
-all: install init submodules $(BUILD) $(SRC) vim ruby mutt tmux golang
+all: install init submodules $(BUILD) $(SRC)
+
+build: vim ruby mutt tmux golang
 
 install:
 	@$(foreach file,$(files),$(call InstallFile,$(file),$(HOME)/$(notdir $(file))))

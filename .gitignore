@@ -1,4 +1,6 @@
 .vim/tmp/
+.vim/bundle/
+.vim/pack/
 .mutt/cache/
 .w3m/history
 .w3m/cookie
@@ -60,7 +62,10 @@
 .config/yandex-disk
 .config/yandex-internet
 .config/yelp
-
+.config/gconf/
+.config/glade.conf
+.config/nvim/
+.config/weston.ini
 
 .cmus/
 ignore
