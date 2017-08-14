@@ -22,6 +22,6 @@ Anonymous Pro http://www.ms-studio.com/FontSales/anonymouspro.html
 * p - print current directory and version control information
 * q - quilt
 * v - git
-* vv - hg
 * w - sorted w
 * x - extract archive
+* y - yank

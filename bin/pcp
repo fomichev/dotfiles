@@ -1,8 +1,0 @@
-#!/bin/bash
-
-set -e
-
-for h in $(cat ~/hosts); do
-	(scp "$@" $h:) &
-done
-wait
