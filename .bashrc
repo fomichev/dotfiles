@@ -33,7 +33,6 @@ path_prepend $OPT_DIR/vim/bin
 path_prepend $OPT_DIR/llvm/bin
 path_prepend $OPT_DIR/ruby/bin
 path_prepend $OPT_DIR/mutt/bin
-path_prepend $OPT_DIR/tmux/bin
 path_prepend ~/local/bin
 path_prepend ~/bin
 path_prepend ~/.rvm/bin

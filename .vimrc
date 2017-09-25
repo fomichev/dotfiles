@@ -18,6 +18,7 @@ Plugin 'nelstrom/vim-markdown-folding.git'
 Plugin 'tpope/vim-rsi.git'
 Plugin 'tpope/vim-speeddating.git'
 Plugin 'bronson/vim-trailing-whitespace.git'
+Plugin 'rust-lang/rust.vim'
 
 call vundle#end()
 filetype plugin indent on
