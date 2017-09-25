@@ -96,10 +96,8 @@ alias q='quilt'
 # n {{{
 
 _n() {
-    local cur IFS=$'\n'
-    cur="${COMP_WORDS[COMP_CWORD]}"
-
-    COMPREPLY=( $(compgen -W "$(n -l)" -- "${cur}") )
+	local cur="${COMP_WORDS[COMP_CWORD]}"
+	COMPREPLY=( $(n -l | grep "^${cur}") )
 }
 complete -o nospace -F _n n
 
