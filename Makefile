@@ -1,7 +1,7 @@
-RUBY_VER:=2.3.1
+RUBY_VER:=2.4.1
 MUTT_VER:=1.6.1
 TMUX_VER:=2.5
-GOLANG_VER:=1.6.2
+GOLANG_VER:=1.9
 
 files := $(shell find $(CURDIR) \
 	-mindepth 1 -maxdepth 1 \
