@@ -1,7 +1,0 @@
-[Desktop Entry]
-Type=Application
-Exec=/usr/local/bin/watcher
-Hidden=false
-X-GNOME-Autostart-enabled=true
-Name=watcher
-Comment=

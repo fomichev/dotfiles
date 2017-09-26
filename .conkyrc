@@ -1,9 +1,0 @@
-background no
-total_run_times 1
-own_window no
-use_spacer none
-out_to_x no
-out_to_console yes
-
-TEXT
-${battery_time} ${battery} | ${loadavg 1} | ${memperc}% | ${time %H:%M %d %b}
