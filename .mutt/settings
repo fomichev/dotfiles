@@ -3,20 +3,7 @@ set signature = ~/.mutt/signature
 
 set envelope_from
 
-# imap settings
-set imap_user = "kernel@fomichev.me"
-unset imap_passive
-set imap_check_subscribed
-set folder = "imaps://imap.gmail.com/"
-set ssl_starttls = yes
-set ssl_force_tls = yes
-
-set sendmail = msmtp
-#set mbox_type = Maildir
-#set folder = "~/.mail"
-
-# threaded sort
-set sort = threads
+set sendmail = "msmtp -a kernel"
 
 # check regulary
 set timeout = 15
@@ -72,7 +59,7 @@ set print_command="muttprint -p - | ps2pdf - $HOME/tmp/muttprint.pdf"
 set print_split = yes
 
 # sort messages by last received in thread
-set sort=reverse-threads
+set sort=threads
 set sort_aux=last-date-received
 
 # pager: don't go to next message automatically
@@ -99,5 +86,6 @@ color body green default "^[\+][^\+]+.*"
 color body red  default "^\-[^\-]+.*"
 color body cyan default "^@@ .*"
 
-# set imap_pass=""
-source ~/local/.mutt/password
+# change date format a bit
+set date_format = "%m/%d"
+set index_format = "[%Z]  %D  %-20.20F  %s"

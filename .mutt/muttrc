@@ -1,12 +1,13 @@
 set from = "kernel@fomichev.me"
 
 set alias_file = "~/.mutt/aliases"
+
+set mbox_type = Maildir
+set folder = "~/.mail"
+set mbox = "+kernel/INBOX"
+set spoolfile = "+kernel/INBOX"
+set record = "+kernel/INBOX"
+set postponed = "+kernel/[Gmail].Drafts"
+
+source ~/.mail/mailboxes
 source ~/.mutt/settings
-
-set spoolfile = +inbox
-set record = +inbox
-set mbox = +inbox
-set postponed = +drafts
-
-mailboxes +inbox +archive +drafts +later
-save-hook . +archive
