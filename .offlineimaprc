@@ -1,9 +1,6 @@
 [general]
-ui = ttyui
 accounts = kernel
 fsync = false
-autorefresh = 0.5
-quick = 10
 
 [mbnames]
 enabled = yes
@@ -16,6 +13,8 @@ footer = "\n"
 [Account kernel]
 localrepository = kernel-local
 remoterepository = kernel-remote
+autorefresh = 5
+quick = 10
 
 [Repository kernel-local]
 type = Maildir
@@ -28,6 +27,7 @@ remoteuser = kernel@fomichev.me
 remotepass = secret
 remotepasseval = open('/home/sdf/local/.msmtp_password', 'r').read()
 realdelete = no
+ssl = yes
 sslcacertfile = /etc/ssl/certs/ca-certificates.crt
 keepalive = 60
 holdconnectionopen = yes
