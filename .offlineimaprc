@@ -15,6 +15,7 @@ localrepository = kernel-local
 remoterepository = kernel-remote
 autorefresh = 5
 quick = 10
+presynchook = imapfilter -c ~/.imapfilter-kernel.lua
 
 [Repository kernel-local]
 type = Maildir
