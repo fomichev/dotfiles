@@ -2,8 +2,17 @@
 
 DIR=$HOME/notes
 
-[ "$1" = "-l" ] && {
-	(cd $DIR && find . -name '*.txt' | sed -e 's@^\./@@' -e 's@.txt$@@')
-} || {
-	$EDITOR "$DIR/${@}.txt"
-}
+case "$1" in
+	"-l")
+		(cd $DIR && find . -name '*.txt' | sed -e 's@^\./@@' -e 's@.txt$@@')
+		;;
+	"--push")
+		rclone sync -v ~/notes remote:Notes
+		;;
+	"--pull")
+		rclone sync -v remote:Notes ~/notes
+		;;
+	*)
+		$EDITOR "$DIR/${@}.txt"
+		;;
+esac
