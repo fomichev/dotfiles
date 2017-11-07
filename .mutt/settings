@@ -75,6 +75,7 @@ alternative_order text/plain text/html
 source $alias_file
 source ~/.mutt/bindings
 source ~/.mutt/lists
+source ~/.mutt/colors
 
 # highlight patches
 color body brightcyan default "^diff \-.*"

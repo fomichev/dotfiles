@@ -1,0 +1,12 @@
+color error         red             default
+color tilde         black           default
+color message       cyan            default
+color markers       red             white
+color attachment    white           default
+color search        brightmagenta   default
+color status        brightyellow    black
+color indicator     black           yellow
+color tree          yellow          default
+
+# highlight new messages
+color index         red             default         "~N"
