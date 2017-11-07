@@ -130,6 +130,13 @@ alias ??='tmux show-messages'
 alias ta='tmux attach -d -t 0'
 
 # }}}
+# tree {{{
+
+tree() {
+	ls -R $* | grep ':$' | sed -e 's/:$//' -e 's/[^\/]*\//|  /g' -e 's/|  \([^|]\)/`--\1/g'
+}
+
+#}}}
 # other {{{
 
 alias j='jobs -l'

@@ -36,6 +36,9 @@ build: vim ruby mutt tmux golang
 install:
 	@$(foreach file,$(files),$(call InstallFile,$(file),$(HOME)/$(notdir $(file))))
 
+colors:
+	./base16-gnome-terminal/color-scripts/base16-ocean.sh
+
 init:
 	git submodule init && \
 	git submodule sync && \

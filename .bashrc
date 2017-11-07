@@ -92,11 +92,6 @@ on_darwin && $(brew_prefix)/etc/profile.d/bash_completion
 # }}}
 # OS dependent settings {{{
 
-on_linux && {
-	# enable ls colors
-	eval $(dircolors ~/.dir_colors)
-}
-
 on_darwin && {
 	# enable ls colors
 	export CLICOLOR=
@@ -120,17 +115,3 @@ stty -ixon
 [ -e ~/local/.bashrc ] && { . ~/local/.bashrc; }
 
 # }}}
-# Cowsay {{{
-
-if [[ $- == *i* ]]; then
-	[ -x /usr/bin/cowsay ] && { cowsay $(fortune); }
-fi
-
-# }}}
-# Tree {{{
-
-tree() {
-	ls -R $* | grep ':$' | sed -e 's/:$//' -e 's/[^\/]*\//|  /g' -e 's/|  \([^|]\)/`--\1/g'
-}
-
-#}}}

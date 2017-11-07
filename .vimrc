@@ -10,7 +10,6 @@ Plugin 'vim-scripts/DirDiff.vim.git'
 Plugin 'kien/ctrlp.vim.git'
 Plugin 'bling/vim-airline.git'
 Plugin 'vim-airline/vim-airline-themes'
-Plugin 'altercation/vim-colors-solarized.git'
 Plugin 'tpope/vim-commentary.git'
 Plugin 'tpope/vim-fugitive.git'
 Plugin 'jnwhiteh/vim-golang.git'
@@ -19,6 +18,7 @@ Plugin 'tpope/vim-rsi.git'
 Plugin 'tpope/vim-speeddating.git'
 Plugin 'bronson/vim-trailing-whitespace.git'
 Plugin 'rust-lang/rust.vim'
+Plugin 'chriskempson/base16-vim'
 
 call vundle#end()
 filetype plugin indent on
@@ -195,27 +195,11 @@ endif
 
 " 1}}}
 " Color scheme {{{1
-" GNU Screen / Tmux {{{2
-
-if &term == "screen" || &term == "screen-256color"
-	set term=xterm
-	" problem with PuTTY
-	let g:solarized_termtrans = 1
-endif
-
-" 2}}}
-" Solarized settings {{{2
-
-let g:solarized_underline = 0
-let g:solarized_bold = 1
-let g:solarized_italic = 1
-
-" 2}}}
 
 syntax enable
 set t_Co=16
 set background=dark
-colorscheme solarized
+colorscheme base16-ocean
 
 " Color scheme enhancements {{{2
 
@@ -373,7 +357,6 @@ let g:Gitv_DoNotMapCtrlKey = 1
 " 2}}}
 " Airline {{{2
 
-let g:airline_theme='solarized'
 let g:airline_powerline_fonts = 1
 let g:airline#extensions#whitespace#enabled = 0
 
