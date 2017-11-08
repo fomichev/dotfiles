@@ -7,10 +7,10 @@ case "$1" in
 		(cd $DIR && find . -name '*.txt' | sed -e 's@^\./@@' -e 's@.txt$@@')
 		;;
 	"--push")
-		rclone sync -v ~/notes remote:Notes
+		rclone sync -v ~/notes remote:notes
 		;;
 	"--pull")
-		rclone sync -v remote:Notes ~/notes
+		rclone sync -v remote:notes ~/notes
 		;;
 	*)
 		$EDITOR "$DIR/${@}.txt"
