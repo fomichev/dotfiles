@@ -29,9 +29,16 @@ define InstallFile
 	};
 endef
 
-all: install init submodules $(BUILD) $(SRC)
+SRC:=$(HOME)/opt
+PREFIX:=$(HOME)/opt
 
-build: abduco nvim ruby mutt tmux golang
+$(PREFIX):
+	mkdir -p $(PREFIX)
+	mkdir -p $(PREFIX)/bin
+
+all: $(PREFIX) install init submodules $(BUILD) $(SRC)
+
+build: alacritty abduco nvim
 
 install:
 	@$(foreach file,$(files),$(call InstallFile,$(file),$(HOME)/$(notdir $(file))))
@@ -50,12 +57,6 @@ submodules:
 
 alias:
 	cat ~/.bash_history | cut -d' ' -f1 | cut -d'|' -f1 | sort | uniq -c | sort -n | sort -nr
-
-SRC:=$(HOME)/opt
-PREFIX:=$(HOME)/opt
-
-$(SRC):
-	mkdir -p $(SRC)
 
 ALACRITTY_SRC:=$(SRC)/alacritty
 $(ALACRITTY_SRC):
@@ -76,7 +77,7 @@ $(ABDUCO_SRC):
 
 $(PREFIX)/bin/abduco: $(ABDUCO_SRC)
 	cd $(ABDUCO_SRC) && \
-		./configure --prefix=$(PREFIX) && make && make install
+		./configure --prefix=$(PREFIX)/ && make && make install
 
 abduco: $(PREFIX)/bin/abduco
 
