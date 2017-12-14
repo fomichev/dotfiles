@@ -44,7 +44,7 @@ install:
 	@$(foreach file,$(files),$(call InstallFile,$(file),$(HOME)/$(notdir $(file))))
 
 colors:
-	./base16-gnome-terminal/color-scripts/base16-ocean.sh
+	base16_ocean
 
 init:
 	git submodule init && \

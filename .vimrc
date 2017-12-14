@@ -264,8 +264,6 @@ nnoremap ? /\v
 " use sudo to save file
 cmap w!! w !sudo tee % > /dev/null
 
-"imap jj <Esc>
-
 " 2}}}
 " Windows {{{2
 
