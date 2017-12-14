@@ -264,6 +264,12 @@ nnoremap ? /\v
 " use sudo to save file
 cmap w!! w !sudo tee % > /dev/null
 
+" open new tab
+nnoremap <leader>n :tabnew<CR>
+
+" close current buffer
+nnoremap <leader>q :bd<CR>
+
 " 2}}}
 " Windows {{{2
 
@@ -281,15 +287,15 @@ inoremap <C-l> <Esc><C-w>li
 " 2}}}
 "" Tabs {{{2
 
-  nmap <leader>1 <Plug>AirlineSelectTab1
-  nmap <leader>2 <Plug>AirlineSelectTab2
-  nmap <leader>3 <Plug>AirlineSelectTab3
-  nmap <leader>4 <Plug>AirlineSelectTab4
-  nmap <leader>5 <Plug>AirlineSelectTab5
-  nmap <leader>6 <Plug>AirlineSelectTab6
-  nmap <leader>7 <Plug>AirlineSelectTab7
-  nmap <leader>8 <Plug>AirlineSelectTab8
-  nmap <leader>9 <Plug>AirlineSelectTab9
+nmap <leader>1 <Plug>AirlineSelectTab1
+nmap <leader>2 <Plug>AirlineSelectTab2
+nmap <leader>3 <Plug>AirlineSelectTab3
+nmap <leader>4 <Plug>AirlineSelectTab4
+nmap <leader>5 <Plug>AirlineSelectTab5
+nmap <leader>6 <Plug>AirlineSelectTab6
+nmap <leader>7 <Plug>AirlineSelectTab7
+nmap <leader>8 <Plug>AirlineSelectTab8
+nmap <leader>9 <Plug>AirlineSelectTab9
 
 "" 2}}}
 " Folding {{{2
@@ -385,32 +391,12 @@ autocmd BufRead,BufNewFile *.h setlocal filetype=c
 autocmd BufRead,BufNewFile *.taskpaper setlocal filetype=taskpaper
 
 " 1}}}
-" Local configuration {{{1
-
-" execute local configuration
-if filereadable(expand($HOME) . '/local/.vimrc')
-	source $HOME/local/.vimrc
-endif
-
 " Neovim {{{1
 
 if has('nvim')
-  autocmd VimEnter * if !empty($NVIM_LISTEN_ADDRESS) && $NVIM_LISTEN_ADDRESS !=# v:servername
-        \ |let g:r=jobstart(['nc', '-U', $NVIM_LISTEN_ADDRESS],{'rpc':v:true})
-        \ |let g:f=fnameescape(expand('%:p'))
-        \ |call rpcrequest(g:r, "nvim_command", "tabnew ".g:f)
-        \ |qa!
-        \ |endif
-
   tnoremap <Esc> <C-\><C-n>
   tnoremap jj <C-\><C-n>
   inoremap jj <Esc>
-  nnoremap <leader>n :tabnew<CR>
-  nnoremap <leader>b :terminal<CR>:set nonumber<CR>:set norelativenumber<CR>i
-  nnoremap <leader>s <C-w>s:terminal<CR>:set nonumber<CR>:set norelativenumber<CR>i
-  nnoremap <leader>v <C-w>v:terminal<CR>:set nonumber<CR>:set norelativenumber<CR>i
-  nnoremap <leader>q :bd
-  nnoremap <leader>r :file 
 
   tnoremap <C-h> <C-\><C-n><C-w>hi
   tnoremap <C-j> <C-\><C-n><C-w>ji
@@ -423,5 +409,13 @@ endif
 " Open tab with notes {{{1
 
 nnoremap <leader>z :lcd ~/notes<CR>:CtrlP<CR>
+
+" 1}}}
+" Local configuration {{{1
+
+" execute local configuration
+if filereadable(expand($HOME) . '/local/.vimrc')
+	source $HOME/local/.vimrc
+endif
 
 " 1}}}

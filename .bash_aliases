@@ -10,7 +10,6 @@ alias a='ls -lah'
 # vim {{{
 
 alias vim=nvim
-alias nvim-send="$HOME/.config/nvim/nvim-send.py"
 
 e() {
 	if [ $# -eq 0 ]; then
@@ -52,26 +51,15 @@ alias decrypt='gpg --decrypt'
 # }}}
 # cd {{{
 
-function __cd() {
-  builtin cd "$@"
-  (ps -ocommand= -p $PPID | grep -q nvim) && nvim-send :tcd "$PWD"
-}
+alias ..='cd .. && p'
+alias ...='cd ../.. && p'
+alias ....='cd ../../.. && p'
+alias .....='cd ../../../.. && p'
+alias ......='cd ../../../../.. && p'
+alias -- -='cd - && p'
 
-alias ..='__cd .. && p'
-alias ...='__cd ../.. && p'
-alias ....='__cd ../../.. && p'
-alias .....='__cd ../../../.. && p'
-alias ......='__cd ../../../../.. && p'
-alias -- -='__cd - && p'
-alias cd=__cd
-
-d() { __cd "$@" &>/dev/null && echo "$(pwd):" | colorify && l; }
+d() { builtin cd "$@" &>/dev/null && echo "$(pwd):" | colorify && l; }
 complete -o filenames -o nospace -F _cd d
-
-# }}}
-# surfraw {{{
-
-alias sr='surfraw -browser=w3m'
 
 # }}}
 # quilt {{{

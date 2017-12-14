@@ -5,9 +5,22 @@ set convert-meta off
 
 set bell-style none
 
+set editing-mode vi
+set keymap vi
+
 set colored-stats on
 set mark-symlinked-directories on
 
 set show-all-if-ambiguous on
 set show-all-if-unmodified on
 set visible-stats on
+
+"k": history-search-backward
+"j": history-search-forward
+
+"\C-k": previous-history
+"\C-j": next-history
+
+set keymap vi-insert
+"\C-l": clear-screen
+"jj": vi-movement-mode

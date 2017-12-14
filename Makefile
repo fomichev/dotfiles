@@ -38,7 +38,7 @@ $(PREFIX):
 
 all: $(PREFIX) install init submodules $(BUILD) $(SRC)
 
-build: alacritty abduco nvim
+build: nvim
 
 install:
 	@$(foreach file,$(files),$(call InstallFile,$(file),$(HOME)/$(notdir $(file))))
@@ -57,29 +57,6 @@ submodules:
 
 alias:
 	cat ~/.bash_history | cut -d' ' -f1 | cut -d'|' -f1 | sort | uniq -c | sort -n | sort -nr
-
-ALACRITTY_SRC:=$(SRC)/alacritty
-$(ALACRITTY_SRC):
-	cd $(SRC) && \
-		git clone https://github.com/jwilm/alacritty.git
-
-$(PREFIX)/bin/alacritty: $(ALACRITTY_SRC)
-	cd $(ALACRITTY_SRC) && \
-		cargo build --release
-
-alacritty: $(PREFIX)/bin/alacritty
-	cp $(ALACRITTY_SRC)/target/release/alacritty $(PREFIX)/bin
-
-ABDUCO_SRC:=$(SRC)/abduco
-$(ABDUCO_SRC):
-	cd $(SRC) && \
-		git clone https://github.com/martanne/abduco.git
-
-$(PREFIX)/bin/abduco: $(ABDUCO_SRC)
-	cd $(ABDUCO_SRC) && \
-		./configure --prefix=$(PREFIX)/ && make && make install
-
-abduco: $(PREFIX)/bin/abduco
 
 NVIM_SRC:=$(SRC)/neovim
 $(NVIM_SRC):
