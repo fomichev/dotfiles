@@ -1,6 +1,6 @@
 RUBY_VER:=2.4.1
 MUTT_VER:=1.6.1
-TMUX_VER:=2.5
+TMUX_VER:=2.6
 GOLANG_VER:=1.9
 
 files := $(shell find $(CURDIR) \
