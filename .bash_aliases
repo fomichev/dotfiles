@@ -2,34 +2,15 @@
 
 # ls {{{
 
-on_linux && { alias ls='ls --color=auto'; }
+alias ls='ls --color=auto'
+alias l='ls -AF --group-directories-first';
 alias a='ls -lah'
-
-on_darwin && \
-	{ alias l='ls -AF'; } || \
-	{ alias l='ls -AF --group-directories-first'; }
 
 # }}}
 # vim {{{
 
-if which mvim &>/dev/null; then
-	alias gvim='mvim'
-	alias vim='mvim -v'
-else
-	if which cvim &>/dev/null; then
-		alias vim='cvim'
-	else
-		alias vim='vim'
-	fi
-fi
-
-E() {
-	if [ $# -eq 0 ]; then
-		gvim --remote-silent .
-	else
-		gvim --remote-silent "$@"
-	fi
-}
+alias vim=nvim
+alias nvim-send="$HOME/.config/nvim/nvim-send.py"
 
 e() {
 	if [ $# -eq 0 ]; then
@@ -48,9 +29,8 @@ __diff() {
 }
 
 ediff() { __diff vim "$1" "$2"; }
-Ediff() { __diff gvim "$1" "$2"; }
 
-alias s='vim ~/s'
+alias s='e ~/s'
 alias scratch='s'
 
 # }}}
@@ -72,14 +52,20 @@ alias decrypt='gpg --decrypt'
 # }}}
 # cd {{{
 
-alias ..='cd .. && p'
-alias ...='cd ../.. && p'
-alias ....='cd ../../.. && p'
-alias .....='cd ../../../.. && p'
-alias ......='cd ../../../../.. && p'
-alias -- -='cd - && p'
+function __cd() {
+  builtin cd "$@"
+  (ps -ocommand= -p $PPID | grep -q nvim) && nvim-send :tcd "$PWD"
+}
 
-d() { builtin cd "$@" &>/dev/null && echo "$(pwd):" | colorify && l; }
+alias ..='__cd .. && p'
+alias ...='__cd ../.. && p'
+alias ....='__cd ../../.. && p'
+alias .....='__cd ../../../.. && p'
+alias ......='__cd ../../../../.. && p'
+alias -- -='__cd - && p'
+alias cd=__cd
+
+d() { __cd "$@" &>/dev/null && echo "$(pwd):" | colorify && l; }
 complete -o filenames -o nospace -F _cd d
 
 # }}}

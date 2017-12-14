@@ -2,29 +2,11 @@
 
 umask 027
 
-# Detect OS type {{{
-
-uname=$(uname)
-on_darwin() { test $uname = 'Darwin'; }
-on_linux() { test $uname = 'Linux'; }
-on_cygwin() { test $uname = 'MINGW32_NT-5.1'; }
-brew_prefix() { echo $(/usr/local/bin/brew --prefix $1 2>/dev/null); }
-npm_prefix() { echo $(/usr/local/bin/npm prefix -g 2>/dev/null); }
-
-on_cygwin && return # do nothing on cygwin
-
-# }}}
 # Modify PATH {{{
 
 path_append() { [ -e $1 ] && { export PATH=$PATH:$1; }; }
 path_prepend() { [ -e $1 ] && { export PATH=$1:$PATH; }; }
 try_source() { [ -r $1 ] && { . $1; }; }
-
-on_darwin && {
-	[ -d $(npm_prefix)/bin ] && {
-		path_prepend $(npm_prefix)/bin
-	}
-}
 
 OPT_DIR=$HOME/opt
 
@@ -49,23 +31,9 @@ export GOPATH=$HOME/go
 path_prepend $GOPATH/bin
 
 # }}}
-# Include RVM {{{
-
-[ -s ~/.rvm/scripts/rvm ] && . ~/.rvm/scripts/rvm
-
-# }}}
-# Include Tmuxifier {{{
-
-[ -e ~/.bundle/tmuxifier/bin/tmuxifier ] && {
-	export TMUXIFIER_LAYOUT_PATH=~/.tmuxifier
-	path_prepend ~/.bundle/tmuxifier/bin
-	eval "$(tmuxifier init -)"
-}
-
-# }}}
 # Include aliases {{{
 
-. ~/.bash_aliases
+try_source ~/.bash_aliases
 
 # }}}
 # Bash settings {{{
@@ -87,16 +55,6 @@ export CDPATH='.:~/src:~/Dropbox/src:~/y/src:~/go/src'
 try_source /etc/bash_completion
 try_source /etc/profile.d/bash_completion.sh
 
-on_darwin && $(brew_prefix)/etc/profile.d/bash_completion
-
-# }}}
-# OS dependent settings {{{
-
-on_darwin && {
-	# enable ls colors
-	export CLICOLOR=
-}
-
 # }}}
 # Utilities settings {{{
 
@@ -106,12 +64,17 @@ export BROWSER=w3m
 # add some color to man
 export LESS_TERMCAP_md=$(tput setaf 4)
 
+# base16 colors
+BASE16_SHELL=$HOME/src/dotfiles/base16-shell/
+[ -s $BASE16_SHELL/profile_helper.sh ] && eval "$($BASE16_SHELL/profile_helper.sh)"
+base16_ocean
+
 # disable start/stop (Ctrl-S/Ctrl-Q) functionality
 stty -ixon
 
 # }}}
 # Include local settings {{{
 
-[ -e ~/local/.bashrc ] && { . ~/local/.bashrc; }
+try_source ~/local/.bashrc
 
 # }}}

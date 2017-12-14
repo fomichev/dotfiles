@@ -31,7 +31,7 @@ endef
 
 all: install init submodules $(BUILD) $(SRC)
 
-build: vim ruby mutt tmux golang
+build: abduco nvim ruby mutt tmux golang
 
 install:
 	@$(foreach file,$(files),$(call InstallFile,$(file),$(HOME)/$(notdir $(file))))
@@ -51,51 +51,52 @@ submodules:
 alias:
 	cat ~/.bash_history | cut -d' ' -f1 | cut -d'|' -f1 | sort | uniq -c | sort -n | sort -nr
 
-SRC:=$(HOME)/opt/tmp/src
-BUILD:=$(HOME)/opt/tmp/bld
+SRC:=$(HOME)/opt
 PREFIX:=$(HOME)/opt
 
 $(SRC):
 	mkdir -p $(SRC)
 
-$(BUILD):
-	mkdir -p $(BUILD)
+ALACRITTY_SRC:=$(SRC)/alacritty
+$(ALACRITTY_SRC):
+	cd $(SRC) && \
+		git clone https://github.com/jwilm/alacritty.git
 
-VIM_SRC:=$(SRC)/vim
+$(PREFIX)/bin/alacritty: $(ALACRITTY_SRC)
+	cd $(ALACRITTY_SRC) && \
+		cargo build --release
 
-$(VIM_SRC):
-	cd $(dir $(VIM_SRC)) && \
-	git clone https://github.com/vim/vim.git
+alacritty: $(PREFIX)/bin/alacritty
+	cp $(ALACRITTY_SRC)/target/release/alacritty $(PREFIX)/bin
 
-$(PREFIX)/bin/vim: $(VIM_SRC)
-	cd $(VIM_SRC) && \
-	find -name configure -exec chmod +x {} \; && \
-	find -name which.sh -exec chmod +x {} \; && \
-	./configure --with-features=huge \
-		    --disable-nls \
-		    --disable-acl \
-		    --disable-gpm \
-		    --disable-sysmouse \
-		    --disable-netbeans \
-		    --enable-rubyinterp=yes \
-		    --enable-pythoninterp=yes \
-		    --with-x \
-		    --with-gnome \
-		    --enable-multibyte \
-		    --prefix=$(PREFIX) && \
-	make && make install && \
-	cp -a runtime/keymap $(PREFIX)/share/vim/vim73/
+ABDUCO_SRC:=$(SRC)/abduco
+$(ABDUCO_SRC):
+	cd $(SRC) && \
+		git clone https://github.com/martanne/abduco.git
 
-vim: $(PREFIX)/bin/vim
+$(PREFIX)/bin/abduco: $(ABDUCO_SRC)
+	cd $(ABDUCO_SRC) && \
+		./configure --prefix=$(PREFIX) && make && make install
 
-vim_plugins:
-	vim +PluginInstall +qall
+abduco: $(PREFIX)/bin/abduco
+
+NVIM_SRC:=$(SRC)/neovim
+$(NVIM_SRC):
+	cd $(SRC) && \
+		git clone https://github.com/neovim/neovim.git
+
+$(PREFIX)/bin/nvim: $(NVIM_SRC)
+	cd $(NVIM_SRC) && \
+		make CMAKE_EXTRA_FLAGS="-DCMAKE_INSTALL_PREFIX=$(PREFIX)" && \
+		make install
+
+nvim: $(PREFIX)/bin/nvim
 
 RUBY_SRC:=$(SRC)/ruby-$(RUBY_VER)
-RUBY_BIN:=$(BUILD)/ruby
+RUBY_BIN:=$(RUBY_SRC)/build
 
 $(RUBY_SRC):
-	cd $(dir $(RUBY_SRC)) && \
+	cd $(SRC) && \
 	curl -LO http://ftp.ruby-lang.org/pub/ruby/ruby-$(RUBY_VER).tar.gz && \
 	tar xf ruby-$(RUBY_VER).tar.gz
 
@@ -107,10 +108,10 @@ $(PREFIX)/bin/ruby: $(RUBY_SRC)
 ruby: $(PREFIX)/bin/ruby
 
 MUTT_SRC:=$(SRC)/mutt-$(MUTT_VER)
-MUTT_BIN:=$(BUILD)/mutt
+MUTT_BIN:=$(MUTT_SRC)/build
 
 $(MUTT_SRC):
-	cd $(dir $(MUTT_SRC)) && \
+	cd $(SRC) && \
 	curl -LO ftp://ftp.mutt.org/mutt/devel/mutt-$(MUTT_VER).tar.gz && \
 	tar xf mutt-$(MUTT_VER).tar.gz && \
 	(cd $(MUTT_SRC) && \
@@ -138,10 +139,10 @@ $(PREFIX)/bin/mutt: $(MUTT_SRC)
 mutt: $(PREFIX)/bin/mutt
 
 TMUX_SRC:=$(SRC)/tmux-$(TMUX_VER)
-TMUX_BIN:=$(BUILD)/tmux
+TMUX_BIN:=$(TMUX_SRC)/build
 
 $(TMUX_SRC):
-	cd $(dir $(TMUX_SRC)) && \
+	cd $(SRC) && \
 	curl -LO https://github.com/tmux/tmux/releases/download/$(TMUX_VER)/tmux-$(TMUX_VER).tar.gz && \
 	tar xf tmux-$(TMUX_VER).tar.gz
 
@@ -161,10 +162,10 @@ golang: $(PREFIX)/bin/go
 
 CMAKE_VER:=3.9.0-rc2
 CMAKE_SRC:=$(SRC)/cmake-$(CMAKE_VER)
-CMAKE_BIN:=$(BUILD)/cmake
+CMAKE_BIN:=$(CMAKE_SRC)/build
 
 $(CMAKE_SRC):
-	cd $(dir $(CMAKE_SRC)) && \
+	cd $(SRC) && \
 	curl -LO https://cmake.org/files/v3.9/cmake-$(CMAKE_VER).tar.gz && \
 	tar xf cmake-$(CMAKE_VER).tar.gz
 
@@ -177,10 +178,10 @@ cmake: $(PREFIX)/bin/cmake
 
 LLVM_VER:=4.0.0
 LLVM_SRC:=$(SRC)/llvm-$(LLVM_VER).src
-LLVM_BIN:=$(BUILD)/llvm
+LLVM_BIN:=$(LLVM_SRC)/build
 
 $(LLVM_SRC):
-	cd $(dir $(LLVM_SRC)) && \
+	cd $(SRC) && \
 	curl -LO http://releases.llvm.org/$(LLVM_VER)/llvm-$(LLVM_VER).src.tar.xz && \
 	curl -LO http://releases.llvm.org/$(LLVM_VER)/cfe-$(LLVM_VER).src.tar.xz && \
 	tar xf llvm-$(LLVM_VER).src.tar.xz && \

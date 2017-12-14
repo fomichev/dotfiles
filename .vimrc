@@ -196,10 +196,12 @@ endif
 " 1}}}
 " Color scheme {{{1
 
+set termguicolors
 syntax enable
-set t_Co=16
-set background=dark
-colorscheme base16-ocean
+if filereadable(expand("~/.vimrc_background"))
+  let base16colorspace=256
+  source ~/.vimrc_background
+endif
 
 " Color scheme enhancements {{{2
 
@@ -273,20 +275,25 @@ nnoremap <C-j> <C-w>j
 nnoremap <C-k> <C-w>k
 nnoremap <C-l> <C-w>l
 
-" 2}}}
-" Tabs {{{2
-
-map <Leader>1 1gt
-map <Leader>2 2gt
-map <Leader>3 3gt
-map <Leader>4 4gt
-map <Leader>5 5gt
-map <Leader>6 6gt
-map <Leader>7 7gt
-map <Leader>8 8gt
-map <Leader>9 9gt
+inoremap <C-h> <Esc><C-w>hi
+inoremap <C-j> <Esc><C-w>ji
+inoremap <C-k> <Esc><C-w>ki
+inoremap <C-l> <Esc><C-w>li
 
 " 2}}}
+"" Tabs {{{2
+
+  nmap <leader>1 <Plug>AirlineSelectTab1
+  nmap <leader>2 <Plug>AirlineSelectTab2
+  nmap <leader>3 <Plug>AirlineSelectTab3
+  nmap <leader>4 <Plug>AirlineSelectTab4
+  nmap <leader>5 <Plug>AirlineSelectTab5
+  nmap <leader>6 <Plug>AirlineSelectTab6
+  nmap <leader>7 <Plug>AirlineSelectTab7
+  nmap <leader>8 <Plug>AirlineSelectTab8
+  nmap <leader>9 <Plug>AirlineSelectTab9
+
+"" 2}}}
 " Folding {{{2
 
 " use space to open/close folds
@@ -359,6 +366,14 @@ let g:Gitv_DoNotMapCtrlKey = 1
 
 let g:airline_powerline_fonts = 1
 let g:airline#extensions#whitespace#enabled = 0
+let g:airline#extensions#tabline#enabled = 1
+let g:airline#extensions#tabline#tab_nr_type = 1
+let g:airline#extensions#tabline#show_tab_type = 0
+let g:airline#extensions#tabline#buffer_idx_mode = 1
+let g:airline#extensions#tabline#show_close_button = 0
+
+let g:airline#extensions#tabline#show_splits = 0
+let g:airline#extensions#tabline#show_buffers = 0
 
 " 2}}}
 " 1}}}
@@ -378,5 +393,37 @@ autocmd BufRead,BufNewFile *.taskpaper setlocal filetype=taskpaper
 if filereadable(expand($HOME) . '/local/.vimrc')
 	source $HOME/local/.vimrc
 endif
+
+" Neovim {{{1
+
+if has('nvim')
+  autocmd VimEnter * if !empty($NVIM_LISTEN_ADDRESS) && $NVIM_LISTEN_ADDRESS !=# v:servername
+        \ |let g:r=jobstart(['nc', '-U', $NVIM_LISTEN_ADDRESS],{'rpc':v:true})
+        \ |let g:f=fnameescape(expand('%:p'))
+        \ |call rpcrequest(g:r, "nvim_command", "tabnew ".g:f)
+        \ |qa!
+        \ |endif
+
+  tnoremap <Esc> <C-\><C-n>
+  tnoremap jj <C-\><C-n>
+  inoremap jj <Esc>
+  nnoremap <leader>n :tabnew<CR>
+  nnoremap <leader>b :terminal<CR>:set nonumber<CR>:set norelativenumber<CR>i
+  nnoremap <leader>s <C-w>s:terminal<CR>:set nonumber<CR>:set norelativenumber<CR>i
+  nnoremap <leader>v <C-w>v:terminal<CR>:set nonumber<CR>:set norelativenumber<CR>i
+  nnoremap <leader>q :bd
+  nnoremap <leader>r :file 
+
+  tnoremap <C-h> <C-\><C-n><C-w>hi
+  tnoremap <C-j> <C-\><C-n><C-w>ji
+  tnoremap <C-k> <C-\><C-n><C-w>ki
+  tnoremap <C-l> <C-\><C-n><C-w>li
+endif
+
+" 1}}}
+
+" Open tab with notes {{{1
+
+nnoremap <leader>z :lcd ~/notes<CR>:CtrlP<CR>
 
 " 1}}}

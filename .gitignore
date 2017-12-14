@@ -64,7 +64,6 @@
 .config/yelp
 .config/gconf/
 .config/glade.conf
-.config/nvim/
 .config/weston.ini
 
 .cmus/

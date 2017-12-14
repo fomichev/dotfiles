@@ -1,0 +1,4 @@
+#!/bin/sh
+
+abduco -l | grep -q nvim-session || rm -f ~/tmp/vim-server
+abduco -e '^_' -A nvim-session env NVIM_LISTEN_ADDRESS=$HOME/tmp/vim-session nvim
