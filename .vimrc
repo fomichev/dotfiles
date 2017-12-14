@@ -164,11 +164,6 @@ set spelllang=en_us,ru
 set spellfile=$HOME/.vim/spell/all.add
 set spell
 
-" make russian keys work in normal mode
-set keymap=russian-jcukenwin
-set imsearch=0
-set iminsert=0
-
 " use homegrown grep wrapper
 set grepprg=g\ $*
 noremap <Leader>g :Grep<space>
@@ -378,6 +373,8 @@ let g:airline#extensions#tabline#show_close_button = 0
 
 let g:airline#extensions#tabline#show_splits = 0
 let g:airline#extensions#tabline#show_buffers = 0
+
+let g:airline_detect_spell = 0
 
 " 2}}}
 " 1}}}

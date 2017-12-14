@@ -8,15 +8,9 @@ path_append() { [ -e $1 ] && { export PATH=$PATH:$1; }; }
 path_prepend() { [ -e $1 ] && { export PATH=$1:$PATH; }; }
 try_source() { [ -r $1 ] && { . $1; }; }
 
-OPT_DIR=$HOME/opt
-
-path_prepend $OPT_DIR/bin
-path_prepend $OPT_DIR/vim/bin
-path_prepend $OPT_DIR/llvm/bin
-path_prepend $OPT_DIR/mutt/bin
+path_prepend ~/opt/bin
 path_prepend ~/local/bin
 path_prepend ~/bin
-path_prepend ~/.rvm/bin
 
 path_prepend /usr/local/bin
 path_prepend /usr/local/share/python
@@ -58,7 +52,7 @@ try_source /etc/profile.d/bash_completion.sh
 # }}}
 # Utilities settings {{{
 
-export EDITOR=vim
+export EDITOR=nvim
 export BROWSER=w3m
 
 # add some color to man

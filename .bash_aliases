@@ -9,13 +9,13 @@ alias a='ls -lah'
 # }}}
 # vim {{{
 
-alias vim=nvim
+alias vim=$EDITOR
 
 e() {
 	if [ $# -eq 0 ]; then
-		vim .
+		$EDITOR .
 	else
-		vim "$@"
+		$EDITOR "$@"
 	fi
 }
 
@@ -27,7 +27,7 @@ __diff() {
 	[ -d "$2" -o -d "$3" ] && { $1 -c "DirDiff $a $b"; } || { ${1}diff "$2" "$3"; }
 }
 
-ediff() { __diff vim "$1" "$2"; }
+ediff() { __diff $EDITOR "$1" "$2"; }
 
 alias s='e ~/s'
 alias scratch='s'
