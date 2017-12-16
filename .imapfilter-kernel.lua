@@ -26,6 +26,9 @@ messages:move_messages(k["linux-kernel"])
 messages = k.INBOX:contain_field("List-Id", "arch-general") - k["INBOX"]:contain_to("kernel@fomichev.me")
 messages:move_messages(k["arch-general"])
 
+messages = k.INBOX:contain_field("List-Id", "bitcoin-dev") - k["INBOX"]:contain_to("kernel@fomichev.me")
+messages:move_messages(k["bitcoin-dev"])
+
 -- lkml filters
 ignore = {
 	"ALSA:",

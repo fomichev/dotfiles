@@ -16,10 +16,12 @@ path_prepend /usr/local/bin
 path_prepend /usr/local/share/python
 
 # }}}
-# Go {{{
+# Rust {{{
 
-export GOROOT=$OPT_DIR/go
-path_prepend $GOROOT/bin
+path_prepend ~/.cargo/bin
+
+# }}}
+# Go {{{
 
 export GOPATH=$HOME/go
 path_prepend $GOPATH/bin
