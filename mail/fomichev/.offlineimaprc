@@ -1,4 +1,5 @@
 [general]
+pythonfile = ~/.offlineimap.py
 accounts = kernel
 fsync = false
 
@@ -15,7 +16,7 @@ localrepository = kernel-local
 remoterepository = kernel-remote
 autorefresh = 5
 quick = 10
-presynchook = imapfilter -c ~/.imapfilter-kernel.lua
+presynchook = imapfilter -c ~/.imapfilter.lua
 
 [Repository kernel-local]
 type = Maildir
@@ -26,7 +27,7 @@ folderfilter = lambda foldername: foldername in [ 'INBOX', '[Gmail].Drafts', '[G
 type = Gmail
 remoteuser = kernel@fomichev.me
 remotepass = secret
-remotepasseval = open('/home/sdf/local/.msmtp_password', 'r').read()
+remotepasseval = getpass("fomichev")
 realdelete = no
 ssl = yes
 sslcacertfile = /etc/ssl/certs/ca-certificates.crt

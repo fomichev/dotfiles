@@ -1,0 +1,10 @@
+#!/bin/bash
+
+[ -n "$1" ] || { echo "Provide directory!"; exit 1; }
+
+dir=$1
+files=".imapfilter.lua .msmtprc .offlineimaprc .muttrc"
+
+for f in $files; do
+	ln -sf $dir/$f ~/$f
+done

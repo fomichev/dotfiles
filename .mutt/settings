@@ -1,9 +1,6 @@
-set realname = "Stanislav Fomichev"
-set signature = ~/.mutt/signature
+source ~/.mail/mailboxes
 
 set envelope_from
-
-set sendmail = "msmtp -a kernel"
 
 # check regulary
 set timeout = 15
@@ -72,7 +69,6 @@ set mailcap_path = ~/.mutt/mailcap
 auto_view text/html
 alternative_order text/plain text/html
 
-source $alias_file
 source ~/.mutt/bindings
 source ~/.mutt/lists
 source ~/.mutt/colors

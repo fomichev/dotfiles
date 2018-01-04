@@ -1,6 +1,6 @@
+set realname = "Stanislav Fomichev"
 set from = "kernel@fomichev.me"
-
-set alias_file = "~/.mutt/aliases"
+set sendmail = "msmtp"
 
 set mbox_type = Maildir
 set folder = "~/.mail"
@@ -9,5 +9,4 @@ set spoolfile = "+kernel/INBOX"
 set record = "+kernel/INBOX"
 set postponed = "+kernel/[Gmail].Drafts"
 
-source ~/.mail/mailboxes
 source ~/.mutt/settings

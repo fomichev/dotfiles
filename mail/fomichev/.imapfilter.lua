@@ -3,7 +3,7 @@ options.subscribe = true
 options.create = true
 -- options.expunge = true
 
-status, password = pipe_from('cat ~/local/.msmtp_password')
+status, password = pipe_from('/home/sdf/src/dotfiles/mail/password fomichev')
 
 k = IMAP {
     server = 'imap.gmail.com',

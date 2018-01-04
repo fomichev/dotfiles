@@ -19,6 +19,7 @@ Plugin 'tpope/vim-speeddating.git'
 Plugin 'bronson/vim-trailing-whitespace.git'
 Plugin 'rust-lang/rust.vim'
 Plugin 'chriskempson/base16-vim'
+Plugin 'fatih/vim-go'
 
 call vundle#end()
 filetype plugin indent on
@@ -264,6 +265,9 @@ nnoremap <leader>n :tabnew<CR>
 
 " close current buffer
 nnoremap <leader>q :bd<CR>
+
+" save file
+nnoremap <leader>s :w<CR>
 
 " 2}}}
 " Windows {{{2
