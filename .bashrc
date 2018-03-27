@@ -16,17 +16,6 @@ path_prepend /usr/local/bin
 path_prepend /usr/local/share/python
 
 # }}}
-# Rust {{{
-
-path_prepend ~/.cargo/bin
-
-# }}}
-# Go {{{
-
-export GOPATH=$HOME/go
-path_prepend $GOPATH/bin
-
-# }}}
 # Include aliases {{{
 
 try_source ~/.bash_aliases
