@@ -2,15 +2,26 @@
 
 DIR=$HOME/notes
 
+sync() {
+        rclone --dry-run sync "$@"
+          while :; do
+                read -p "Sync files? [y/n]: " yn
+                case $yn in
+                        [Yy]* ) rclone -v sync "$@"; break ;;
+                        [Nn]* ) exit ;;
+                esac
+        done
+}
+
 case "$1" in
 	"-l")
 		(cd $DIR && find . -name '*.txt' | sed -e 's@^\./@@' -e 's@.txt$@@')
 		;;
 	"--push")
-		rclone sync -v ~/notes remote:notes
+		sync ~/notes remote:notes
 		;;
 	"--pull")
-		rclone sync -v remote:notes ~/notes
+		sync remote:notes ~/notes
 		;;
 	*)
 		$EDITOR "$DIR/${@}.txt"
