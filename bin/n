@@ -1,27 +1,16 @@
 #!/bin/sh
 
-DIR=$HOME/notes
-
-sync() {
-        rclone --dry-run sync "$@"
-          while :; do
-                read -p "Sync files? [y/n]: " yn
-                case $yn in
-                        [Yy]* ) rclone -v sync "$@"; break ;;
-                        [Nn]* ) exit ;;
-                esac
-        done
-}
+DIR=$HOME/cloud/notes
 
 case "$1" in
 	"-l")
 		(cd $DIR && find . -name '*.txt' | sed -e 's@^\./@@' -e 's@.txt$@@')
 		;;
 	"--push")
-		sync ~/notes remote:notes
+		sync --pull notes
 		;;
 	"--pull")
-		sync remote:notes ~/notes
+		sync --push notes
 		;;
 	*)
 		$EDITOR "$DIR/${@}.txt"

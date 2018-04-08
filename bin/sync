@@ -1,0 +1,28 @@
+#!/bin/sh
+
+DIR=$HOME/cloud
+
+do_sync() {
+	rclone --dry-run sync "$@"
+	while :; do
+		read -p "Sync files? [y/n]: " yn
+		case $yn in
+			[Yy]* ) rclone -v sync "$@"; break ;;
+			[Nn]* ) exit ;;
+		esac
+	done
+}
+
+case "$1" in
+	"--push")
+		shift
+		do_sync "$DIR/$@" "remote:$@"
+		;;
+	"--pull")
+		shift
+		do_sync "remote:$@" "$DIR/$@"
+		;;
+	*)
+		echo "usage: sync [--push|--pull] <file>"
+		;;
+esac
