@@ -7,10 +7,10 @@ case "$1" in
 		(cd $DIR && find . -name '*.txt' | sed -e 's@^\./@@' -e 's@.txt$@@')
 		;;
 	"--push")
-		sync --pull notes
+		sync --push notes
 		;;
 	"--pull")
-		sync --push notes
+		sync --pull notes
 		;;
 	*)
 		$EDITOR "$DIR/${@}.txt"
