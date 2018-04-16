@@ -32,11 +32,11 @@ endef
 SRC:=$(HOME)/opt
 PREFIX:=$(HOME)/opt
 
+all: $(PREFIX) install init submodules $(BUILD) $(SRC)
+
 $(PREFIX):
 	mkdir -p $(PREFIX)
 	mkdir -p $(PREFIX)/bin
-
-all: $(PREFIX) install init submodules $(BUILD) $(SRC)
 
 build: nvim
 
