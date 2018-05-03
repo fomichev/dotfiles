@@ -6,11 +6,11 @@ case "$1" in
 	"-l")
 		(cd $DIR && find . -name '*.txt' | sed -e 's@^\./@@' -e 's@.txt$@@')
 		;;
-	"--push")
-		sync --push notes
+	"push")
+		cloud push notes
 		;;
-	"--pull")
-		sync --pull notes
+	"pull")
+		cloud pull notes
 		;;
 	*)
 		$EDITOR "$DIR/${@}.txt"

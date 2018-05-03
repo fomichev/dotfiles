@@ -14,15 +14,18 @@ do_sync() {
 }
 
 case "$1" in
-	"--push")
+	"push")
 		shift
 		do_sync "$DIR/$@" "remote:$@"
 		;;
-	"--pull")
+	"pull")
 		shift
 		do_sync "remote:$@" "$DIR/$@"
 		;;
+        "setup")
+		rclone config
+		;;
 	*)
-		echo "usage: sync [--push|--pull] <file>"
+		echo "usage: sync [push|pull|setup] <file>"
 		;;
 esac

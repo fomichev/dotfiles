@@ -11,6 +11,7 @@ try_source() { [ -r $1 ] && { . $1; }; }
 path_prepend ~/opt/bin
 path_prepend ~/local/bin
 path_prepend ~/bin
+path_prepend ~/go/bin
 
 path_prepend /usr/local/bin
 path_prepend /usr/local/share/python
