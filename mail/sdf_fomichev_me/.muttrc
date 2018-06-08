@@ -1,0 +1,12 @@
+set realname = "Stanislav Fomichev"
+set from = "sdf@fomichev.me"
+set sendmail = "msmtp"
+
+set mbox_type = Maildir
+set folder = "~/.mail/sdf_fomichev_me"
+set mbox = "+INBOX"
+set spoolfile = "+INBOX"
+set record = "+INBOX"
+set postponed = "+[Gmail].Drafts"
+
+source ~/.mutt/settings

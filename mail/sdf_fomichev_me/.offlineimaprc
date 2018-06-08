@@ -1,6 +1,6 @@
 [general]
 pythonfile = ~/.offlineimap.py
-accounts = kernel
+accounts = x
 fsync = false
 
 [mbnames]
@@ -11,23 +11,23 @@ peritem = "+%(accountname)s/%(foldername)s"
 sep = " "
 footer = "\n"
 
-[Account kernel]
-localrepository = kernel-local
-remoterepository = kernel-remote
+[Account x]
+localrepository = x-local
+remoterepository = x-remote
 autorefresh = 5
 quick = 10
 presynchook = imapfilter -c ~/.imapfilter.lua
 
-[Repository kernel-local]
+[Repository x-local]
 type = Maildir
-localfolders = ~/.mail/kernel
+localfolders = ~/.mail/sdf_fomichev_me
 folderfilter = lambda foldername: foldername in [ 'INBOX', '[Gmail].Drafts', '[Gmail].Spam', '[Gmail].Trash', '[Gmail].Sent Mail', 'platform-driver-x86', 'linux-kernel', 'arch', 'driverdev-devel' ]
 
-[Repository kernel-remote]
+[Repository x-remote]
 type = Gmail
-remoteuser = kernel@fomichev.me
+remoteuser = sdf@fomichev.me
 remotepass = secret
-remotepasseval = getpass("fomichev")
+remotepasseval = getpass("sdf_fomichev_me")
 realdelete = no
 ssl = yes
 sslcacertfile = /etc/ssl/certs/ca-certificates.crt

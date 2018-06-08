@@ -255,7 +255,7 @@ nnoremap <silent> # :let stay_hash_view = winsaveview()<cr>#:call winrestview(st
 
 " use convenient regular expressions
 nnoremap / /\v
-nnoremap ? /\v
+nnoremap ? ?\v
 
 " use sudo to save file
 cmap w!! w !sudo tee % > /dev/null
