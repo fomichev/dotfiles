@@ -224,3 +224,6 @@ DSL
 отрисовкой
 BDD
 va_list
+gbuild/!
+v/!
+pkgs/!

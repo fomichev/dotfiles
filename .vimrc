@@ -269,6 +269,9 @@ nnoremap <leader>q :bd<CR>
 " save file
 nnoremap <leader>s :w<CR>
 
+" execute current file
+nnoremap <leader>e :!%:p<CR>
+
 " 2}}}
 " Windows {{{2
 
