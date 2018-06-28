@@ -24,7 +24,7 @@ __diff() {
 	b=$(echo "$3" | sed -e 's/ /\\ /g')
 
 	[ -z "$2" -o -z "$3" ] && { return; }
-	[ -d "$2" -o -d "$3" ] && { $1 -c "DirDiff $a $b"; } || { ${1}diff "$2" "$3"; }
+	[ -d "$2" -o -d "$3" ] && { $1 -c "DirDiff $a $b"; } || { ${1} -d "$2" "$3"; }
 }
 
 ediff() { __diff $EDITOR "$1" "$2"; }
