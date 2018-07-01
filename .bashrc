@@ -42,6 +42,11 @@ try_source /etc/bash_completion
 try_source /etc/profile.d/bash_completion.sh
 
 # }}}
+# FZF {{{
+
+[ -f ~/.fzf.bash ] && source ~/.fzf.bash
+
+# }}}
 # Utilities settings {{{
 
 export EDITOR=nvim

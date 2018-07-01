@@ -1,28 +1,25 @@
-" Vundle {{{1
+" vim-plug {{{1
 
 set nocompatible
-filetype off
 
-set rtp+=~/.vim/bundle/Vundle.vim
-call vundle#begin()
+if empty(glob('~/.local/share/nvim/site/autoload/plug.vim'))
+  silent !curl -fLo ~/.local/share/nvim/site/autoload/plug.vim --create-dirs
+    \ https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+  autocmd VimEnter * PlugInstall --sync | source ~/.vimrc
+endif
 
-Plugin 'vim-scripts/DirDiff.vim.git'
-Plugin 'kien/ctrlp.vim.git'
-Plugin 'bling/vim-airline.git'
-Plugin 'vim-airline/vim-airline-themes'
-Plugin 'tpope/vim-commentary.git'
-Plugin 'tpope/vim-fugitive.git'
-Plugin 'jnwhiteh/vim-golang.git'
-Plugin 'nelstrom/vim-markdown-folding.git'
-Plugin 'tpope/vim-rsi.git'
-Plugin 'tpope/vim-speeddating.git'
-Plugin 'bronson/vim-trailing-whitespace.git'
-Plugin 'rust-lang/rust.vim'
-Plugin 'chriskempson/base16-vim'
-Plugin 'fatih/vim-go'
-
-call vundle#end()
-filetype plugin indent on
+call plug#begin('~/.vim/bundle')
+Plug 'will133/vim-dirdiff'
+Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
+Plug 'bling/vim-airline'
+Plug 'vim-airline/vim-airline-themes'
+Plug 'nelstrom/vim-markdown-folding'
+Plug 'tpope/vim-rsi'
+Plug 'tpope/vim-speeddating'
+Plug 'bronson/vim-trailing-whitespace'
+Plug 'chriskempson/base16-vim'
+Plug 'fatih/vim-go'
+call plug#end()
 
 "1}}}
 " Essentials {{{1
@@ -317,28 +314,6 @@ nnoremap <c-_> <c-w>v<c-]>zMzvz<cr>
 " 2}}}
 " 1}}}
 " Plugins {{{1
-" Ctrl-p {{{2
-
-" search by full path
-let g:ctrlp_by_filename = 0
-" don't manage working directory
-let g:ctrlp_working_path_mode = 0
-" don't search for dotfiles
-let g:ctrlp_dotfiles = 0
-" open new file in current window
-let g:ctrlp_open_new_file = 'r'
-" let ctrl-p replace netrw buffer
-let g:ctrlp_reuse_window = 'netrw\|help\|quickfix'
-" use ,, to invoke
-let g:ctrlp_map = '<Leader>,'
-" store cache along with other temporary files
-let g:ctrlp_cache_dir = $HOME.'/.vim/tmp/ctrlp'
-" only jump to the buffer if it's opened in the current tab
-let g:ctrlp_switch_buffer = 1
-
-nnoremap <leader>. :CtrlPMRUFiles<cr>
-
-" 2}}}
 " Alternative (header/source) {{{2
 
 nnoremap <silent> <Leader>a :A<CR>
@@ -410,9 +385,9 @@ endif
 
 " 1}}}
 
-" Open tab with notes {{{1
+" FZF {{{1
 
-nnoremap <leader>z :lcd ~/notes<CR>:CtrlP<CR>
+nnoremap <C-p> :FZF<CR>
 
 " 1}}}
 " Local configuration {{{1
