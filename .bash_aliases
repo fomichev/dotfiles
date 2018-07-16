@@ -123,6 +123,5 @@ sussh() { local host="$1"; shift; ssh $SSH_OPT -t "$host" sudo -i "$@"; }
 alias b="$BROWSER"
 alias serve="ruby -run -e httpd . -p 9090"
 alias ussh="ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o LogLevel=quiet"
-alias info="info --vi-keys"
 
 # }}}
