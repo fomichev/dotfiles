@@ -1,6 +1,6 @@
 [general]
 pythonfile = ~/.offlineimap.py
-accounts = x
+accounts = sdf_fomichev_me
 fsync = false
 
 [mbnames]
@@ -11,19 +11,18 @@ peritem = "+%(accountname)s/%(foldername)s"
 sep = " "
 footer = "\n"
 
-[Account x]
-localrepository = x-local
-remoterepository = x-remote
+[Account sdf_fomichev_me]
+localrepository = sdf_fomichev_me-local
+remoterepository = sdf_fomichev_me-remote
 autorefresh = 5
 quick = 10
 presynchook = imapfilter -c ~/.imapfilter.lua
 
-[Repository x-local]
+[Repository sdf_fomichev_me-local]
 type = Maildir
 localfolders = ~/.mail/sdf_fomichev_me
-folderfilter = lambda foldername: foldername in [ 'INBOX', '[Gmail].Drafts', '[Gmail].Spam', '[Gmail].Trash', '[Gmail].Sent Mail', 'platform-driver-x86', 'linux-kernel', 'arch', 'driverdev-devel' ]
 
-[Repository x-remote]
+[Repository sdf_fomichev_me-remote]
 type = Gmail
 remoteuser = sdf@fomichev.me
 remotepass = secret
