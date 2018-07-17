@@ -14,6 +14,12 @@ k = IMAP {
 
 k.INBOX:check_status()
 
+-- move syzkaller bugs into it's own directory
+k:create_mailbox('syzkaller')
+syzbot = (k.INBOX:contain_from('syzbot') + k.INBOX:contain_cc('syzkaller-bugs')) - k.INBOX:contain_to("sdf@fomichev.me")
+syzbot:move_messages(k['syzkaller'])
+
+-- per mailing list directories
 lists = {
 	"netdev",
 	"driverdev-devel",
@@ -25,7 +31,7 @@ lists = {
 
 for i, name in ipairs(lists) do
 	k:create_mailbox(name)
-	messages = k.INBOX:contain_field("List-Id", name) - k["INBOX"]:contain_to("sdf@fomichev.me")
+	messages = k.INBOX:contain_field("List-Id", name) - k.INBOX:contain_to("sdf@fomichev.me")
 	messages:move_messages(k[name])
 end
 
