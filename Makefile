@@ -32,7 +32,7 @@ endef
 SRC:=$(HOME)/opt
 PREFIX:=$(HOME)/opt
 
-all: $(PREFIX) install init submodules $(BUILD) $(SRC)
+all: $(PREFIX) install init update $(BUILD) $(SRC)
 
 $(PREFIX):
 	mkdir -p $(PREFIX)
@@ -51,7 +51,7 @@ init:
 	git submodule sync && \
 	git submodule update
 
-submodules:
+update:
 	git submodule foreach git fetch && \
 	git submodule foreach git reset --hard origin/master
 
