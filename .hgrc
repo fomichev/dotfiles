@@ -1,12 +1,17 @@
 [ui]
 username = Stanislav Fomichev <s@fomichev.me>
 merge = internal:merge
-commitsubrepos = True
+#commitsubrepos = True
 
 [alias]
-show = log -pvr
-h = glog -p
+a = add
+ci = commit
 d = diff
+h = glog -p
+l = log
+s = show
+show = log -pvr
+st = status
 
 [extensions]
 record =
@@ -38,7 +43,7 @@ qguard.unguarded = red
 
 [pager]
 pager = LESS='FSRX' less
-attend = show glog log diff tags help incoming outgoing annotate h
+attend = show glog log diff tags help incoming outgoing annotate h l
 
 [diff]
 git = True
