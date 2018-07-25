@@ -362,11 +362,12 @@ let g:airline_detect_spell = 0
 " 1}}}
 " Associations {{{1
 
+" treat .h files as C files
+let g:c_syntax_for_h=1
+
 autocmd BufRead,BufNewFile *mutt-* setfiletype mail
 autocmd BufRead,BufNewFile *.md setlocal filetype=markdown
-"autocmd BufRead,BufNewFile */notes/* setlocal filetype=markdown
 autocmd BufRead,BufNewFile *.cls setlocal filetype=tex
-autocmd BufRead,BufNewFile *.h setlocal filetype=c
 autocmd BufRead,BufNewFile *.taskpaper setlocal filetype=taskpaper
 
 " 1}}}

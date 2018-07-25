@@ -5,9 +5,6 @@ let c_curly_error=1
 let c_bracket_error=1
 let c_gnu=1
 
-" treat .h files as C files
-let g:c_syntax_for_h=1
-
 setlocal foldmethod=syntax
 setlocal cindent
 
