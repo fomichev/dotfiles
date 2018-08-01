@@ -49,11 +49,13 @@ colors:
 init:
 	git submodule init && \
 	git submodule sync && \
-	git submodule update
+	git submodule update && \
+	~/.tmux/plugins/tpm/bin/install_plugins
 
 update:
 	git submodule foreach git fetch && \
-	git submodule foreach git reset --hard origin/master
+	git submodule foreach git reset --hard origin/master && \
+	~/.tmux/plugins/tpm/bin/update_plugins all
 
 alias:
 	cat ~/.bash_history | cut -d' ' -f1 | cut -d'|' -f1 | sort | uniq -c | sort -n | sort -nr
