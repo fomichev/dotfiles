@@ -19,7 +19,6 @@ Plug 'tpope/vim-speeddating'
 Plug 'bronson/vim-trailing-whitespace'
 Plug 'chriskempson/base16-vim'
 Plug 'fatih/vim-go'
-Plug 'christoomey/vim-tmux-navigator'
 call plug#end()
 
 "1}}}
