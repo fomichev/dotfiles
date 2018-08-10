@@ -23,7 +23,7 @@
 	i = !git log origin/$(git rev-parse --abbrev-ref HEAD) --not $(git rev-parse --abbrev-ref HEAD) --
 	out = log --branches --not --remotes=origin --
 	in = log --remotes=origin --not --branches --
-	fp = format-patch
+	fp = format-patch --thread
 	s = show --pretty=fuller
 	rollback = reset HEAD^
 	lp = log -p

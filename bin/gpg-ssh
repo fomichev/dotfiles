@@ -1,0 +1,2 @@
+source ~/bin/gpg-agent-for-ssh
+ssh -A "$@"

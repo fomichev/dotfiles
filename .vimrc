@@ -371,24 +371,9 @@ autocmd BufRead,BufNewFile *.cls setlocal filetype=tex
 autocmd BufRead,BufNewFile *.taskpaper setlocal filetype=taskpaper
 
 " 1}}}
-" Neovim {{{1
-
-if has('nvim')
-  tnoremap <Esc> <C-\><C-n>
-  tnoremap jj <C-\><C-n>
-  inoremap jj <Esc>
-
-  tnoremap <C-h> <C-\><C-n><C-w>hi
-  tnoremap <C-j> <C-\><C-n><C-w>ji
-  tnoremap <C-k> <C-\><C-n><C-w>ki
-  tnoremap <C-l> <C-\><C-n><C-w>li
-endif
-
-" 1}}}
-
 " FZF {{{1
 
-nnoremap <C-p> :FZF<CR>
+noremap <Leader>, :FZF<CR>
 
 " 1}}}
 " Local configuration {{{1
