@@ -1,10 +1,5 @@
 Beware the crocodiles
 
-Anonymous Pro http://www.ms-studio.com/FontSales/anonymouspro.html
-
-# Cron job to update mailbox
-*/5 *  *   *   *     /usr/bin/mbsync -c /home/sdf/.mbsyncrc all
-
 # Aliases and tools
 * _ - sudo
 * a - ls -l
