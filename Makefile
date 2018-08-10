@@ -42,6 +42,7 @@ build: nvim
 
 install:
 	@$(foreach file,$(files),$(call InstallFile,$(file),$(HOME)/$(notdir $(file))))
+	chmod 700 .gnupg
 
 colors:
 	base16_ocean
