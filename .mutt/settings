@@ -1,3 +1,5 @@
+# use the following to update:
+# offlineimap --mbnames-prune
 source ~/.mail/mailboxes
 
 set envelope_from
@@ -85,3 +87,14 @@ color body cyan default "^@@ .*"
 # change date format a bit
 set date_format = "%m/%d"
 set index_format = "[%Z]  %D  %-20.20F  %s"
+
+# sidebar
+set sidebar_visible
+set sidebar_format = "%B%?F? [%F]?%* %?N?%N?"
+set mail_check_stats
+set sidebar_short_path
+set sidebar_delim_chars = "/"
+
+bind index,pager K sidebar-prev
+bind index,pager J sidebar-next
+bind index,pager O sidebar-open

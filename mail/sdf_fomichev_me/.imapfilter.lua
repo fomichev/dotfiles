@@ -24,6 +24,7 @@ lists = {
 	"netdev",
 	"driverdev-devel",
 	"platform-drive-x86",
+	"linux-crypto",
 	"linux-kernel",
 	"arch-general",
 	"bitcoin-dev",
