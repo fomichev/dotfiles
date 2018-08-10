@@ -98,3 +98,4 @@ set sidebar_delim_chars = "/"
 bind index,pager K sidebar-prev
 bind index,pager J sidebar-next
 bind index,pager O sidebar-open
+bind index,pager B sidebar-toggle-visible
