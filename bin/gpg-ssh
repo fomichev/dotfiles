@@ -1,3 +1,2 @@
-export SSH_AUTH_SOCK="$(gpgconf --list-dirs agent-ssh-socket)"
-gpg-connect-agent updatestartuptty /bye
+source ~/bin/gpg-agent-for-ssh
 ssh -A "$@"
