@@ -1,0 +1,5 @@
+#!/bin/bash
+
+[ $# -eq 0 ] && { set .; }
+
+find "$@" -name '*.gpg' -print0 | xargs -0 gpg --decrypt-files

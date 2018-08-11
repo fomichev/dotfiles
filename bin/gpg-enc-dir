@@ -1,0 +1,5 @@
+#!/bin/bash
+
+[ $# -eq 0 ] && { set .; }
+
+find "$@" -not -name '*.gpg' -print0 | xargs -0 gpg --encrypt-files
