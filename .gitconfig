@@ -45,8 +45,8 @@
 	smtpserver = smtp.gmail.com:587
 	smtpuser = kernel@fomichev.me
 	smtpencryption = tls
-	suppresscc = self
-	bcc = kernel@fomichev.me
+	#suppresscc = self
+	#bcc = kernel@fomichev.me
 	confirm = always
 
 [merge]
