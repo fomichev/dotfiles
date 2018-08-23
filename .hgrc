@@ -43,7 +43,7 @@ qguard.unguarded = red
 
 [pager]
 pager = LESS='FSRX' less
-attend = show glog log diff tags help incoming outgoing annotate h l
+attend = show glog log diff tags help incoming outgoing annotate h l d
 
 [diff]
 git = True
