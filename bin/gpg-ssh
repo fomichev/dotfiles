@@ -1,2 +1,2 @@
-source ~/bin/gpg-agent-for-ssh
+export_gpg_ssh_agent
 ssh -A "$@"
