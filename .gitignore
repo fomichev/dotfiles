@@ -5,6 +5,8 @@
 
 .mutt/cache/
 
+mail/.notmuch/
+
 .w3m/history
 .w3m/cookie
 
