@@ -228,3 +228,9 @@ gbuild/!
 v/!
 pkgs/!
 kernel/!
+selftests
+libbpf
+bpftool
+bpf
+prog
+rst
