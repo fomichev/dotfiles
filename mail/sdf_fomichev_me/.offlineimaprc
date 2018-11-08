@@ -17,6 +17,7 @@ remoterepository = sdf_fomichev_me-remote
 autorefresh = 5
 quick = 10
 presynchook = imapfilter -c ~/.imapfilter.lua
+postsynchook = notmuch new
 
 [Repository sdf_fomichev_me-local]
 type = Maildir
@@ -30,5 +31,6 @@ remotepasseval = getpass("sdf_fomichev_me")
 realdelete = no
 ssl = yes
 sslcacertfile = /etc/ssl/certs/ca-certificates.crt
+ssl_version = tls1_2
 keepalive = 60
 holdconnectionopen = yes
