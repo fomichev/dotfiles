@@ -1,6 +1,7 @@
 .vim/tmp/
 .vim/bundle/
 .vim/pack/
+.vim/spell/all.add.spl
 
 .mutt/cache/
 
