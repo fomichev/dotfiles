@@ -7,6 +7,6 @@ set folder = "~/.mail"
 set mbox = "+sdf_fomichev_me/INBOX"
 set spoolfile = "+sdf_fomichev_me/INBOX"
 set record = "+sdf_fomichev_me/INBOX"
-set postponed = "+sdf_fomichev_me/[Gmail].Drafts"
+set postponed = "+sdf_fomichev_me/drafts"
 
 source ~/.mutt/settings
