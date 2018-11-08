@@ -15,6 +15,7 @@ Options:
 
   -C            Same as -p '*.c'
   -H            Same as -p '*.h'
+  -M            Same as -p 'Makefile'
 END
 }
 
@@ -83,7 +84,7 @@ else
 	grep_opts="$grep_opts --color=never"
 fi
 
-ARGS=`getopt slivwd:p:hHC "$@"`
+ARGS=`getopt slivwd:p:hHCM "$@"`
 [ ! $? -eq 0 ] && { exit $?; }
 eval set -- $ARGS
 
@@ -140,6 +141,11 @@ while true; do
 
 	-C)
 		find_include "*.c"
+		shift
+		;;
+
+	-M)
+		find_include "Makefile"
 		shift
 		;;
 
