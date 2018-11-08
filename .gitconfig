@@ -49,6 +49,10 @@
 	#bcc = kernel@fomichev.me
 	confirm = always
 
+[format]
+	coverletter = auto
+	signOff = true
+
 [merge]
 	renamelimit = 0
 
