@@ -1,0 +1,8 @@
+/dev/*
+/lost+found/*
+/media/*
+/mnt/*
+/proc/*
+/run/*
+/sys/*
+/tmp/*
