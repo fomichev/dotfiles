@@ -1,0 +1,9 @@
+#!/bin/bash
+
+REPO="$1"
+shift
+
+export GOOGLE_PROJECT_ID=680984499942
+export GOOGLE_APPLICATION_CREDENTIALS=$HOME/backups-222103-e9a763ed2cfd.json
+
+restic -r "gs:$REPO:/" "$@"
