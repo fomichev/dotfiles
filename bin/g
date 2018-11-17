@@ -15,7 +15,7 @@ Options:
 
   -C            Same as -p '*.c'
   -H            Same as -p '*.h'
-  -M            Same as -p 'Makefile'
+  -M            Same as -p '[M|m]akefile.*'
 END
 }
 
@@ -146,6 +146,9 @@ while true; do
 
 	-M)
 		find_include "Makefile"
+		find_include "Makefile.*"
+		find_include "makefile"
+		find_include "makefile.*"
 		shift
 		;;
 
