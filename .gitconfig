@@ -39,14 +39,10 @@
 	interactive = auto
 
 [sendemail]
-	aliasesfile = ~/.mutt/aliases
-	aliasfiletype = mutt
 	chainreplyto = false
 	smtpserver = smtp.gmail.com:587
-	smtpuser = kernel@fomichev.me
+	smtpuser = sdf@fomichev.me
 	smtpencryption = tls
-	#suppresscc = self
-	#bcc = kernel@fomichev.me
 	confirm = always
 
 [format]
