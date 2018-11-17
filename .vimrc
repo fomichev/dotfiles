@@ -307,10 +307,21 @@ vnoremap <Space> za
 nnoremap zO zCzO
 
 " 2}}}
-" Ctags {{{2
-nnoremap <c-]> <c-]>zvz<cr>
-nnoremap <c-\> :tab split<cr><c-]>zMzvz<cr>
-nnoremap <c-_> <c-w>v<c-]>zMzvz<cr>
+" Ctags & Cscope {{{2
+
+nnoremap <c-\> :tab split<cr><c-]>
+
+" :tag and C-] always use cscope when available
+set cscopetag
+" search cstope database first
+set cscopetagorder=0
+" automatically pick up local cscope database
+if filereadable("cscope.out")
+	cs add cscope.out
+endif
+
+" quick search for function callers
+nnoremap <leader><c-]> :cs find c <C-R>=expand("<cword>")<cr><cr>
 " 2}}}
 " 1}}}
 " Plugins {{{1
