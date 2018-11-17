@@ -1,0 +1,61 @@
+#!/bin/bash
+
+set -e
+
+ARGS=`getopt l: "$@"`
+[ ! $? -eq 0 ] && { exit $?; }
+eval set -- $ARGS
+
+limit=999
+
+while true; do
+	case "$1" in
+	--)
+		shift
+		break
+		;;
+
+	-l)
+		limit="$2"
+		shift
+		shift
+		;;
+	esac
+done
+
+cs() { cscope -f cscope.out "$@"; }
+callers() { cs -L3 "$@" | awk '{print $2}'; }
+
+ident() {
+	for (( j=0; j<$1; j++ )); do
+		echo -n "  "
+	done
+}
+
+declare -A visited
+
+visited[bool]=1
+
+recursive_callers() {
+	for i in $(callers "$2"); do
+		if [[ ${visited[$i]} != "" ]]; then
+			continue
+		fi
+
+		if [[ $1 > $limit ]]; then
+			break
+		fi
+
+		ident $1
+		echo "$i {"
+
+		visited[$i]=1
+
+		recursive_callers $(( $1 + 1 )) "$i"
+
+		ident $1
+		echo "}"
+	done
+}
+
+recursive_callers 0 "$1"
