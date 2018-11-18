@@ -7,3 +7,4 @@
 /sys/*
 /tmp/*
 /var/lib/bitcoin/*
+/home/sdf/.mail/.notmuch/*
