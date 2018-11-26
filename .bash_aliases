@@ -48,6 +48,16 @@ alias mm='make menuconfig'
 
 alias decrypt='gpg --decrypt'
 
+gpg-restart() {
+	gpgconf --reload scdaemon
+	gpgconf --reload gpg-agent
+}
+
+gpg-export-ssh-agent() {
+	export SSH_AUTH_SOCK="$(gpgconf --list-dirs agent-ssh-socket)"
+	gpg-connect-agent updatestartuptty /bye
+}
+
 # }}}
 # cd {{{
 

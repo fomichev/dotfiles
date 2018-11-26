@@ -64,14 +64,6 @@ try_source ~/.base16_theme
 stty -ixon
 
 # }}}
-# gpg {{{
-
-export_gpg_ssh_agent() {
-	export SSH_AUTH_SOCK="$(gpgconf --list-dirs agent-ssh-socket)"
-	gpg-connect-agent updatestartuptty /bye
-}
-
-# {{{
 # Include local settings {{{
 
 try_source ~/local/.bashrc
