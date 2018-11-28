@@ -1,9 +1,15 @@
 #!/bin/bash
 
-REPO="$1"
-shift
-
 export GOOGLE_PROJECT_ID=680984499942
-export GOOGLE_APPLICATION_CREDENTIALS=$HOME/backups-222103-e9a763ed2cfd.json
+export GOOGLE_APPLICATION_CREDENTIALS=$HOME/gs-secret-restic-key.json
 
-restic -r "gs:$REPO:/" "$@"
+if [ $# -eq 0 ]; then
+	set -- \
+		--verbose \
+		--limit-upload 128 \
+		--exclude-file ~/src/dotfiles/.restic-exclude \
+		backup /
+fi
+
+echo sudo -E restic -r "gs:$(hostname -s):/" "$@"
+sudo -E restic -r "gs:$(hostname -s):/" "$@"
