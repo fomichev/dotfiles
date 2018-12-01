@@ -12,3 +12,5 @@
 /var/cache/*
 /var/tmp/*
 /home/sdf/.mail/.notmuch/*
+/home/sdf/.cache
+/home/sdf/.var
