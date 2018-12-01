@@ -1,8 +1,14 @@
 #!/bin/sh
 
 DIR=$HOME/cloud
+DRY=${DRY:-y}
 
 do_sync() {
+	[ $DRY = y ] || {
+		rclone -v sync "$@"
+		return
+	}
+
 	rclone --dry-run sync "$@"
 	while :; do
 		read -p "Sync files? [y/n]: " yn
