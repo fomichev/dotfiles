@@ -9,6 +9,7 @@ path_prepend() { [ -e $1 ] && { export PATH=$1:$PATH; }; }
 try_source() { [ -r $1 ] && { . $1; }; }
 
 path_prepend ~/opt/bin
+path_prepend ~/opt/go/bin
 path_prepend ~/local/bin
 path_prepend ~/bin
 path_prepend ~/go/bin

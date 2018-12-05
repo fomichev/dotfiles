@@ -1,0 +1,21 @@
+NAME:=llvm
+LLVM_VER:=7.0.0
+URL=http://releases.llvm.org/$(LLVM_VER)
+LLVM_TAR=llvm-$(LLVM_VER).src.tar.xz
+CFE_TAR=cfe-$(LLVM_VER).src.tar.xz
+TAR=$(URL)/$(LLVM_TAR)
+
+include Makefile.lib
+
+PKG_SRC:=$(OPT_TAR)/$(NAME)-$(LLVM_VER).src
+
+fetch:
+	(cd $(OPT_TAR) && [ -e $(CFE_TAR) ] && : || curl -LO $(URL)/$(CFE_TAR))
+	$(SUBMAKE) fetch_tar
+
+build:
+	tar -C $(OPT_TAR) -xf $(TARBALL)
+	tar -C $(OPT_TAR) -xf $(OPT_TAR)/cfe-$(LLVM_VER).src.tar.xz
+	mv $(OPT_TAR)/cfe-$(LLVM_VER).src $(PKG_SRC)/tools/clang
+
+	$(SUBMAKE) build_cmake
