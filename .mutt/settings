@@ -76,13 +76,25 @@ source ~/.mutt/lists
 source ~/.mutt/colors
 
 # highlight patches
-color body brightcyan default "^diff \-.*"
-color body brightcyan default "^index [a-f0-9].*"
-color body brightcyan default "^[\-]{3} .*"
-color body brightcyan default "^[\+]{3} .*"
-color body green default "^[\+][^\+]+.*"
-color body red  default "^\-[^\-]+.*"
-color body cyan default "^@@ .*"
+
+color  body  yellow       default  "^diff \-.*"
+color  body  brightwhite  default  "^index [a-f0-9].*"
+color  body  yellow       default  ^(diff).*
+color  body  brightblue   default  "^---$"
+color  body  white        default  "^[\-]{3} .*"
+color  body  white        default  "^[\+]{3} .*"
+color  body  green        default  "^[\+][^\+]+.*"
+color  body  red          default  "^\-[^\-]+.*"
+color  body  brightblue   default  "^@@ .*"
+color  body  cyan         default  ^(Signed-off-by:).*
+color  body  cyan         default  ^(Acked-by:).*
+color  body  red          default  ^(Nacked-by:).*
+color  body  cyan         default  ^(Tested-by:).*
+color  body  cyan         default  ^(Reviewed-by:).*
+color  body  green        default  "LGTM"
+
+# highlight quote
+color body brightblack default "^>.*"
 
 # change date format a bit
 set date_format = "%m/%d"
