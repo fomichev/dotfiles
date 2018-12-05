@@ -9,7 +9,7 @@ alias a='ls -lah'
 # }}}
 # vim {{{
 
-alias vim=$EDITOR
+[ "$EDITOR" != "vim" ] && alias vim=$EDITOR
 
 e() {
 	if [ $# -eq 0 ]; then

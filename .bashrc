@@ -20,6 +20,9 @@ path_prepend /usr/local/share/python
 # }}}
 # Include aliases {{{
 
+export EDITOR=vim
+export BROWSER=w3m
+
 try_source ~/.bash_aliases
 
 # }}}
@@ -49,9 +52,6 @@ try_source /etc/profile.d/bash_completion.sh
 
 # }}}
 # Utilities settings {{{
-
-export EDITOR=nvim
-export BROWSER=w3m
 
 # add some color to man
 export LESS_TERMCAP_md=$(tput setaf 4)
