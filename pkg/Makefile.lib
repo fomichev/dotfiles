@@ -5,8 +5,12 @@ OPT_GIT:=$(OPT)/git
 OPT_TAR:=$(OPT)/tarball
 PREFIX:=$(HOME)/opt
 
-#NPROC:=$(shell nproc)
-NPROC:=8
+MAX_NPROC:=16
+NPROC:=$(shell nproc)
+NPROC:=$(shell echo 'if($(NPROC)>$(MAX_NPROC)){$(MAX_NPROC)}else{$(NPROC)}' | bc)
+export CMAKE_BUILD_PARALLEL_LEVEL=$(NPROC)
+
+$(info $(CMAKE_BUILD_PARALLEL_LEVEL))
 
 ifneq ($(GIT),)
 PKG_SRC:=$(OPT_GIT)/$(NAME)
@@ -102,8 +106,9 @@ build_autoconf:
 
 build_cmake:
 	mkdir -p $(PKG_BLD)
-	(cd $(PKG_BLD) && cmake \
-		$(CMAKE_FLAGS) \
-		CMAKE_EXTRA_FLAGS="-DCMAKE_INSTALL_PREFIX=$(PREFIX)" ..)
-	$(MAKE) -j$(NPROC) -C $(PKG_BLD)
-	$(MAKE) -C $(PKG_BLD) $(INSTALL_FLAGS) install
+	(cd $(PKG_BLD) && \
+		cmake $(CMAKE_FLAGS) .. && \
+		cmake --build . && \
+		cmake $(INSTALL_FLAGS) \
+			-DCMAKE_INSTALL_PREFIX=$(PREFIX) \
+			-P cmake_install.cmake)
