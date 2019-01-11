@@ -40,7 +40,7 @@ alias rmutt='mutt -R'
 # }}}
 # make {{{
 
-alias m='make -s'
+alias m="make -s -j$(nproc)"
 alias mm='make menuconfig'
 
 # }}}
