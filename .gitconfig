@@ -19,6 +19,7 @@
 	gl = log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit
 	sm = submodule
 	l = log --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit
+	lo = log --oneline
 	o = !git log $(git rev-parse --abbrev-ref HEAD) --not origin/$(git rev-parse --abbrev-ref HEAD) --
 	i = !git log origin/$(git rev-parse --abbrev-ref HEAD) --not $(git rev-parse --abbrev-ref HEAD) --
 	out = log --branches --not --remotes=origin --
@@ -27,9 +28,10 @@
 	s = show --pretty=fuller
 	rollback = reset HEAD^
 	lp = log -p
-	bl = blame -w
+	bl = blame -w -s
 	t = log --tags --simplify-by-decoration --pretty="format:%ai %d"
 	f = fetch
+	fa = fetch --all
 	rpo = remote prune origin
 	rd = range-diff
 
