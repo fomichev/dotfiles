@@ -14,13 +14,22 @@ REPO=${REPO:-gs:$(hostname -s):/}
 ARGS=${ARGS:- --limit-upload 512}
 RESTIC=${RESTIC:-restic}
 
+do_rstc() {
+	echo $SUDO $RESTIC -r "$REPO" "$@"
+	$SUDO $RESTIC -r "$REPO" "$@"
+}
+
 if [ $# -eq 0 ]; then
-	set -- \
+	do_rstc \
+		--verbose \
 		--verbose \
 		$ARGS \
 		--exclude-file $HOME/src/dotfiles/.restic-exclude \
 		backup /
+
+	do_rstc forget --keep-last 5 --prune
+	do_rstc snapshots
+	exit
 fi
 
-echo $SUDO $RESTIC -r "$REPO" "$@"
-$SUDO $RESTIC -r "$REPO" "$@"
+do_rstc "$@"
