@@ -4,7 +4,7 @@ options.create = true
 -- options.expunge = true
 
 me_at = "sdf@" -- both sdf@fomichev.me and sdf@google.com
-status, password = pipe_from('/home/sdf/src/dotfiles/mail/password sdf_fomichev_me')
+status, password = pipe_from('/home/sdf/bin/secret sdf_fomichev_me')
 
 k = IMAP {
     server = 'imap.gmail.com',

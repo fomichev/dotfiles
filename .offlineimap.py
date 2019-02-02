@@ -2,4 +2,4 @@
 from subprocess import check_output
 
 def getpass(account):
-    return check_output("/home/sdf/src/dotfiles/mail/password "+account, shell=True).strip("\n")
+    return check_output("/home/sdf/bin/secret "+account, shell=True).strip("\n")

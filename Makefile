@@ -37,6 +37,7 @@ build:
 install:
 	@$(foreach file,$(files),$(call InstallFile,$(file),$(HOME)/$(notdir $(file))))
 	chmod 700 .gnupg
+	chmod -R 700 ~/.secret
 
 colors:
 	base16_ocean
