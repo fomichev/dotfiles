@@ -1,0 +1,8 @@
+[Unit]
+Description=Restic Backup to Google Storage
+OnFailure=status-email-user@%n.service
+
+[Service]
+Type=simple
+Nice=10
+ExecStart=sudo /home/sdf/src/dotfiles/bin/rstc

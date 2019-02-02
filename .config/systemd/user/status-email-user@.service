@@ -1,0 +1,6 @@
+[Unit]
+Description=Send status email for %i to user
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/sbin/systemd-email s@fomichev.me %i
