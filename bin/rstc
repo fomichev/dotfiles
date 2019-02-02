@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -e
+
 export GOOGLE_PROJECT_ID=680984499942
 export GOOGLE_APPLICATION_CREDENTIALS=$HOME/gs-secret-restic-key.json
 export RESTIC_PASSWORD_FILE="$HOME/restic-password.txt"
