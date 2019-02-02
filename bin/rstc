@@ -10,10 +10,12 @@ export GOOGLE_PROJECT_ID=680984499942
 export GOOGLE_APPLICATION_CREDENTIALS=$HOME/gs-secret-restic-key.json
 export RESTIC_PASSWORD_FILE="$HOME/restic-password.txt"
 
+ARGS=${ARGS:- --limit-upload 512}
+
 if [ $# -eq 0 ]; then
 	set -- \
 		--verbose \
-		--limit-upload 128 \
+		$ARGS \
 		--exclude-file $HOME/src/dotfiles/.restic-exclude \
 		backup /
 fi
