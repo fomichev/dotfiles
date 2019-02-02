@@ -1,22 +1,15 @@
 #!/bin/bash
 
-SUDO="sudo -E"
-if [ "$USER" = "root" ]; then
-	HOME=/home/sdf
-	SUDO=
-fi
-
 export GOOGLE_PROJECT_ID=680984499942
 export GOOGLE_APPLICATION_CREDENTIALS=$HOME/gs-secret-restic-key.json
 export RESTIC_PASSWORD_FILE="$HOME/restic-password.txt"
 
 REPO=${REPO:-gs:$(hostname -s):/}
 ARGS=${ARGS:- --limit-upload 512}
-RESTIC=${RESTIC:-restic}
 
 do_rstc() {
-	echo $SUDO $RESTIC -r "$REPO" "$@"
-	$SUDO $RESTIC -r "$REPO" "$@"
+	echo sudo -E restic -r "$REPO" "$@"
+	sudo -E restic -r "$REPO" "$@" 2>&1 | stdbuf -o0 cat
 }
 
 if [ $# -eq 0 ]; then

@@ -6,3 +6,4 @@ OnFailure=status-email-user@%n.service
 Type=simple
 Nice=10
 ExecStart=/home/sdf/src/dotfiles/bin/rstc
+ExecStartPost=/home/sdf/bin/systemd-email s@fomichev.me %i
