@@ -3,6 +3,7 @@ options.subscribe = true
 options.create = true
 -- options.expunge = true
 
+me_at = "sdf@" -- both sdf@fomichev.me and sdf@google.com
 status, password = pipe_from('/home/sdf/src/dotfiles/mail/password sdf_fomichev_me')
 
 k = IMAP {
@@ -14,18 +15,20 @@ k = IMAP {
 
 k.INBOX:check_status()
 
--- move syzkaller bugs into it's own directory
+-- everything from me should be marked as read
+k.INBOX:is_unseen():contain_from(me_at):mark_seen()
+
+-- syzkaller bugs have it's own directory
 k:create_mailbox('syzkaller')
-syzbot = (k.INBOX:contain_from('syzbot') + k.INBOX:contain_cc('syzkaller-bugs')) - k.INBOX:contain_to("sdf@fomichev.me")
+syzbot = (k.INBOX:contain_from('syzbot') + k.INBOX:contain_cc('syzkaller-bugs')) - k.INBOX:contain_to(me_at)
 syzbot:move_messages(k['syzkaller'])
 
--- per mailing list directories
+-- mailing lists have their own directories
 lists = {
 	"netdev",
 	"driverdev-devel",
 	"platform-drive-x86",
 	"linux-crypto",
-	"linux-kernel",
 	"arch-general",
 	"bitcoin-dev",
 	"iovisor-dev",
@@ -33,63 +36,20 @@ lists = {
 
 for i, name in ipairs(lists) do
 	k:create_mailbox(name)
-	messages = k.INBOX:contain_field("List-Id", name) - k.INBOX:contain_to("sdf@fomichev.me")
+	messages = k.INBOX:contain_field("List-Id", name)
 	messages:move_messages(k[name])
 end
 
--- lkml filters
-ignore = {
-	"ALSA:",
-	"android:",
-	"ARM:",
-	"arm64:",
-	"ath10k:",
-	"Bluetooth:",
-	"can:",
-	"coccinelle:",
-	"drivers:",
-	"drm",
-	"dt-bindings:",
-	"f2fs:",
-	"fpga:",
-	"[GIT PULL]",
-	"gpio:",
-	"HID:",
-	"i2c:",
-	"iio:",
-	"Input:",
-	"iommu:",
-	"irqchip:",
-	"KVM",
-	"linux-next",
-	"MAINTAINERS:",
-	"media:",
-	"MIPS:",
-	"misc:",
-	"mmc:",
-	"mtd:",
-	"PCI:",
-	"phy:",
-	"pinctrl:",
-	"power:",
-	"pwm:",
-	"rtc:",
-	"rtlwifi:",
-	"scsi:",
-	"serial:",
-	"sound:",
-	"spark:",
-	"spi:",
-	"staging:",
-	"tip:",
-	"usb:",
-	"video:",
-	"watchdog:",
-	"xen:",
-	"XEN",
-}
+-- something that is addressed to me and is on the cc of a known mailing
+-- list should be moved to the appropriate mailbox (and flagged later)
+for i, name in ipairs(lists) do
+	messages = k.INBOX:contain_to(me_at) + k.INBOX:contain_cc(name .. "@")
+	messages:move_messages(k[name])
+end
 
-lkml_new = k["linux-kernel"]:is_unseen()
-for i, subj in ipairs(ignore) do
-	lkml_new:contain_subject(subj):mark_seen()
+-- flag to:me on the mailing lists
+for i, name in ipairs(lists) do
+	unseen = k[name]:is_unseen()
+	messages = unseen:contain_to(me_at)
+	messages:mark_flagged()
 end
