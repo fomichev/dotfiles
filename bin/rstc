@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -e
+set -eo pipefail
 
 export GOOGLE_PROJECT_ID=680984499942
 export GOOGLE_APPLICATION_CREDENTIALS=$HOME/.secret/restic-google-storage
@@ -9,12 +9,18 @@ export RESTIC_PASSWORD_FILE="$HOME/.secret/restic"
 REPO=${REPO:-gs:$(hostname -s):/}
 ARGS=${ARGS:- --limit-upload 512}
 
+finish() {
+	systemd-email s@fomichev.me restic
+}
+
 do_rstc() {
-	echo sudo -E restic -r "$REPO" "$@"
-	sudo -E restic -r "$REPO" "$@" 2>&1 | stdbuf -o0 cat
+	echo restic -r "$REPO" "$@"
+	sudo -E restic -r "$REPO" "$@" 2>&1 | cat
 }
 
 if [ $# -eq 0 ]; then
+	trap finish EXIT
+
 	do_rstc \
 		--verbose \
 		--verbose \
@@ -22,8 +28,8 @@ if [ $# -eq 0 ]; then
 		--exclude-file $HOME/src/dotfiles/.restic-exclude \
 		backup /
 
-	do_rstc forget --keep-last 5 --prune
 	do_rstc snapshots
+	do_rstc forget --keep-last 5 --prune
 	exit
 fi
 

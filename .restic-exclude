@@ -22,4 +22,7 @@
 /home/sdf/.cargo
 /home/sdf/.xargo
 /home/sdf/.bundle
-/home/sdf/.local/share/Trash/
+/home/sdf/.local/share/Trash
+/home/sdf/src/dotfiles/.config/signal
+/home/sdf/src/dotfiles/.config/epiphany
+/home/sdf/src/dotfiles/.local/share/keybase
