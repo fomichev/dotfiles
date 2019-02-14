@@ -5,35 +5,29 @@
 [alias]
 	a = add
 	au = add -u :/
-	ai = add --interactive
-	d = diff
-	dc = diff --cached
-	ri = rebase --interactive
-	rc = rebase --continue
-	ra = rebase --abort
-	st = status -sb
+	b = branch
+	bl = blame -w -s
+	ca = commit --amend
 	ci = commit -s
 	co = checkout
 	cp = cherry-pick
-	b = branch
-	gl = log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit
-	sm = submodule
+	dc = diff --cached
+	d = diff
+	fa = fetch --all
+	f = fetch
+	fp = format-patch --thread
 	l = log --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit
 	lo = log --oneline
-	o = !git log $(git rev-parse --abbrev-ref HEAD) --not origin/$(git rev-parse --abbrev-ref HEAD) --
-	i = !git log origin/$(git rev-parse --abbrev-ref HEAD) --not $(git rev-parse --abbrev-ref HEAD) --
-	out = log --branches --not --remotes=origin --
-	in = log --remotes=origin --not --branches --
-	fp = format-patch --thread
-	s = show --pretty=fuller
-	rollback = reset HEAD^
 	lp = log -p
-	bl = blame -w -s
-	t = log --tags --simplify-by-decoration --pretty="format:%ai %d"
-	f = fetch
-	fa = fetch --all
-	rpo = remote prune origin
+	pr = pull --rebase
+	ra = rebase --abort
+	rc = rebase --continue
 	rd = range-diff
+	ri = rebase --interactive
+	rpo = remote prune origin
+	sm = submodule
+	s = show --pretty=fuller
+	st = status -sb
 
 [color]
 	diff = auto
