@@ -38,8 +38,6 @@ shopt -s histappend
 shopt -s no_empty_cmd_completion
 # don't save matching lines
 export HISTCONTROL=ignoreboth
-# the search path for the `cd' command
-export CDPATH='.:~/src:~/Dropbox/src:~/y/src:~/go/src'
 
 # enable completion
 try_source /etc/bash_completion
