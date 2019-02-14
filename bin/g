@@ -16,6 +16,7 @@ Options:
   -C            Same as -p '*.c'
   -H            Same as -p '*.h'
   -M            Same as -p '[M|m]akefile.*'
+  -K            Same as -p 'Kconfig.*'
 END
 }
 
@@ -84,7 +85,7 @@ else
 	grep_opts="$grep_opts --color=never"
 fi
 
-ARGS=`getopt slivwd:p:hHCM "$@"`
+ARGS=`getopt slivwd:p:hHCMK "$@"`
 [ ! $? -eq 0 ] && { exit $?; }
 eval set -- $ARGS
 
@@ -149,6 +150,12 @@ while true; do
 		find_include "Makefile.*"
 		find_include "makefile"
 		find_include "makefile.*"
+		shift
+		;;
+
+	-K)
+		find_include "Kconfig"
+		find_include "Kconfig.*"
 		shift
 		;;
 
