@@ -1,9 +1,0 @@
-NAME:=nvim
-GIT:=https://github.com/neovim/neovim.git
-
-include Makefile.lib
-
-PKG_BLD=$(PKG_SRC)/build
-
-build:
-	$(SUBMAKE) build_cmake

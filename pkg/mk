@@ -1,0 +1,154 @@
+#!/bin/bash
+
+set -e
+
+R="$HOME/opt"
+STAMP="$R/stamp"
+SRC="$R/src"
+PREFIX="$R/sysroot"
+
+FILE="$1"
+PKG="$(basename "$FILE")"
+shift
+
+S="$SRC/$PKG"
+B="$R/build/$PKG"
+PKG_STAMP_FETCH="$STAMP/${PKG}_fetch"
+PKG_STAMP_BUILD="$STAMP/${PKG}_build"
+
+configure_flags=(--prefix=$PREFIX)
+MAKE_FLAGS=""
+CMAKE_FLAGS=""
+INSTALL_FLAGS=""
+
+MAX_NPROC=64
+NPROC=$(nproc)
+NPROC=$(echo "if(${NPROC}>${MAX_NPROC}){${MAX_NPROC}}else{${NPROC}}" | bc)
+export CMAKE_BUILD_PARALLEL_LEVEL=$NPROC
+
+say() { echo "${PKG}: $@"; }
+die() { echo "$@"; exit 1; }
+
+[ -z "$PKG" ] && { die "Specify package name!"; }
+
+say "NPROC=$NPROC PREFIX=$PREFIX"
+
+__fetch_git() {
+	local s="$1"
+	local dirname="$2"
+
+	if [ -d "$dirname" ]; then
+		(cd $dirname && git pull --ff-only)
+	else
+		git clone $s $dirname
+	fi
+
+	(cd $dirname && git describe --always) >> $PKG_STAMP_FETCH
+
+	if [ ! -e "$PKG" ]; then
+		ln -s $dirname $PKG
+	fi
+}
+
+__fetch_tar() {
+	local s="$1"
+
+	if [ ! -e "$(basename $s)" ]; then
+		say "fetching $s into $PWD"
+		curl -LO "$s"
+		say "estracting $s into $B"
+		tar xf "$(basename $s)" -C "$B"
+	fi
+
+	echo "$s" >> $PKG_STAMP_FETCH
+}
+
+fetch() {
+	rm -f $PKG_STAMP_FETCH
+
+	if [ -e "$source" ]; then
+		die "No source specified!"
+	fi
+
+	for s in ${source[@]}; do
+		local fullname="$(basename $s)"
+		local extension="${fullname##*.}"
+		local dirname="${fullname%.*}"
+
+		case "$extension" in
+			git) __fetch_git "$s" "$dirname" ;;
+			*) __fetch_tar "$s" ;;
+		esac
+	done
+}
+
+pre_build() { :; }
+
+__build_cmake() {
+	cmake $CMAKE_FLAGS "$S"
+	cmake --build .
+	cmake $INSTALL_FLAGS \
+		-DCMAKE_INSTALL_PREFIX=$PREFIX \
+		-P cmake_install.cmake
+}
+
+__build_autoconf() {
+	[ -x "$S/autogen.sh" ] && (cd "$S" && ./autogen.sh) || :
+	$S/configure --prefix=$PREFIX ${configure_flags[@]}
+	make -j$NPROC $MAKE_FLAGS
+	make $INSTALL_FLAGS install
+}
+
+extract_to_prefix() {
+	for s in ${source[@]}; do
+		(cd $PREFIX && tar xf $SRC/$(basename $s))
+	done
+}
+
+build() {
+	if [ -f "$S/CMakeLists.txt" ]; then
+		__build_cmake
+	elif [ -f "$S/configure" -o -f "$S/configure.ac" ]; then
+		# build in the source tree
+		B="$S"
+		cd "$B"
+
+		__build_autoconf
+	else
+		die "Unsupported build system!"
+	fi
+}
+
+post_build() { :; }
+
+source "$FILE"
+
+checksum() {
+	sha256sum "$1" 2>&1 | cut -d' ' -f1
+}
+
+checksum_matches() {
+	test "$(checksum "$1")" = "$(checksum "$2")"
+}
+
+mkdir -p "$SRC" "$STAMP" "$B"
+
+
+
+
+say "fetch"
+(cd $SRC && fetch)
+
+if checksum_matches "$PKG_STAMP_FETCH" "$PKG_STAMP_BUILD"; then
+	say "build is up to date"
+	exit 0
+fi
+
+say "pre build"
+[ -e "$S" ] && (cd $S && pre_build)
+say "build"
+(cd $B && build)
+say "post build"
+(cd $B && post_build)
+
+cp "$PKG_STAMP_FETCH" "$PKG_STAMP_BUILD"

@@ -1,8 +1,0 @@
-NAME:=golang
-GOLANG_VER:=1.11.2
-TAR:=https://storage.googleapis.com/golang/go${GOLANG_VER}.linux-amd64.tar.gz
-
-include Makefile.lib
-
-build:
-	(cd $(PREFIX) && tar xf $(TARBALL))

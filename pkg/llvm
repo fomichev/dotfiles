@@ -1,0 +1,8 @@
+#!/bin/bash
+
+source=(https://github.com/llvm-mirror/llvm.git
+	https://github.com/llvm-mirror/clang.git)
+
+pre_build() {
+	(cd tools && ln -sf $SRC/clang)
+}

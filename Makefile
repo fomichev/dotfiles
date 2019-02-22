@@ -27,12 +27,13 @@ endef
 all: install init update
 
 build:
-	$(MAKE) -C pkg -f Makefile.golang
-	#$(MAKE) -C pkg -f Makefile.llvm
-	#$(MAKE) -C pkg -f Makefile.neomutt
-	#$(MAKE) -C pkg -f Makefile.nvim
-	#$(MAKE) -C pkg -f Makefile.tmux
-	$(MAKE) -C pkg -f Makefile.vim
+	pkg/mk pkg/golang
+	pkg/mk pkg/vim
+
+	#pkg/mk pkg/llvm
+	#pkg/mk pkg/neomutt
+	#pkg/mk pkg/nvim
+	#pkg/mk pkg/tmux
 
 install:
 	@$(foreach file,$(files),$(call InstallFile,$(file),$(HOME)/$(notdir $(file))))

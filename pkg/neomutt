@@ -1,0 +1,14 @@
+#!/bin/bash
+
+source=(https://github.com/neomutt/neomutt.git)
+
+configure_flags+=(
+		--disable-gpgme
+		--disable-doc
+		--gnutls
+		--gss
+		--idn
+		--mixmaster
+		--sasl
+		--ssl
+		)

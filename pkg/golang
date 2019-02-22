@@ -1,0 +1,8 @@
+#!/bin/bash
+
+ver=1.11.2
+source=(https://storage.googleapis.com/golang/go${ver}.linux-amd64.tar.gz)
+
+build() {
+	ln -sf $PWD/go $PREFIX/go
+}

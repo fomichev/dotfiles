@@ -1,0 +1,26 @@
+#!/bin/bash
+
+source=(https://github.com/vim/vim.git)
+
+configure_flags+=(
+		--with-features=huge
+		--disable-nls
+		--disable-acl
+		--disable-gpm
+		--disable-sysmouse
+		--disable-netbeans
+		--enable-rubyinterp=yes
+		--enable-pythoninterp=yes
+		--with-x
+		--with-gnome
+		--enable-multibyte
+		)
+
+pre_build() {
+	find $S -name configure -exec chmod +x {} \;
+	find $S -name which.sh -exec chmod +x {} \;
+}
+
+post_build() {
+	cp -a $S/runtime/keymap $PREFIX/share/vim/vim73/
+}
