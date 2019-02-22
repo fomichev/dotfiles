@@ -27,7 +27,7 @@ NPROC=$(echo "if(${NPROC}>${MAX_NPROC}){${MAX_NPROC}}else{${NPROC}}" | bc)
 export CMAKE_BUILD_PARALLEL_LEVEL=$NPROC
 
 say() { echo "${PKG}: $@"; }
-die() { echo "$@"; exit 1; }
+die() { echo "${PKG}: $@"; exit 1; }
 
 [ -z "$PKG" ] && { die "Specify package name!"; }
 
@@ -85,7 +85,7 @@ fetch() {
 pre_build() { :; }
 
 __build_cmake() {
-	cmake $CMAKE_FLAGS "$S"
+	cmake -DCMAKE_INSTALL_PREFIX=$PREFIX $CMAKE_FLAGS "$S"
 	cmake --build .
 	cmake $INSTALL_FLAGS \
 		-DCMAKE_INSTALL_PREFIX=$PREFIX \
