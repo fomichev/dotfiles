@@ -18,26 +18,36 @@ k.INBOX:check_status()
 -- everything from me should be marked as read
 k.INBOX:is_unseen():contain_from(me_at):mark_seen()
 
--- syzkaller bugs have it's own directory
-k:create_mailbox('syzkaller')
-syzbot = (k.INBOX:contain_from('syzbot') + k.INBOX:contain_cc('syzkaller-bugs')) - k.INBOX:contain_to(me_at)
-syzbot:move_messages(k['syzkaller'])
-
 -- mailing lists have their own directories
+--
+-- if the email targeted to multiple lists, we will put in the
+-- first match
 lists = {
-	"netdev",
-	"driverdev-devel",
-	"platform-drive-x86",
-	"linux-crypto",
-	"arch-general",
-	"bitcoin-dev",
-	"iovisor-dev",
+	"bpf@vger.kernel.org",
+	"netdev@vger.kernel.org",
+	"linux-crypto@vger.kernel.org",
+	"arch-general@archlinux.org",
+	"bitcoin-dev@lists.linuxfoundation.org",
+	"iovisor-dev@lists.iovisor.org",
+	"linux-kernel@vger.kernel.org",
 }
 
-for i, name in ipairs(lists) do
+for i, email in ipairs(lists) do
+	name = string.gsub(email, "@.+$", "")
 	k:create_mailbox(name)
-	messages = k.INBOX:contain_field("List-Id", name)
+	messages = k.INBOX:contain_to(name) + k.INBOX:contain_cc(name)
 	messages:move_messages(k[name])
+end
+
+-- mark everything on lkml as read except from those
+lkml_ignore_except = {
+	'torvalds@linux-foundation.org',
+}
+
+lkml_new = k["linux-kernel"]:is_unseen()
+lkml_new:mark_seen()
+for i, from in ipairs(lkml_ignore_except) do
+       lkml_new:contain_from(from):unmark_seen()
 end
 
 -- something that is addressed to me and is on the cc of a known mailing
