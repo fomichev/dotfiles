@@ -52,13 +52,15 @@ end
 
 -- something that is addressed to me and is on the cc of a known mailing
 -- list should be moved to the appropriate mailbox (and flagged later)
-for i, name in ipairs(lists) do
+for i, email in ipairs(lists) do
+	name = string.gsub(email, "@.+$", "")
 	messages = k.INBOX:contain_to(me_at) + k.INBOX:contain_cc(name .. "@")
 	messages:move_messages(k[name])
 end
 
 -- flag to:me on the mailing lists
-for i, name in ipairs(lists) do
+for i, email in ipairs(lists) do
+	name = string.gsub(email, "@.+$", "")
 	unseen = k[name]:is_unseen()
 	messages = unseen:contain_to(me_at)
 	messages:mark_flagged()
