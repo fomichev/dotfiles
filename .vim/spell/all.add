@@ -258,3 +258,9 @@ paperdoll
 paperdoll
 TODO
 unhandled
+skb
+nhoff
+eth
+headlen
+netif
+RFS

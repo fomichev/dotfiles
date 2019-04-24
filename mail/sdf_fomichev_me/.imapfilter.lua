@@ -29,6 +29,7 @@ lists = {
 	"arch-general@archlinux.org",
 	"bitcoin-dev@lists.linuxfoundation.org",
 	"iovisor-dev@lists.iovisor.org",
+	"cgroups@vger.kernel.org",
 	"linux-kernel@vger.kernel.org",
 }
 
