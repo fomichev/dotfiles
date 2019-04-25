@@ -29,8 +29,9 @@ all: install init update
 build:
 	pkg/mk pkg/golang
 	pkg/mk pkg/vim
-
-	#pkg/mk pkg/llvm
+	pkg/mk pkg/llvm
+	pkg/mk pkg/pahole
+	pkg/mk pkg/sparse
 	#pkg/mk pkg/neomutt
 	#pkg/mk pkg/nvim
 	#pkg/mk pkg/tmux

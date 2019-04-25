@@ -19,7 +19,7 @@
 	l = log --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit
 	lo = log --oneline
 	lp = log -p
-	pr = pull --rebase
+	pr = pull --rebase --autostash
 	ra = rebase --abort
 	rc = rebase --continue
 	rd = range-diff

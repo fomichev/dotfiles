@@ -16,10 +16,13 @@ B="$R/build/$PKG"
 PKG_STAMP_FETCH="$STAMP/${PKG}_fetch"
 PKG_STAMP_BUILD="$STAMP/${PKG}_build"
 
+# PACKAGES CAN CONFIGURE THESE
+# {{{
 configure_flags=(--prefix=$PREFIX)
-MAKE_FLAGS=""
-CMAKE_FLAGS=""
-INSTALL_FLAGS=""
+make_flags=()
+cmake_flags=()
+install_flags=()
+# }}}
 
 MAX_NPROC=64
 NPROC=$(nproc)
@@ -85,9 +88,9 @@ fetch() {
 pre_build() { :; }
 
 __build_cmake() {
-	cmake -DCMAKE_INSTALL_PREFIX=$PREFIX $CMAKE_FLAGS "$S"
+	cmake -DCMAKE_INSTALL_PREFIX=$PREFIX ${cmake_flags[@]} "$S"
 	cmake --build .
-	cmake $INSTALL_FLAGS \
+	cmake ${install_flags[@]} \
 		-DCMAKE_INSTALL_PREFIX=$PREFIX \
 		-P cmake_install.cmake
 }
@@ -95,8 +98,16 @@ __build_cmake() {
 __build_autoconf() {
 	[ -x "$S/autogen.sh" ] && (cd "$S" && ./autogen.sh) || :
 	$S/configure --prefix=$PREFIX ${configure_flags[@]}
-	make -j$NPROC $MAKE_FLAGS
-	make $INSTALL_FLAGS install
+	make -j$NPROC ${make_flags[@]}
+	make ${install_flags[@]} install
+}
+
+__build_make() {
+	make_flags+=(PREFIX=$PREFIX)
+	install_flags+=(PREFIX=$PREFIX)
+
+	make -j$NPROC ${make_flags[@]}
+	make ${install_flags[@]} install
 }
 
 extract_to_prefix() {
@@ -114,6 +125,12 @@ build() {
 		cd "$B"
 
 		__build_autoconf
+	elif [ -f "$S/Makefile" ]; then
+		# build in the source tree
+		B="$S"
+		cd "$B"
+
+		__build_make
 	else
 		die "Unsupported build system!"
 	fi
@@ -131,10 +148,7 @@ checksum_matches() {
 	test "$(checksum "$1")" = "$(checksum "$2")"
 }
 
-mkdir -p "$SRC" "$STAMP" "$B"
-
-
-
+mkdir -p "$SRC" "$STAMP"
 
 say "fetch"
 (cd $SRC && fetch)
@@ -147,6 +161,8 @@ fi
 say "pre build"
 [ -e "$S" ] && (cd $S && pre_build)
 say "build"
+rm -rf "$B"
+mkdir -p "$B"
 (cd $B && build)
 say "post build"
 (cd $B && post_build)
