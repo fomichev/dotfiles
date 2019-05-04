@@ -1,0 +1,40 @@
+#!/bin/bash
+
+if [ $# -eq 0 ]; then
+	set incoming update install foreign
+fi
+
+cd ~/src/aur
+
+fn() {
+	for d in $(ls -1); do
+		echo "${d}:"
+		(cd $d && eval "$@")
+	done
+}
+
+foreign() {
+	pacman -Qm
+}
+
+incoming_pkg() {
+	git fetch
+	git log -p origin/$(git rev-parse --abbrev-ref HEAD) --not $(git rev-parse --abbrev-ref HEAD) --
+}
+
+update_pkg() {
+	git pull
+}
+
+install_pkg() {
+	makepkg -si
+}
+
+incoming() { fn incoming_pkg; }
+update() { fn update_pkg; }
+install() { fn install_pkg; }
+
+for f in "$@"; do
+	echo "$f" | colorify
+	$f
+done
