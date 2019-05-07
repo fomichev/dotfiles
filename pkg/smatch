@@ -1,0 +1,3 @@
+#!/bin/bash
+
+source=(git://repo.or.cz/smatch.git)

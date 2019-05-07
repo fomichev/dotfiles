@@ -1,0 +1,4 @@
+#!/bin/bash
+
+source=(git://git.kernel.org/pub/scm/network/iproute2/iproute2.git)
+install_flags=(DESTDIR=$PREFIX)
