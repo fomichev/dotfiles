@@ -21,6 +21,15 @@ do_rstc() {
 if [ $# -eq 0 ]; then
 	trap finish EXIT
 
+	echo 'update timeliner'
+	go get github.com/mholt/timeliner
+
+	if [ -d $HOME/Pictures/Google ]; then
+		echo 'timeliner get-latest'
+		(cd $HOME/Pictures/Google && \
+		/home/sdf/go/bin/timeliner get-latest google_photos/s@fomichev.me)
+	fi
+
 	do_rstc \
 		--verbose \
 		--verbose \
