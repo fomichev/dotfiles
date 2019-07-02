@@ -19,7 +19,7 @@ foreign() {
 
 incoming_pkg() {
 	git fetch
-	git log -p origin/$(git rev-parse --abbrev-ref HEAD) --not $(git rev-parse --abbrev-ref HEAD) --
+	git diff origin/$(git rev-parse --abbrev-ref HEAD) $(git rev-parse --abbrev-ref HEAD)
 }
 
 update_pkg() {
