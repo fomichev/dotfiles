@@ -21,6 +21,9 @@ do_rstc() {
 if [ $# -eq 0 ]; then
 	trap finish EXIT
 
+	echo 'pull could data'
+	[ -d $HOME/Drive] && DRY=n cloud pull
+
 	echo 'update timeliner'
 	go get github.com/mholt/timeliner
 
