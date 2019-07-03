@@ -1,0 +1,20 @@
+[database]
+path=/home/sdf/Mail
+
+[user]
+name=Stanislav Fomichev
+primary_email=s@fomichev.me
+other_email=kernel@fomichev.me;sdf@fomichev.me;sdf@google.com;
+
+[new]
+tags=unread;inbox;
+ignore=
+
+[search]
+exclude_tags=deleted;spam;
+
+[maildir]
+synchronize_flags=true
+
+[crypto]
+gpg_path=gpg

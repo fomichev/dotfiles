@@ -1,7 +1,3 @@
-# use the following to update:
-# offlineimap --mbnames-prune
-source ~/.mail/mailboxes
-
 set envelope_from
 
 # check regulary
