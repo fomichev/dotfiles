@@ -5,8 +5,8 @@ set sendmail = "msmtp"
 set mbox_type = Maildir
 
 set folder = "~/Mail"
-set mbox = "+sdf_fomichev_me/Inbox"
-set spoolfile = "+sdf_fomichev_me/Inbox"
+set mbox = "+sdf_fomichev_me/inbox"
+set spoolfile = "+sdf_fomichev_me/inbox"
 set record = "+sdf_fomichev_me/inbox"
 set postponed = "+sdf_fomichev_me/drafts"
 mailboxes `find ~/Mail/ -type d -name cur -printf "%h\n" | sort | awk '{ print "\""$0"\""}' | tr "\n" " "`

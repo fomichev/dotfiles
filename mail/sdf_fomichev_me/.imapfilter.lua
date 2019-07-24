@@ -25,7 +25,6 @@ k.INBOX:is_unseen():contain_from(me_at):mark_seen()
 lists = {
 	"bpf@vger.kernel.org",
 	"netdev@vger.kernel.org",
-	"linux-crypto@vger.kernel.org",
 	"arch-general@archlinux.org",
 	"bitcoin-dev@lists.linuxfoundation.org",
 	"iovisor-dev@lists.iovisor.org",
