@@ -2,6 +2,12 @@
 
 set -e
 
+__usage() {
+	echo "usage: mk <recipe>"
+	echo "       mk <recipe> clean"
+	exit 1
+}
+
 R="$HOME/opt"
 STAMP="$R/stamp"
 SRC="$R/src"
@@ -9,7 +15,12 @@ PREFIX="$R/sysroot"
 
 FILE="$1"
 PKG="$(basename "$FILE")"
+[ -z "$FILE" ] && __usage
 shift
+if [ ! -z "$1" ]; then
+	CMD="$1"
+	shift
+fi
 
 S="$SRC/$PKG"
 B="$R/build/$PKG"
@@ -138,7 +149,10 @@ build() {
 
 post_build() { :; }
 
-source "$FILE"
+[ ! -e "$FILE" ] && {
+	echo "File '$FILE' not found"
+	exit 1
+} || source "$FILE"
 
 checksum() {
 	sha256sum "$1" 2>&1 | cut -d' ' -f1
@@ -148,23 +162,38 @@ checksum_matches() {
 	test "$(checksum "$1")" = "$(checksum "$2")"
 }
 
-mkdir -p "$SRC" "$STAMP"
+__clean() {
+	say "clean"
+	rm -f  $PKG_STAMP_FETCH $PKG_STAMP_BUILD
+	rm -rf $B $S
+}
 
-say "fetch"
-(cd $SRC && fetch)
+__build() {
+	mkdir -p "$SRC" "$STAMP"
 
-if checksum_matches "$PKG_STAMP_FETCH" "$PKG_STAMP_BUILD"; then
-	say "build is up to date"
-	exit 0
-fi
+	say "fetch"
+	(cd $SRC && fetch)
 
-say "pre build"
-[ -e "$S" ] && (cd $S && pre_build)
-say "build"
-rm -rf "$B"
-mkdir -p "$B"
-(cd $B && build)
-say "post build"
-(cd $B && post_build)
+	if checksum_matches "$PKG_STAMP_FETCH" "$PKG_STAMP_BUILD"; then
+		say "build is up to date"
+		say "run '$0 $FILE clean' to force rebuild"
+		exit 0
+	fi
 
-cp "$PKG_STAMP_FETCH" "$PKG_STAMP_BUILD"
+	say "pre build"
+	[ -e "$S" ] && (cd $S && pre_build)
+	say "build"
+	rm -rf "$B"
+	mkdir -p "$B"
+	(cd $B && build)
+	say "post build"
+	(cd $B && post_build)
+
+	cp "$PKG_STAMP_FETCH" "$PKG_STAMP_BUILD"
+}
+
+case "$CMD" in
+	clean) __clean ;;
+	help) __usage ;;
+	*) __build ;;
+esac
