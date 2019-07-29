@@ -4,6 +4,7 @@
 
 [alias]
 	a = add
+	ai = add --interactive
 	au = add -u :/
 	b = branch
 	bl = blame -w -s
@@ -28,6 +29,7 @@
 	sm = submodule
 	s = show --pretty=fuller
 	st = status -sb
+	mrproper = clean -xdf
 
 [color]
 	diff = auto
