@@ -22,7 +22,7 @@ if [ $# -eq 0 ]; then
 	trap finish EXIT
 
 	echo 'pull could data'
-	[ -d $HOME/Drive] && DRY=n cloud pull
+	[ -d $HOME/Drive ] && DRY=n $HOME/bin/cloud pull
 
 	echo 'update timeliner'
 	go get github.com/mholt/timeliner
