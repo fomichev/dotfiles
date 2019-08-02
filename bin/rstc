@@ -10,7 +10,7 @@ REPO=${REPO:-gs:$(hostname -s):/}
 ARGS=${ARGS:- --limit-upload 512}
 
 finish() {
-	/home/sdf/bin/systemd-email s@fomichev.me restic
+	$HOME/bin/systemd-email s@fomichev.me restic
 }
 
 do_rstc() {
