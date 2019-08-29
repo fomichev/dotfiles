@@ -70,8 +70,9 @@ __fetch_tar() {
 	if [ ! -e "$(basename $s)" ]; then
 		say "fetching $s into $PWD"
 		curl -LO "$s"
-		say "estracting $s into $B"
-		tar xf "$(basename $s)" -C "$B"
+		say "estracting $s into $S"
+		mkdir -p "$S"
+		tar xf "$(basename $s)" -C "$S"
 	fi
 
 	echo "$s" >> $PKG_STAMP_FETCH
@@ -164,6 +165,9 @@ checksum_matches() {
 
 __clean() {
 	say "clean"
+
+	(cd $SRC && for s in ${source[@]}; do rm -f $(basename $s); done)
+
 	rm -f  $PKG_STAMP_FETCH $PKG_STAMP_BUILD
 	rm -rf $B $S
 }
