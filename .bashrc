@@ -33,12 +33,29 @@ PS1='\$ '
 
 # keep the same multi line history entries in one entry
 shopt -s cmdhist
+# multi-line commands are saved with embedded new lines
+shopt -s lithist
 # don't overwrite history
 shopt -s histappend
 # don't try to complete empty line
 shopt -s no_empty_cmd_completion
-# don't save matching lines
-export HISTCONTROL=ignoreboth
+# keep up to a million history entries (up from default 64k)
+export HISTFILESIZE=1000000
+export HISTSIZE=$HISTFILESIZE
+# ignore one or two line commands
+# HISTIGNORE subsumes the function of HISTCONTROL:
+# ?    - one character commands
+# ??   - two character commands
+# &    - ignoredupes
+# [ ]* - ignorespace
+export HISTIGNORE='?:??:&:[ ]*:..:...:....:.....'
+# don't waste space in history file with timestamps
+unset HISTTIMEFORMAT
+
+history_defrag() {
+	mv ~/.bash_history ~/.bash_history.bak
+	cat ~/.bash_history.bak | egrep -v '^#' | sort | uniq > ~/.bash_history
+}
 
 # enable completion
 try_source /etc/bash_completion
