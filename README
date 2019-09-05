@@ -20,3 +20,10 @@ Beware the crocodiles
 * w - sorted w
 * x - extract archive
 * y - yank
+
+# ld.so.conf
+
+```
+$ echo $HOME/opt/sysroot/lib | sudo tee /etc/ld.so.conf.d/$USER.conf
+$ sudo ldconfig
+```
