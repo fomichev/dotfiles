@@ -1,7 +1,7 @@
 #!/bin/bash
 
 if [ $# -eq 0 ]; then
-	set incoming update install foreign
+	set incoming update install orphaned foreign
 fi
 
 cd ~/src/aur
@@ -15,6 +15,10 @@ fn() {
 
 foreign() {
 	pacman -Qm
+}
+
+orphaned() {
+	pacman -Rs $(pacman -Qqtd)
 }
 
 incoming_pkg() {
