@@ -18,7 +18,7 @@ foreign() {
 }
 
 orphaned() {
-	pacman -Rs $(pacman -Qqtd)
+	sudo pacman -Rs $(pacman -Qqtd)
 }
 
 incoming_pkg() {
