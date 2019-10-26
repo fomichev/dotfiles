@@ -23,7 +23,7 @@ orphaned() {
 
 incoming_pkg() {
 	git fetch
-	git diff origin/$(git rev-parse --abbrev-ref HEAD) $(git rev-parse --abbrev-ref HEAD)
+	git diff $(git rev-parse --abbrev-ref HEAD) origin/$(git rev-parse --abbrev-ref HEAD)
 }
 
 update_pkg() {
