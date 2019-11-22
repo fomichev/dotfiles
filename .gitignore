@@ -24,3 +24,9 @@ mail/.notmuch/
 ignore
 
 .gnupg
+
+.tmux/
+
+bin/gkectl
+bin/govc
+bin/kubeadm

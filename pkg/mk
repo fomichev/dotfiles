@@ -33,6 +33,7 @@ configure_flags=(--prefix=$PREFIX)
 make_flags=()
 cmake_flags=()
 install_flags=()
+src_subdir="" # cd into this sub-directory before trying to build
 invoke_install=true
 
 pre_build() { :; }
@@ -102,7 +103,7 @@ fetch() {
 }
 
 __build_cmake() {
-	cmake -DCMAKE_INSTALL_PREFIX=$PREFIX ${cmake_flags[@]} "$S"
+	cmake -DCMAKE_INSTALL_PREFIX=$PREFIX ${cmake_flags[@]} "$1"
 	cmake --build .
 	cmake ${install_flags[@]} \
 		-DCMAKE_INSTALL_PREFIX=$PREFIX \
@@ -130,18 +131,28 @@ extract_to_prefix() {
 	done
 }
 
+__src_path() {
+	if [ -e "$src_subdir" ]; then
+		echo "$S"
+	else
+		echo "$S/$src_subdir"
+	fi
+}
+
 build() {
-	if [ -f "$S/CMakeLists.txt" ]; then
-		__build_cmake
-	elif [ -f "$S/configure" -o -f "$S/configure.ac" ]; then
+	local src="$(__src_path)"
+
+	if [ -f "$src/CMakeLists.txt" ]; then
+		__build_cmake "$src"
+	elif [ -f "$src/configure" -o -f "$src/configure.ac" ]; then
 		# build in the source tree
-		B="$S"
+		B="$src"
 		cd "$B"
 
 		__build_autoconf
-	elif [ -f "$S/Makefile" ]; then
+	elif [ -f "$src/Makefile" ]; then
 		# build in the source tree
-		B="$S"
+		B="$src"
 		cd "$B"
 
 		__build_make

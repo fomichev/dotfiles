@@ -1,2 +1,2 @@
-export_gpg_ssh_agent
+gpg-export-ssh-agent
 ssh -A "$@"

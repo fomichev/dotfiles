@@ -1,8 +1,5 @@
 #!/bin/bash
 
-source=(https://github.com/llvm-mirror/llvm.git
-	https://github.com/llvm-mirror/clang.git)
-
-pre_build() {
-	(cd tools && ln -sf $SRC/clang)
-}
+cmake_flags=(-DLLVM_ENABLE_PROJECTS=clang)
+source=(https://github.com/llvm/llvm-project.git)
+src_subdir=llvm
