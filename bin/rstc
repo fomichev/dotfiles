@@ -43,7 +43,7 @@ if [ $# -eq 0 ]; then
 	do_rstc unlock
 
 	do_rstc snapshots
-	do_rstc forget --keep-last 5 --prune
+	do_rstc forget --keep-within 95d --prune
 	exit
 fi
 
