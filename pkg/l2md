@@ -1,0 +1,8 @@
+#!/bin/bash
+
+source=(git://git.kernel.org/pub/scm/linux/kernel/git/dborkman/l2md.git)
+invoke_install=false
+
+post_build() {
+	cp $S/l2md $PREFIX/bin
+}

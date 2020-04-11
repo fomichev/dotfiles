@@ -33,6 +33,10 @@ configure_flags=(--prefix=$PREFIX)
 make_flags=()
 cmake_flags=()
 install_flags=()
+invoke_install=true
+
+pre_build() { :; }
+post_build() { :; }
 # }}}
 
 MAX_NPROC=64
@@ -70,7 +74,7 @@ __fetch_tar() {
 	if [ ! -e "$(basename $s)" ]; then
 		say "fetching $s into $PWD"
 		curl -LO "$s"
-		say "estracting $s into $S"
+		say "extracting $s into $S"
 		mkdir -p "$S"
 		tar xf "$(basename $s)" -C "$S"
 	fi
@@ -97,8 +101,6 @@ fetch() {
 	done
 }
 
-pre_build() { :; }
-
 __build_cmake() {
 	cmake -DCMAKE_INSTALL_PREFIX=$PREFIX ${cmake_flags[@]} "$S"
 	cmake --build .
@@ -111,7 +113,7 @@ __build_autoconf() {
 	[ -x "$S/autogen.sh" ] && (cd "$S" && ./autogen.sh) || :
 	$S/configure --prefix=$PREFIX ${configure_flags[@]}
 	make -j$NPROC ${make_flags[@]}
-	make ${install_flags[@]} install
+	[ "$invoke_install" = " true" ] && make ${install_flags[@]} install
 }
 
 __build_make() {
@@ -119,7 +121,7 @@ __build_make() {
 	install_flags+=(PREFIX=$PREFIX)
 
 	make -j$NPROC ${make_flags[@]}
-	make ${install_flags[@]} install
+	[ "$invoke_install" = " true" ] && make ${install_flags[@]} install
 }
 
 extract_to_prefix() {
@@ -148,8 +150,6 @@ build() {
 	fi
 }
 
-post_build() { :; }
-
 [ ! -e "$FILE" ] && {
 	echo "File '$FILE' not found"
 	exit 1
@@ -173,7 +173,7 @@ __clean() {
 }
 
 __build() {
-	mkdir -p "$SRC" "$STAMP"
+	mkdir -p "$SRC" "$STAMP" "$PREFIX/bin"
 
 	say "fetch"
 	(cd $SRC && fetch)
