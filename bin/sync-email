@@ -6,3 +6,4 @@ set -e
 imapfilter -c ~/.imapfilter.lua
 mbsync -aV
 notmuch new
+l2md
