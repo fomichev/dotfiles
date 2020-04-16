@@ -3,7 +3,7 @@
 set -x
 set -e
 
-imapfilter -c ~/.imapfilter.lua
-mbsync -aV
-notmuch new
-l2md
+[ -e ~/.imapfilter.lua ] && imapfilter -c ~/.imapfilter.lua
+[ -e ~/.mbsyncrc ] && mbsync -aV
+[ -e ~/.notmuch-config ] && notmuch new
+[ -e ~/.l2mdconfig ] && l2md

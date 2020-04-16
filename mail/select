@@ -4,8 +4,10 @@
 path=$HOME/mail/$1
 [ -e "$path" ] || { echo "Profile $path doesn't exist!"; exit 1; }
 
-files=".imapfilter.lua .msmtprc .mbsyncrc .muttrc"
+files=$(cd $path && find -type f)
 
 for f in $files; do
+	f=$(basename $f)
+	echo ln -sf $path/$f ~/$f
 	ln -sf $path/$f ~/$f
 done

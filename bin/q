@@ -1,0 +1,148 @@
+#!/bin/bash
+
+NRCPU=4
+MEMORY=16041
+
+usage() {
+	echo "q <path to bzImage>"
+	exit 1
+}
+
+host() {
+	local kernel="$1"
+
+	[ -z "$kernel" ] && usage
+
+	local cmdline
+
+	local fs
+	fs+=" -nodefaults"
+	fs+=" -fsdev local,id=vfs1,path=/,security_model=none,readonly"
+	fs+=" -device virtio-9p-pci,fsdev=vfs1,mount_tag=/dev/root"
+
+	local console
+	console+=" -display none"
+	console+=" -serial mon:stdio"
+
+	cmdline+=" earlyprintk=serial,ttyS0,115200"
+	cmdline+=" console=ttyS0,115200"
+
+	local net
+	net+=" -netdev user,id=virtual"
+	net+=" -device virtio-net-pci,netdev=virtual"
+
+	# TODO: ^^^ CONFIG_VHOST_NET vhost=on + macvtap or tun/tap
+	# TODO: replace -netdev user with proper settings (-netdev tap,id=mynet0)
+
+	#  /sys/devices/virtual/misc/vhost-net/dev 
+	#net+=" -netdev tap,id=guest0,vhost=on,script=no"
+	#net+=" -net nic,model=virtio,netdev=guest0" #,macaddr=00:16:35:AF:94:4B"
+
+	cmdline+=" rootfstype=9p"
+	cmdline+=" rootflags=version=9p2000.L,trans=virtio,access=any"
+	cmdline+=" ro"
+	cmdline+=" nokaslr"
+	cmdline+=" init=/bin/sh -- -c \"$0 -g -H $HOME\""
+
+	qemu-system-x86_64 \
+		-nodefaults \
+		-no-reboot \
+		-machine accel=kvm:tcg \
+		-watchdog i6300esb \
+		-device virtio-rng-pci \
+		-cpu host \
+		-enable-kvm \
+		-smp $NRCPU \
+		-m $MEMORY \
+		$fs \
+		$console \
+		$net \
+		-kernel "$kernel" \
+		-append "$cmdline"
+}
+
+say() {
+	trap 'tput sgr0' 2 #SIGINT
+	tput setaf 2
+	echo ">" "$@"
+	tput sgr0
+}
+
+guest() {
+	say early setup
+
+	export PATH=/bin:/sbin:/usr/bin:/usr/sbin
+	mount -t sysfs -o nosuid,noexec,nodev sys /sys/
+
+	mount -t tmpfs tmpfs /tmp/
+	mount -t tmpfs tmpfs /var/log/
+	mount -t tmpfs tmpfs /run/
+
+	mkdir -p -m 0755 /tmp/etc
+
+	touch /tmp/etc/fstab
+	mount --bind /{tmp/etc,etc}/fstab
+
+	mount -t proc -o nosuid,noexec,nodev proc /proc/
+	mount -t configfs configfs /sys/kernel/config
+	mount -t debugfs debugfs /sys/kernel/debug
+
+	mkdir -p -m 0755 /dev/shm /dev/pts
+	mount -t devpts -o gid=tty,mode=620,noexec,nosuid devpts /dev/pts
+	mount -t tmpfs -o mode=1777,nosuid,nodev tmpfs /dev/shm
+
+	local kver="`uname -r`"
+	say modules /lib/modules/$kver
+	mount -t tmpfs none /lib/modules
+	mkdir -p "/lib/modules/$kver"
+	mount -n -t tmpfs -o ro,mode=0000 disallow_modules "/lib/modules/$kver"
+
+	say networking
+
+	hostname q
+	touch /tmp/etc/hostname
+	mount --bind /{tmp/etc,etc}/hostname
+	echo q > /tmp/etc/hostname
+
+	ip link set dev lo up
+
+	touch /tmp/etc/resolv.conf
+	mount --bind /{tmp/etc,etc}/resolv.conf
+	mkdir -p -m 0755 /tmp/etc/resolvconf/run
+	mount --bind /{tmp/etc,etc}/resolvconf/run
+	mkdir /run/resolvconf
+	echo "nameserver 8.8.8.8" > /run/resolvconf/resolv.conf
+
+	local dev=$(ls -d /sys/bus/virtio/drivers/virtio_net/virtio* |sort -g |head -n1)
+	local iface=$(ls $dev/net)
+	say dhcp on iface $iface
+	busybox udhcpc -i $iface -p /run/udhcpc -s /etc/udhcpc/default.script -q -t 1 -n -f
+
+	say root environment
+	touch /tmp/etc/{profile,bash.bashrc}
+	mount --bind /{tmp/etc,etc}/profile
+	mount --bind /{tmp/etc,etc}/bash.bashrc
+
+	mkdir -m 0755 /tmp/root
+	touch /tmp/root/.bashrc
+	touch /tmp/root/.bash_profile
+
+	local rcfile=$HOME/.bashrc
+	export HOME=/tmp/root
+
+	say interactive bash $rcfile
+	setsid bash --rcfile $rcfile 0<>"/dev/ttyS0" 1>&0 2>&0
+}
+
+GUEST=n
+
+while getopts "hgH:" opt; do
+	case $opt in
+		h) usage ;;
+		g) GUEST=y ;;
+		H) export HOME=$OPTARG ;;
+	esac
+done
+shift $((OPTIND -1))
+
+[ "$GUEST" = "y" ] && guest "$@" || host "$@"

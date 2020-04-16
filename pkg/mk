@@ -52,6 +52,14 @@ die() { echo "${PKG}: $@"; exit 1; }
 
 say "NPROC=$NPROC PREFIX=$PREFIX"
 
+finish() {
+	RET=$?
+	if [ $RET -ne 0 ]; then
+		echo "FAILED: $RET"
+	fi
+}
+trap finish EXIT
+
 __fetch_git() {
 	local s="$1"
 	local dirname="$2"
@@ -114,7 +122,7 @@ __build_autoconf() {
 	[ -x "$S/autogen.sh" ] && (cd "$S" && ./autogen.sh) || :
 	$S/configure --prefix=$PREFIX ${configure_flags[@]}
 	make -j$NPROC ${make_flags[@]}
-	[ "$invoke_install" = " true" ] && make ${install_flags[@]} install
+	[ "$invoke_install" = " true" ] && make ${install_flags[@]} install || :
 }
 
 __build_make() {
@@ -122,7 +130,7 @@ __build_make() {
 	install_flags+=(PREFIX=$PREFIX)
 
 	make -j$NPROC ${make_flags[@]}
-	[ "$invoke_install" = " true" ] && make ${install_flags[@]} install
+	[ "$invoke_install" = " true" ] && make ${install_flags[@]} install || :
 }
 
 extract_to_prefix() {

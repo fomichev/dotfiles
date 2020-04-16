@@ -1,0 +1,15 @@
+[general]
+        base = ~/Mail/sdf_google_com/
+        period = 30
+        oneshot = 1
+
+[repo bpf]
+        url = https://lore.kernel.org/bpf/0
+        maildir = ~/Mail/sdf_google_com/bpf
+        initial_import = 100
+
+[repo netdev]
+        url = https://lore.kernel.org/netdev/0
+        url = https://lore.kernel.org/netdev/1
+        maildir = ~/Mail/sdf_google_com/netdev
+        initial_import = 100
