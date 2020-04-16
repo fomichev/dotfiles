@@ -1,0 +1,10 @@
+[Unit]
+Description=Email Sync Service
+
+[Service]
+Type=oneshot
+Nice=10
+ExecStart=/home/sdf/bin/sync-email
+
+[Install]
+WantedBy=default.target
