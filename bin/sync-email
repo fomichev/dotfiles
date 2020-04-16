@@ -6,4 +6,4 @@ set -e
 [ -e ~/.imapfilter.lua ] && imapfilter -c ~/.imapfilter.lua
 [ -e ~/.mbsyncrc ] && mbsync -aV
 [ -e ~/.notmuch-config ] && notmuch new
-[ -e ~/.l2mdconfig ] && l2md
+[ -e ~/.l2mdconfig ] && $HOME/opt/sysroot/bin/l2md --verbose
