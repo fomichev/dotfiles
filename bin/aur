@@ -31,7 +31,7 @@ update_pkg() {
 }
 
 install_pkg() {
-	makepkg -si
+	makepkg -si --noconfirm --needed
 }
 
 incoming() { fn incoming_pkg; }
