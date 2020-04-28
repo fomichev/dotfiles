@@ -1,24 +1,39 @@
 #!/bin/bash
 
-NRCPU=4
-MEMORY=16041
-
 usage() {
-	echo "q <path to bzImage>"
+	echo "q [options] [path to bzImage] [script]"
+	echo
+	echo "Run it from the kernel directory (make sure .config is there)"
+	echo
+	echo "options:"
+	echo "    m - run depmod and modprobe"
+	echo "    c - pass extra kernel cmdline options"
 	exit 1
 }
 
+# This function is called _BEFORE_ QEMU starts (on host).
 host() {
 	local kernel="$1"
+	shift
 
-	[ -z "$kernel" ] && usage
+	if [ -z "$kernel" ]; then
+		if [ -e "arch/x86/boot/bzImage" ]; then
+			kernel="arch/x86/boot/bzImage"
+		fi
+		[ -n "$kernel" ] || usage
+	fi
+	[ -e ".config" ] || usage
 
 	local cmdline
 
 	local fs
 	fs+=" -nodefaults"
 	fs+=" -fsdev local,id=vfs1,path=/,security_model=none,readonly"
+	fs+=" -fsdev local,id=vfs2,path=$(pwd),security_model=none"
+	fs+=" -fsdev local,id=vfs3,path=/export/hda3/tmp,security_model=none"
 	fs+=" -device virtio-9p-pci,fsdev=vfs1,mount_tag=/dev/root"
+	fs+=" -device virtio-9p-pci,fsdev=vfs2,mount_tag=/dev/kernel"
+	fs+=" -device virtio-9p-pci,fsdev=vfs3,mount_tag=/dev/tmp"
 
 	local console
 	console+=" -display none"
@@ -31,18 +46,15 @@ host() {
 	net+=" -netdev user,id=virtual"
 	net+=" -device virtio-net-pci,netdev=virtual"
 
-	# TODO: ^^^ CONFIG_VHOST_NET vhost=on + macvtap or tun/tap
-	# TODO: replace -netdev user with proper settings (-netdev tap,id=mynet0)
-
-	#  /sys/devices/virtual/misc/vhost-net/dev 
-	#net+=" -netdev tap,id=guest0,vhost=on,script=no"
-	#net+=" -net nic,model=virtio,netdev=guest0" #,macaddr=00:16:35:AF:94:4B"
+	local opts
+	[ "$MODULES" = "y" ] && opts+=" -m"
 
 	cmdline+=" rootfstype=9p"
 	cmdline+=" rootflags=version=9p2000.L,trans=virtio,access=any"
 	cmdline+=" ro"
 	cmdline+=" nokaslr"
-	cmdline+=" init=/bin/sh -- -c \"$0 -g -H $HOME\""
+	cmdlint+=" $CMDLINE"
+	cmdline+=" init=/bin/sh -- -c \"$0 -g $opts -H $HOME -k '$(pwd)' -a '$*'\""
 
 	qemu-system-x86_64 \
 		-nodefaults \
@@ -68,60 +80,99 @@ say() {
 	tput sgr0
 }
 
+# This function is called _AFTER_ QEMU starts (on guest).
 guest() {
 	say early setup
 
 	export PATH=/bin:/sbin:/usr/bin:/usr/sbin
-	mount -t sysfs -o nosuid,noexec,nodev sys /sys/
+	mount -n -t sysfs -o nosuid,noexec,nodev sys /sys/
 
-	mount -t tmpfs tmpfs /tmp/
-	mount -t tmpfs tmpfs /var/log/
-	mount -t tmpfs tmpfs /run/
+	mount -n -t tmpfs tmpfs /tmp
+	mount -n -t tmpfs tmpfs /var/log
+	mount -n -t tmpfs tmpfs /run
+	mount -n -t tmpfs tmpfs /export
+
+	mkdir -p /export/hda3/tmp
+	mount -n -t 9p -o trans=virtio /dev/tmp /export/hda3/tmp -oversion=9p2000.L
 
 	mkdir -p -m 0755 /tmp/etc
 
 	touch /tmp/etc/fstab
-	mount --bind /{tmp/etc,etc}/fstab
+	mount -n --bind /{tmp/etc,etc}/fstab
 
-	mount -t proc -o nosuid,noexec,nodev proc /proc/
-	mount -t configfs configfs /sys/kernel/config
-	mount -t debugfs debugfs /sys/kernel/debug
+	mount -n -t proc -o nosuid,noexec,nodev proc /proc/
+	mount -n -t configfs configfs /sys/kernel/config
+	mount -n -t debugfs debugfs /sys/kernel/debug
+	mount -n -t devtmpfs -o mode=0755,nosuid,noexec devtmpfs /dev
 
-	mkdir -p -m 0755 /dev/shm /dev/pts
-	mount -t devpts -o gid=tty,mode=620,noexec,nosuid devpts /dev/pts
-	mount -t tmpfs -o mode=1777,nosuid,nodev tmpfs /dev/shm
+	mkdir -p -m 0755 /dev/shm /dev/pts /dev/cgroup
+	mkdir -p -m 0755 /dev/cgroup/{cpu,cpuset,net}
+	mount -n -t devpts -o gid=tty,mode=620,noexec,nosuid devpts /dev/pts
+	mount -n -t tmpfs -o mode=1777,nosuid,nodev tmpfs /dev/shm
 
 	local kver="`uname -r`"
-	say modules /lib/modules/$kver
-	mount -t tmpfs none /lib/modules
-	mkdir -p "/lib/modules/$kver"
-	mount -n -t tmpfs -o ro,mode=0000 disallow_modules "/lib/modules/$kver"
+	local mods="$(find /sys/devices -type f -name modalias -print0 | xargs -0 cat | sort | uniq)"
+	local mods_nr=$(echo "$mods" | wc -w)
+
+	say modules /lib/modules/$kver $mods_nr modules
+	mount -n -t 9p -o trans=virtio /dev/kernel $KERNEL -oversion=9p2000.L
+	mount -n -t tmpfs tmpfs /lib/modules
+	ln -s $KERNEL "/lib/modules/$kver"
+
+	# make sure config points to the right place
+	mount -n -t tmpfs tmpfs /boot
+	ln -s $KERNEL/.config /boot/config-$kver
+
+	if [ "$MODULES" = "y" ]; then
+		if [ ! -e $KERNEL/modules.dep.bin ]; then
+			say modules.dep.bin not found, running depmod, may take awhile
+			depmod -a 2>/dev/null
+		fi
+		modprobe -q -a -- $mods
+	fi
 
 	say networking
 
 	hostname q
 	touch /tmp/etc/hostname
-	mount --bind /{tmp/etc,etc}/hostname
+	mount -n --bind /{tmp/etc,etc}/hostname
 	echo q > /tmp/etc/hostname
 
 	ip link set dev lo up
 
 	touch /tmp/etc/resolv.conf
-	mount --bind /{tmp/etc,etc}/resolv.conf
+	mount -n --bind /{tmp/etc,etc}/resolv.conf
 	mkdir -p -m 0755 /tmp/etc/resolvconf/run
-	mount --bind /{tmp/etc,etc}/resolvconf/run
+	mount -n --bind /{tmp/etc,etc}/resolvconf/run
 	mkdir /run/resolvconf
 	echo "nameserver 8.8.8.8" > /run/resolvconf/resolv.conf
 
 	local dev=$(ls -d /sys/bus/virtio/drivers/virtio_net/virtio* |sort -g |head -n1)
 	local iface=$(ls $dev/net)
 	say dhcp on iface $iface
-	busybox udhcpc -i $iface -p /run/udhcpc -s /etc/udhcpc/default.script -q -t 1 -n -f
+	busybox udhcpc -i $iface -p /run/udhcpc \
+		-s /etc/udhcpc/default.script -q -t 1 -n -f
+
+	say setup cgroups
+	mount -t cgroup -o cpu,cpuacct none /dev/cgroup/cpu
+	mount -t cgroup -o cpuset none /dev/cgroup/cpuset
+	mount -t cgroup -o net none /dev/cgroup/net &>/dev/null
+	sysctl -q kernel.allow_bpf_attach_netcg=0 &>/dev/null
+	mount -t cgroup2 none /sys/fs/cgroup
+
+	say setup bpf
+	sysctl -q net.core.bpf_jit_enable=1
+	sysctl -q net.core.bpf_jit_kallsyms=1
+	sysctl -q net.core.bpf_jit_harden=0
+	mount -t bpf bpffs /sys/fs/bpf
+	ulimit -l unlimited &>/dev/null # EINVAL when loading more than 3 bpf programs
+	ulimit -n 819200 &>/dev/null
+	ulimit -a &>/dev/null
 
 	say root environment
 	touch /tmp/etc/{profile,bash.bashrc}
-	mount --bind /{tmp/etc,etc}/profile
-	mount --bind /{tmp/etc,etc}/bash.bashrc
+	mount -n --bind /{tmp/etc,etc}/profile
+	mount -n --bind /{tmp/etc,etc}/bash.bashrc
 
 	mkdir -m 0755 /tmp/root
 	touch /tmp/root/.bashrc
@@ -129,18 +180,50 @@ guest() {
 
 	local rcfile=$HOME/.bashrc
 	export HOME=/tmp/root
+	export PATH=$HOME/local/bin:$PATH
+	export PATH=$KERNEL/tools/bpf/bpftool:$PATH
+	export PATH=$KERNEL/tools/perf:$PATH
 
-	say interactive bash $rcfile
-	setsid bash --rcfile $rcfile 0<>"/dev/ttyS0" 1>&0 2>&0
+	source $KERNEL/tools/bpf/bpftool/bash-completion/bpftool
+
+	cd $KERNEL
+
+	if [ -n "$ARGS" ]; then
+		say non-interactive bash script
+		setsid bash --rcfile $rcfile -c "$ARGS"
+		if [ ! $? -eq 0 ]; then
+			say script failed, starting interactive console
+			setsid bash --rcfile $rcfile 0<>"/dev/ttyS0" 1>&0 2>&0
+		fi
+	else
+		say interactive bash $rcfile
+		setsid bash --rcfile $rcfile 0<>"/dev/ttyS0" 1>&0 2>&0
+	fi
+
+	echo
+	say poweroff
+	echo o > /proc/sysrq-trigger
+	sleep 30
 }
 
 GUEST=n
+MODULES=n
+CMDLINE=""
 
-while getopts "hgH:" opt; do
+NRCPU=4
+MEMORY=16041
+
+while getopts "hgmk:c:a:H:N:M:" opt; do
 	case $opt in
 		h) usage ;;
 		g) GUEST=y ;;
+		m) MODULES=y ;;
+		k) KERNEL="$OPTARG" ;;
+		c) CMDLINE="$OPTARG" ;;
+		a) ARGS="$OPTARG" ;;
 		H) export HOME=$OPTARG ;;
+		M) MEMORY="$OPTARG" ;;
+		N) NRCPU="$OPTARG" ;;
 	esac
 done
 shift $((OPTIND -1))

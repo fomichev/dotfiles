@@ -72,11 +72,6 @@ d() { builtin cd "$@" &>/dev/null && echo "$(pwd):" | colorify && l; }
 complete -o filenames -o nospace -F _cd d
 
 # }}}
-# quilt {{{
-
-alias q='quilt'
-
-#}}}
 # n {{{
 
 _n() {
