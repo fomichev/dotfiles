@@ -12,6 +12,7 @@
 	ci = commit -s
 	co = checkout
 	cp = cherry-pick
+	cpa = cherry-pick --abort
 	dc = diff --cached
 	d = diff
 	fa = fetch --all
@@ -30,6 +31,7 @@
 	s = show --pretty=fuller
 	st = status -sb
 	mrproper = clean -xdf
+	wt = worktree
 
 [color]
 	diff = auto
