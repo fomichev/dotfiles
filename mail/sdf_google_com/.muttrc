@@ -1,13 +1,13 @@
 set realname = "Stanislav Fomichev"
-set from = "sdf@google.me"
+set from = "sdf@google.com"
 set sendmail = "sendgmr"
 
 set mbox_type = Maildir
 
 set folder = "~/Mail"
-set mbox = "+sdf_google_com/inbox"
-set spoolfile = "+sdf_google_com/inbox"
-set record = "+sdf_google_com/inbox"
+set mbox = "+sdf_google_com/bpf"
+set spoolfile = "+sdf_google_com/bpf"
+set record = "+sdf_google_com/bpf"
 set postponed = "+sdf_google_com/drafts"
 mailboxes `find ~/Mail/ -type d -name cur -printf "%h\n" | sort | awk '{ print "\""$0"\""}' | tr "\n" " "`
 
