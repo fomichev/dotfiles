@@ -1,6 +1,6 @@
 set realname = "Stanislav Fomichev"
 set from = "sdf@google.com"
-set sendmail = "sendgmr"
+set sendmail = "sendgmr -parse_headers=true"
 
 set mbox_type = Maildir
 
