@@ -117,7 +117,9 @@ guest() {
 	say modules /lib/modules/$kver $mods_nr modules
 	mount -n -t 9p -o trans=virtio /dev/kernel $KERNEL -oversion=9p2000.L
 	mount -n -t tmpfs tmpfs /lib/modules
-	ln -s $KERNEL "/lib/modules/$kver"
+	mkdir "/lib/modules/$kver"
+	ln -s $KERNEL "/lib/modules/$kver/source"
+	ln -s $KERNEL "/lib/modules/$kver/build"
 
 	# make sure config points to the right place
 	mount -n -t tmpfs tmpfs /boot
@@ -178,11 +180,16 @@ guest() {
 	touch /tmp/root/.bashrc
 	touch /tmp/root/.bash_profile
 
-	local rcfile=$HOME/.bashrc
-	export HOME=/tmp/root
+	local rcfile=/tmp/.bashrc
 	export PATH=$HOME/local/bin:$PATH
 	export PATH=$KERNEL/tools/bpf/bpftool:$PATH
 	export PATH=$KERNEL/tools/perf:$PATH
+	export NO_BASE16=y # hack for my bashrc to disable colors
+
+	cat << EOF > $rcfile
+source $HOME/.bashrc
+resize
+EOF
 
 	source $KERNEL/tools/bpf/bpftool/bash-completion/bpftool
 
