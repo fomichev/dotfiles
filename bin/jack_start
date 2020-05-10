@@ -1,0 +1,35 @@
+#!/bin/bash
+
+set -ex
+
+function cleanup {
+	set +e
+
+	jack_control stop
+
+	pkill qjackctl
+	pkill alsa_out
+	pkill guitarix
+	pkill ardour5
+	pkill -9 jackd
+}
+trap cleanup EXIT
+
+DEV_EXT=hw:Jam
+DEV_INT=hw:PCH
+
+#sudo alsactl store
+#sudo alsactl restore
+
+# list devices
+cat /proc/asound/cards
+
+pasuspender -- jackd -d alsa -d "$DEV_EXT" -r 48000 -n 3 -p 64 -C &
+sleep 1
+alsa_out -d "$DEV_INT" &
+sleep 1
+#guitarix -i system:capture_1 &
+qjackctl &
+#~/src/ardour/sysroot/bin/ardour6 &
+
+wait
