@@ -54,7 +54,7 @@ host() {
 	cmdline+=" ro"
 	cmdline+=" nokaslr"
 	cmdline+=" $CMDLINE"
-	cmdline+=" init=/bin/sh -- -c \"$0 -g $opts -H $HOME -k '$(pwd)' -a '$*'\""
+	cmdline+=" init=/bin/sh -- -c \"$(realpath $0) -g $opts -H $HOME -k '$(pwd)' -a '$*'\""
 
 	qemu-system-x86_64 \
 		-nodefaults \
