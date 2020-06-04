@@ -152,6 +152,7 @@ guest() {
 	local dev=$(ls -d /sys/bus/virtio/drivers/virtio_net/virtio* |sort -g |head -n1)
 	local iface=$(ls $dev/net)
 	say dhcp on iface $iface
+	ip link set dev $iface up
 	busybox udhcpc -i $iface -p /run/udhcpc \
 		-s /etc/udhcpc/default.script -q -t 1 -n -f
 
