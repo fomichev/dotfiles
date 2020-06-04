@@ -53,7 +53,7 @@ host() {
 	cmdline+=" rootflags=version=9p2000.L,trans=virtio,access=any"
 	cmdline+=" ro"
 	cmdline+=" nokaslr"
-	cmdlint+=" $CMDLINE"
+	cmdline+=" $CMDLINE"
 	cmdline+=" init=/bin/sh -- -c \"$0 -g $opts -H $HOME -k '$(pwd)' -a '$*'\""
 
 	qemu-system-x86_64 \
