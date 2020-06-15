@@ -1,5 +1,5 @@
 #!/bin/bash
 
 source=(git://git.kernel.org/pub/scm/network/iproute2/iproute2.git)
-make_flags=(LDFLAGS="-static -lelf -lz")
+make_flags=(V=99 SHARED_LIBS=n LDFLAGS="-static -lelf -lz")
 install_flags=(DESTDIR=$PREFIX)
