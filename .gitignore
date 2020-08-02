@@ -26,7 +26,3 @@ ignore
 .gnupg
 
 .tmux/
-
-bin/gkectl
-bin/govc
-bin/kubeadm
