@@ -2,12 +2,14 @@
 
 set -eo pipefail
 
-export GOOGLE_PROJECT_ID=680984499942
-export GOOGLE_APPLICATION_CREDENTIALS=$HOME/.secret/restic-google-storage
 export RESTIC_PASSWORD_FILE="$HOME/.secret/restic"
 
-REPO=${REPO:-gs:$(hostname -s):/}
-ARGS=${ARGS:- --limit-upload 512}
+#export GOOGLE_PROJECT_ID=680984499942
+#export GOOGLE_APPLICATION_CREDENTIALS=$HOME/.secret/restic-google-storage
+#REPO=${REPO:-gs:$(hostname -s):/}
+#ARGS=${ARGS:- --limit-upload 512}
+
+REPO=${REPO:-/run/media/sdf/backup}
 
 finish() {
 	$HOME/bin/systemd-email s@fomichev.me restic
