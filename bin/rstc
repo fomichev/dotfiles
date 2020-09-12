@@ -2,37 +2,36 @@
 
 set -eo pipefail
 
-export RESTIC_PASSWORD_FILE="$HOME/.secret/restic"
+source ~/.secret/restic-settings
 
-#export GOOGLE_PROJECT_ID=680984499942
-#export GOOGLE_APPLICATION_CREDENTIALS=$HOME/.secret/restic-google-storage
-#REPO=${REPO:-gs:$(hostname -s):/}
-#ARGS=${ARGS:- --limit-upload 512}
+say() {
+	echo ">> $@" | colorify
 
-REPO=${REPO:-/run/media/sdf/backup}
+}
+
+if [ -z "$REPO" ]; then
+	say '$REPO is not specified!'
+	exit 1
+fi
 
 finish() {
 	$HOME/bin/systemd-email s@fomichev.me restic
 }
 
 do_rstc() {
-	echo restic -r "$REPO" "$@"
+	say restic -r "$REPO" "$@"
 	sudo -E restic -r "$REPO" "$@" 2>&1 | cat
 }
 
 if [ $# -eq 0 ]; then
 	trap finish EXIT
 
-	echo 'pull could data'
+	say 'pull could data'
 	[ -d $HOME/Drive ] && DRY=n $HOME/bin/cloud pull
 
-	echo 'update timeliner'
-	go get github.com/mholt/timeliner
-
 	if [ -d $HOME/Pictures/Google ]; then
-		echo 'timeliner get-latest'
-		(cd $HOME/Pictures/Google && \
-		/home/sdf/go/bin/timeliner get-latest google_photos/s@fomichev.me)
+		say 'fetch google photos'
+		gphotos-sync ~/Pictures/Google/
 	fi
 
 	do_rstc \
