@@ -12,6 +12,7 @@ path_prepend ~/opt/sysroot/sbin
 path_prepend ~/opt/sysroot/bin
 path_prepend ~/opt/sysroot/go/bin
 path_prepend ~/local/bin
+path_prepend ~/.local/bin
 path_prepend ~/bin
 path_prepend ~/go/bin
 
