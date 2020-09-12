@@ -1,17 +1,8 @@
 #!/bin/bash
 
 if [ $# -eq 0 ]; then
-	set golang sync incoming update install orphaned foreign
+	set golang update orphaned foreign
 fi
-
-cd ~/src/aur
-
-fn() {
-	for d in $(ls -1); do
-		echo "${d}:"
-		(cd $d && eval "$@")
-	done
-}
 
 foreign() {
 	pacman -Qm
@@ -21,25 +12,8 @@ orphaned() {
 	sudo pacman -Rs $(pacman -Qqtd)
 }
 
-incoming_pkg() {
-	git fetch
-	git diff $(git rev-parse --abbrev-ref HEAD) origin/$(git rev-parse --abbrev-ref HEAD)
-}
-
-update_pkg() {
-	git pull
-}
-
-install_pkg() {
-	makepkg -si --noconfirm --needed
-}
-
-incoming() { fn incoming_pkg; }
-update() { fn update_pkg; }
-install() { fn install_pkg; }
-
+update() { yay; }
 golang() { go get -u all; }
-sync() { sudo pacman -Syu; }
 
 for f in "$@"; do
 	echo "$f" | colorify
