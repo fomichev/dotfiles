@@ -1,5 +1,5 @@
 [Unit]
-Description=Restic Backup to Google Storage
+Description=Restic Backup
 
 [Service]
 Type=simple

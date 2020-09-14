@@ -5,8 +5,11 @@ set -eo pipefail
 source ~/.secret/restic-settings
 
 say() {
-	echo ">> $@" | colorify
+	echo ">> $@" | $HOME/bin/colorify
+}
 
+notify() {
+	notify-send "Restic backup!" "$@"
 }
 
 if [ -z "$REPO" ]; then
@@ -24,10 +27,13 @@ do_rstc() {
 }
 
 if [ $# -eq 0 ]; then
+	notify "Starting restic backup..."
 	trap finish EXIT
 
-	say 'pull could data'
-	[ -d $HOME/Drive ] && DRY=n $HOME/bin/cloud pull
+	if [ -d $HOME/Drive ]; then
+		say 'pull could data'
+		DRY=n $HOME/bin/cloud pull
+	fi
 
 	if [ -d $HOME/Pictures/Google ]; then
 		say 'fetch google photos'
@@ -45,6 +51,7 @@ if [ $# -eq 0 ]; then
 
 	do_rstc snapshots
 	do_rstc forget --keep-within 95d --prune
+	do_rstc stats
 	exit
 fi
 
