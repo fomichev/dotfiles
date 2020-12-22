@@ -1,7 +1,7 @@
 #!/bin/bash
 
 if [ $# -eq 0 ]; then
-	set update orphaned foreign
+	set update orphaned foreign cleanup
 fi
 
 foreign() {
@@ -13,6 +13,12 @@ orphaned() {
 }
 
 update() { yay; }
+
+cleanup() {
+	journalctl --vacuum-time=7d
+	flatpak uninstall --unused
+	pacman -Scc
+}
 
 for f in "$@"; do
 	echo "$f" | colorify
