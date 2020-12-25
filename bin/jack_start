@@ -44,7 +44,7 @@ case "$DEV_IN" in
 		# Apogee Jam does not have an output, use system.
 		DEV_OUT=hw:PCH
 		JACK_MODE="--capture"
-		JACK_RATE=32000
+		JACK_RATE=48000
 		JACK_NPERIODS=4
 		JACK_PERIOD=128
 		;;
