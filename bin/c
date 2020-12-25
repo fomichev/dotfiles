@@ -1,7 +1,10 @@
 #!/bin/sh
 
+export PYTHONSTARTUP=$HOME/src/dotfiles/rc.py
+export PYTHONPATH=$HOME/src/dotfiles
+
 if [ -z "$*" ]; then
-  irb
+  python -B
 else
-  ruby -I "${HOME}/lib" -r fixnum -e "puts($*)"
+  python -B -c "from rc import *; print($@)"
 fi
