@@ -1,5 +1,7 @@
 #!/bin/bash
 
+ARCH=${ARCH:-x86_64}
+
 usage() {
 	echo "q [options] [path to bzImage] [script]"
 	echo
@@ -56,14 +58,36 @@ host() {
 	cmdline+=" $CMDLINE"
 	cmdline+=" init=/bin/sh -- -c \"$(realpath $0) -g $opts -H $HOME -k '$(pwd)' -a '$*'\""
 
-	qemu-system-x86_64 \
+	local accel
+	if [ "$(arch)" = "${ARCH}" ]; then
+		accel+=" -machine accel=kvm:tcg"
+		accel+=" -enable-kvm"
+	fi
+
+	local cpu
+	case "${ARCH}" in
+		x86_64)
+			if [ "$(arch)" = "${ARCH}" ]; then
+				cpu="host"
+			fi
+			;;
+		ppc64)
+			cpu="POWER9"
+			;;
+	esac
+
+	if [ -z "$cpu" ]; then
+		echo "unknown cpu for ${ARCH} arch"
+		exit 1
+	fi
+
+	qemu-system-${ARCH} \
 		-nodefaults \
 		-no-reboot \
-		-machine accel=kvm:tcg \
+		$accel \
 		-watchdog i6300esb \
 		-device virtio-rng-pci \
-		-cpu host \
-		-enable-kvm \
+		-cpu $cpu \
 		-smp $NRCPU \
 		-m $MEMORY \
 		$fs \
@@ -86,6 +110,7 @@ guest() {
 
 	export PATH=/bin:/sbin:/usr/bin:/usr/sbin
 	mount -n -t sysfs -o nosuid,noexec,nodev sys /sys/
+	mount -t securityfs security /sys/kernel/security
 
 	mount -n -t tmpfs tmpfs /tmp
 	mount -n -t tmpfs tmpfs /var/log
@@ -219,7 +244,7 @@ MODULES=n
 CMDLINE=""
 
 NRCPU=4
-MEMORY=16041
+MEMORY=15872
 
 while getopts "hgmk:c:a:H:N:M:" opt; do
 	case $opt in
