@@ -5,6 +5,7 @@ Description=Email Sync Service
 Type=oneshot
 Nice=10
 ExecStart=%h/bin/sync-email
+LimitNOFILE=200000
 
 [Install]
 WantedBy=default.target
