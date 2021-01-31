@@ -99,8 +99,7 @@ alias ??='tmux show-messages'
 [ -e /usr/share/bash-completion/completions/git ] && {
 	. /usr/share/bash-completion/completions/git
 
-	complete -o bashdefault -o default -o nospace -F _git v 2>/dev/null \
-	    || complete -o default -o nospace -F _git v
+	__git_complete v __git_main
 }
 
 # }}}
