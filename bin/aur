@@ -15,9 +15,9 @@ orphaned() {
 update() { yay; }
 
 cleanup() {
-	journalctl --vacuum-time=7d
-	flatpak uninstall --unused
-	pacman -Scc
+	sudo journalctl --vacuum-time=7d
+	sudo flatpak uninstall --unused
+	sudo pacman -Scc
 }
 
 for f in "$@"; do
