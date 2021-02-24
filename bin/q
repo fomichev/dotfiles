@@ -1,8 +1,14 @@
 #!/bin/bash
 
-ARCH=${ARCH:-x86_64}
+Q_DIR="$(dirname $0)"
+EXPORT=/export/hda3/tmp
 
 usage() {
+	if [ -n "$*" ]; then
+		echo "error: %@"
+		echo
+	fi
+
 	echo "q [options] [path to bzImage] [script]"
 	echo
 	echo "Run it from the kernel directory (make sure .config is there)"
@@ -16,33 +22,30 @@ usage() {
 # This function is called _BEFORE_ QEMU starts (on host).
 host() {
 	local kernel="$1"
-	shift
 
-	if [ -z "$kernel" ]; then
-		if [ -e "arch/x86/boot/bzImage" ]; then
-			kernel="arch/x86/boot/bzImage"
-		fi
-		[ -n "$kernel" ] || usage
-	fi
 	[ -e ".config" ] || usage
 
 	local cmdline
 
 	local fs
-	fs+=" -nodefaults"
-	fs+=" -fsdev local,id=vfs1,path=/,security_model=none,readonly"
+	fs+=" -fsdev local,id=vfs1,path=$ROOTFS,security_model=none,readonly"
 	fs+=" -fsdev local,id=vfs2,path=$(pwd),security_model=none"
-	fs+=" -fsdev local,id=vfs3,path=/export/hda3/tmp,security_model=none"
+	fs+=" -fsdev local,id=vfs3,path=$EXPORT,security_model=none"
+	fs+=" -fsdev local,id=vfs4,path=$Q_DIR,security_model=none,readonly"
 	fs+=" -device virtio-9p-pci,fsdev=vfs1,mount_tag=/dev/root"
 	fs+=" -device virtio-9p-pci,fsdev=vfs2,mount_tag=/dev/kernel"
-	fs+=" -device virtio-9p-pci,fsdev=vfs3,mount_tag=/dev/tmp"
+	fs+=" -device virtio-9p-pci,fsdev=vfs3,mount_tag=$EXPORT"
+	fs+=" -device virtio-9p-pci,fsdev=vfs4,mount_tag=/tmp/q_dir"
 
 	local console
 	console+=" -display none"
 	console+=" -serial mon:stdio"
 
-	cmdline+=" earlyprintk=serial,ttyS0,115200"
-	cmdline+=" console=ttyS0,115200"
+	if [ "${ARCH}" != "arm64" ]; then
+		# TODO: figure this out
+		cmdline+=" earlyprintk=serial,$TTY,115200"
+		cmdline+=" console=$TTY,115200"
+	fi
 
 	local net
 	net+=" -netdev user,id=virtual"
@@ -56,7 +59,6 @@ host() {
 	cmdline+=" ro"
 	cmdline+=" nokaslr"
 	cmdline+=" $CMDLINE"
-	cmdline+=" init=/bin/sh -- -c \"$(realpath $0) -g $opts -H $HOME -k '$(pwd)' -a '$*'\""
 
 	local accel
 	if [ "$(arch)" = "${ARCH}" ]; then
@@ -65,24 +67,43 @@ host() {
 	fi
 
 	local cpu
+	local qemu_flavor=$ARCH
 	case "${ARCH}" in
 		x86_64)
 			if [ "$(arch)" = "${ARCH}" ]; then
 				cpu="host"
 			fi
 			;;
-		ppc64)
-			cpu="POWER9"
+		arm64)
+			if [ "$(arch)" = "${ARCH}" ]; then
+				cpu="host"
+			else
+				accel+=" -machine virt"
+				cpu="max"
+			fi
+			qemu_flavor=aarch64
+			TTY=ttyAMA0
 			;;
 	esac
+
+	local init
+	init+="mount -n -t tmpfs tmpfs /tmp"
+	init+=" && "
+	init+="mkdir -p /tmp/q_dir"
+	init+=" && "
+	init+="mount -n -t 9p -o trans=virtio /tmp/q_dir /tmp/q_dir"
+	init+=" && "
+	init+="/tmp/q_dir/q -g $opts -T $TTY -r $ROOTFS -H $HOME -k '$(pwd)' -s '$SCRIPT'"
+
+	cmdline+=" init=/bin/sh -- -c \"$init\""
 
 	if [ -z "$cpu" ]; then
 		echo "unknown cpu for ${ARCH} arch"
 		exit 1
 	fi
 
-	qemu-system-${ARCH} \
-		-nodefaults \
+	qemu-system-${qemu_flavor} \
+		-nographic \
 		-no-reboot \
 		$accel \
 		-watchdog i6300esb \
@@ -112,13 +133,16 @@ guest() {
 	mount -n -t sysfs -o nosuid,noexec,nodev sys /sys/
 	mount -t securityfs security /sys/kernel/security
 
-	mount -n -t tmpfs tmpfs /tmp
 	mount -n -t tmpfs tmpfs /var/log
 	mount -n -t tmpfs tmpfs /run
-	mount -n -t tmpfs tmpfs /export
 
-	mkdir -p /export/hda3/tmp
-	mount -n -t 9p -o trans=virtio /dev/tmp /export/hda3/tmp -oversion=9p2000.L
+	if [ -d /export ]; then
+		mount -n -t tmpfs tmpfs /export
+		mkdir -p $EXPORT
+		mount -n -t 9p -o trans=virtio $EXPORT $EXPORT
+	else
+		say "$/expor mount point doesn't exist, not mounting $EXPORT"
+	fi
 
 	mkdir -p -m 0755 /tmp/etc
 
@@ -135,51 +159,63 @@ guest() {
 	mount -n -t devpts -o gid=tty,mode=620,noexec,nosuid devpts /dev/pts
 	mount -n -t tmpfs -o mode=1777,nosuid,nodev tmpfs /dev/shm
 
-	local kver="`uname -r`"
-	local mods="$(find /sys/devices -type f -name modalias -print0 | xargs -0 cat | sort | uniq)"
-	local mods_nr=$(echo "$mods" | wc -w)
+	if [ -d $DIR_KERNEL ]; then
+		local kver="`uname -r`"
+		local mods="$(find /sys/devices -type f -name modalias -print0 | xargs -0 cat | sort | uniq)"
+		local mods_nr=$(echo "$mods" | wc -w)
 
-	say modules /lib/modules/$kver $mods_nr modules
-	mount -n -t 9p -o trans=virtio /dev/kernel $KERNEL -oversion=9p2000.L
-	mount -n -t tmpfs tmpfs /lib/modules
-	mkdir "/lib/modules/$kver"
-	ln -s $KERNEL "/lib/modules/$kver/source"
-	ln -s $KERNEL "/lib/modules/$kver/build"
+		say modules /lib/modules/$kver $mods_nr modules
+		mount -n -t 9p -o trans=virtio /dev/kernel $DIR_KERNEL
+		mount -n -t tmpfs tmpfs /lib/modules
+		mkdir "/lib/modules/$kver"
+		ln -s $DIR_KERNEL "/lib/modules/$kver/source"
+		ln -s $DIR_KERNEL "/lib/modules/$kver/build"
 
-	# make sure config points to the right place
-	mount -n -t tmpfs tmpfs /boot
-	ln -s $KERNEL/.config /boot/config-$kver
+		# make sure config points to the right place
+		mount -n -t tmpfs tmpfs /boot
+		ln -s $DIR_KERNEL/.config /boot/config-$kver
 
-	if [ "$MODULES" = "y" ]; then
-		if [ ! -e $KERNEL/modules.dep.bin ]; then
-			say modules.dep.bin not found, running depmod, may take awhile
-			depmod -a 2>/dev/null
+		if [ "$MODULES" = "y" ]; then
+			if [ ! -e $DIR_KERNEL/modules.dep.bin ]; then
+				say modules.dep.bin not found, running depmod, may take awhile
+				depmod -a 2>/dev/null
+			fi
+			modprobe -q -a -- $mods
 		fi
-		modprobe -q -a -- $mods
+	else
+		say "$DIR_KERNEL mount point doesn't exist, not mounting"
 	fi
 
 	say networking
 
-	hostname q
-	touch /tmp/etc/hostname
-	mount -n --bind /{tmp/etc,etc}/hostname
-	echo q > /tmp/etc/hostname
+	if [ -n "$(command -v hostname)" ]; then
+		hostname q
+		touch /tmp/etc/hostname
+		mount -n --bind /{tmp/etc,etc}/hostname
+		echo q > /tmp/etc/hostname
+	else
+		say "hostname is not found, don't set hostname"
+	fi
 
 	ip link set dev lo up
 
-	touch /tmp/etc/resolv.conf
-	mount -n --bind /{tmp/etc,etc}/resolv.conf
-	mkdir -p -m 0755 /tmp/etc/resolvconf/run
-	mount -n --bind /{tmp/etc,etc}/resolvconf/run
-	mkdir /run/resolvconf
-	echo "nameserver 8.8.8.8" > /run/resolvconf/resolv.conf
+	if [ -n "$(command -v busybox)" ]; then
+		touch /tmp/etc/resolv.conf
+		mount -n --bind /{tmp/etc,etc}/resolv.conf
+		mkdir -p -m 0755 /tmp/etc/resolvconf/run
+		mount -n --bind /{tmp/etc,etc}/resolvconf/run
+		mkdir /run/resolvconf
+		echo "nameserver 8.8.8.8" > /run/resolvconf/resolv.conf
 
-	local dev=$(ls -d /sys/bus/virtio/drivers/virtio_net/virtio* |sort -g |head -n1)
-	local iface=$(ls $dev/net)
-	say dhcp on iface $iface
-	ip link set dev $iface up
-	busybox udhcpc -i $iface -p /run/udhcpc \
-		-s /etc/udhcpc/default.script -q -t 1 -n -f
+		local dev=$(ls -d /sys/bus/virtio/drivers/virtio_net/virtio* |sort -g |head -n1)
+		local iface=$(ls $dev/net)
+		say dhcp on iface $iface
+		ip link set dev $iface up
+		busybox udhcpc -i $iface -p /run/udhcpc \
+			-s /etc/udhcpc/default.script -q -t 1 -n -f
+	else
+		say "busybox is not found, skipping udhcpc"
+	fi
 
 	say setup cgroups
 	mount -t cgroup -o cpu,cpuacct none /dev/cgroup/cpu
@@ -208,8 +244,8 @@ guest() {
 
 	local rcfile=/tmp/.bashrc
 	export PATH=$HOME/local/bin:$PATH
-	export PATH=$KERNEL/tools/bpf/bpftool:$PATH
-	export PATH=$KERNEL/tools/perf:$PATH
+	export PATH=$DIR_KERNEL/tools/bpf/bpftool:$PATH
+	export PATH=$DIR_KERNEL/tools/perf:$PATH
 	export NO_BASE16=y # hack for my bashrc to disable colors
 
 	cat << EOF > $rcfile
@@ -217,20 +253,20 @@ source $HOME/.bashrc
 resize
 EOF
 
-	source $KERNEL/tools/bpf/bpftool/bash-completion/bpftool
+	source $DIR_KERNEL/tools/bpf/bpftool/bash-completion/bpftool
 
-	cd $KERNEL
+	cd $DIR_KERNEL
 
-	if [ -n "$ARGS" ]; then
+	if [ -n "$SCRIPT" ]; then
 		say non-interactive bash script
-		setsid bash --rcfile $rcfile -c "$ARGS"
+		setsid bash --rcfile $rcfile -c "$SCRIPT"
 		if [ ! $? -eq 0 ]; then
 			say script failed, starting interactive console
-			setsid bash --rcfile $rcfile 0<>"/dev/ttyS0" 1>&0 2>&0
+			setsid bash --rcfile $rcfile 0<>"/dev/$TTY" 1>&0 2>&0
 		fi
 	else
 		say interactive bash $rcfile
-		setsid bash --rcfile $rcfile 0<>"/dev/ttyS0" 1>&0 2>&0
+		setsid bash --rcfile $rcfile 0<>"/dev/$TTY" 1>&0 2>&0
 	fi
 
 	echo
@@ -241,24 +277,55 @@ EOF
 
 GUEST=n
 MODULES=n
-CMDLINE=""
+ROOTFS=/
+TTY=ttyS0
 
 NRCPU=4
 MEMORY=15872
 
-while getopts "hgmk:c:a:H:N:M:" opt; do
+while getopts "hgms:c:k:r:A:H:N:M:T:" opt; do
 	case $opt in
 		h) usage ;;
 		g) GUEST=y ;;
 		m) MODULES=y ;;
-		k) KERNEL="$OPTARG" ;;
+		k) DIR_KERNEL="$OPTARG" ;;
+		r) ROOTFS="$OPTARG" ;;
 		c) CMDLINE="$OPTARG" ;;
-		a) ARGS="$OPTARG" ;;
+		s) SCRIPT="$OPTARG" ;;
+		A) ARCH="$OPTARG" ;;
 		H) export HOME=$OPTARG ;;
 		M) MEMORY="$OPTARG" ;;
 		N) NRCPU="$OPTARG" ;;
+		T) TTY="$OPTARG" ;;
 	esac
 done
 shift $((OPTIND -1))
 
-[ "$GUEST" = "y" ] && guest "$@" || host "$@"
+if [ "$GUEST" = "y" ]; then
+	guest
+else
+	kernel="$1"
+	shift
+
+	if [ -z "$kernel" ]; then
+		if [ -e "arch/x86/boot/bzImage" ]; then
+			kernel="arch/x86/boot/bzImage"
+		elif [ -e "arch/arm64/boot/Image" ]; then
+			kernel="arch/arm64/boot/Image"
+		fi
+	fi
+
+	if file $kernel | grep -q x86; then
+		ARCH=x86_64
+	elif file $kernel | grep -q ARM64; then
+		ARCH=arm64
+
+		if [ "$ROOTFS" = "/" ]; then
+			ROOTFS="$HOME/src/aarch64"
+		fi
+	fi
+
+	[ -n "$ARCH" ] || usage "unknown arch"
+
+	host "$kernel"
+fi
