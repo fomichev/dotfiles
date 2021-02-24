@@ -1,21 +1,19 @@
 #!/bin/bash
 
-Q_DIR="$(dirname $0)"
-EXPORT=/export/hda3/tmp
-
 usage() {
 	if [ -n "$*" ]; then
 		echo "error: %@"
 		echo
 	fi
 
-	echo "q [options] [path to bzImage] [script]"
+	echo "q [options] [path to bzImage]"
 	echo
 	echo "Run it from the kernel directory (make sure .config is there)"
 	echo
 	echo "options:"
 	echo "    m - run depmod and modprobe"
 	echo "    c - pass extra kernel cmdline options"
+	echo "    s - run script instead of interactive bash"
 	exit 1
 }
 
@@ -28,14 +26,14 @@ host() {
 	local cmdline
 
 	local fs
-	fs+=" -fsdev local,id=vfs1,path=$ROOTFS,security_model=none,readonly"
+	fs+=" -fsdev local,id=vfs1,path=$DIR_ROOT,security_model=none,readonly"
 	fs+=" -fsdev local,id=vfs2,path=$(pwd),security_model=none"
-	fs+=" -fsdev local,id=vfs3,path=$EXPORT,security_model=none"
-	fs+=" -fsdev local,id=vfs4,path=$Q_DIR,security_model=none,readonly"
+	fs+=" -fsdev local,id=vfs3,path=$DIR_EXPORT,security_model=none"
+	fs+=" -fsdev local,id=vfs4,path=$DIR_Q,security_model=none,readonly"
 	fs+=" -device virtio-9p-pci,fsdev=vfs1,mount_tag=/dev/root"
 	fs+=" -device virtio-9p-pci,fsdev=vfs2,mount_tag=/dev/kernel"
-	fs+=" -device virtio-9p-pci,fsdev=vfs3,mount_tag=$EXPORT"
-	fs+=" -device virtio-9p-pci,fsdev=vfs4,mount_tag=/tmp/q_dir"
+	fs+=" -device virtio-9p-pci,fsdev=vfs3,mount_tag=$DIR_EXPORT"
+	fs+=" -device virtio-9p-pci,fsdev=vfs4,mount_tag=/tmp/dir_q"
 
 	local console
 	console+=" -display none"
@@ -89,11 +87,11 @@ host() {
 	local init
 	init+="mount -n -t tmpfs tmpfs /tmp"
 	init+=" && "
-	init+="mkdir -p /tmp/q_dir"
+	init+="mkdir -p /tmp/dir_q"
 	init+=" && "
-	init+="mount -n -t 9p -o trans=virtio /tmp/q_dir /tmp/q_dir"
+	init+="mount -n -t 9p -o trans=virtio /tmp/dir_q /tmp/dir_q"
 	init+=" && "
-	init+="/tmp/q_dir/q -g $opts -T $TTY -r $ROOTFS -H $HOME -k '$(pwd)' -s '$SCRIPT'"
+	init+="/tmp/dir_q/q -g $opts -T $TTY -r $DIR_ROOT -H $HOME -k '$(pwd)' -s '$SCRIPT'"
 
 	cmdline+=" init=/bin/sh -- -c \"$init\""
 
@@ -138,10 +136,10 @@ guest() {
 
 	if [ -d /export ]; then
 		mount -n -t tmpfs tmpfs /export
-		mkdir -p $EXPORT
-		mount -n -t 9p -o trans=virtio $EXPORT $EXPORT
+		mkdir -p $DIR_EXPORT
+		mount -n -t 9p -o trans=virtio $DIR_EXPORT $DIR_EXPORT
 	else
-		say "$/expor mount point doesn't exist, not mounting $EXPORT"
+		say "$/expor mount point doesn't exist, not mounting $DIR_EXPORT"
 	fi
 
 	mkdir -p -m 0755 /tmp/etc
@@ -249,8 +247,12 @@ guest() {
 	export NO_BASE16=y # hack for my bashrc to disable colors
 
 	cat << EOF > $rcfile
-source $HOME/.bashrc
-resize
+	if [ -e "$HOME/.bashrc" ]; then
+		source $HOME/.bashrc
+	fi
+	if [ -n "$(command -v resize)" ]; then
+		resize
+	fi
 EOF
 
 	source $DIR_KERNEL/tools/bpf/bpftool/bash-completion/bpftool
@@ -275,9 +277,12 @@ EOF
 	sleep 30
 }
 
+DIR_Q="$(dirname $0)"
+DIR_EXPORT=/export/hda3/tmp
+DIR_ROOT=/
+
 GUEST=n
 MODULES=n
-ROOTFS=/
 TTY=ttyS0
 
 NRCPU=4
@@ -289,7 +294,7 @@ while getopts "hgms:c:k:r:A:H:N:M:T:" opt; do
 		g) GUEST=y ;;
 		m) MODULES=y ;;
 		k) DIR_KERNEL="$OPTARG" ;;
-		r) ROOTFS="$OPTARG" ;;
+		r) DIR_ROOT="$OPTARG" ;;
 		c) CMDLINE="$OPTARG" ;;
 		s) SCRIPT="$OPTARG" ;;
 		A) ARCH="$OPTARG" ;;
@@ -320,8 +325,8 @@ else
 	elif file $kernel | grep -q ARM64; then
 		ARCH=arm64
 
-		if [ "$ROOTFS" = "/" ]; then
-			ROOTFS="$HOME/src/aarch64"
+		if [ "$DIR_ROOT" = "/" ]; then
+			DIR_ROOT="$HOME/src/aarch64"
 		fi
 	fi
 
