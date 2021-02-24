@@ -3,8 +3,14 @@
 export PYTHONSTARTUP=$HOME/src/dotfiles/rc.py
 export PYTHONPATH=$HOME/src/dotfiles
 
+PYTHON=python
+
+if [ ! -z "$(which python3)" ]; then
+	PYTHON=python3
+fi
+
 if [ -z "$*" ]; then
-  python -B
+  $PYTHON -B
 else
-  python -B -c "from rc import *; print($@)"
+  $PYTHON -B -c "from rc import *; print($@)"
 fi
