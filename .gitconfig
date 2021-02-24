@@ -51,15 +51,20 @@
 	signOff = true
 
 [merge]
-	renamelimit = 0
+	renamelimit = 128
 
 [push]
 	default = simple
 
-[include]
-	path = ~/local/.gitconfig
 [core]
 	abbrev = 12
+	pager = "less -FXS"
 
 [diff "default"]
 	xfuncname = "^[[:alpha:]$_].*[^:]$"
+
+[pretty]
+	fixes = Fixes: %h (\"%s\")
+
+[include]
+	path = ~/local/.gitconfig
