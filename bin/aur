@@ -1,7 +1,7 @@
 #!/bin/bash
 
 if [ $# -eq 0 ]; then
-	set update orphaned foreign cleanup
+	set update update_aur update_python orphaned foreign cleanup
 fi
 
 foreign() {
@@ -12,7 +12,42 @@ orphaned() {
 	sudo pacman -Rs $(pacman -Qqtd)
 }
 
-update() { yay; }
+aur_for_each() {
+	for d in $(ls -1); do
+		echo "${d}:"
+		(cd $d && eval "$@")
+	done
+}
+
+aur_diff() {
+	git fetch
+	git diff $(git rev-parse --abbrev-ref HEAD) origin/$(git rev-parse --abbrev-ref HEAD)
+}
+
+aur_update() {
+	git pull --rebase
+}
+
+aur_install() {
+	makepkg -si --noconfirm --needed
+}
+
+update_aur() {
+	pushd ~/src/aur
+	aur_for_each aur_diff
+	aur_for_each aur_update
+	aur_for_each aur_install
+	popd
+}
+
+update_python() {
+	pip3 install gphotos-sync
+	pip3 install md2pdf
+}
+
+update() {
+	sudo pacman -Syu
+}
 
 cleanup() {
 	sudo journalctl --vacuum-time=7d
