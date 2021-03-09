@@ -1,3 +1,5 @@
+import socket
+
 def humanize(n, power, units):
   unit = 0
   mod = 0
@@ -50,3 +52,15 @@ def o(n):
 
 def h(n):
   return hex(n)
+
+def htons(x):
+  return socket.htons(x)
+
+def ntohs(x):
+  return socket.ntohs(x)
+
+def htonl(x):
+  return socket.htonl(x)
+
+def ntohl(x):
+  return socket.ntohl(x)
