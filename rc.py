@@ -40,7 +40,7 @@ def bits(n):
   for i in range(len(b)):
     pos = len(b) - i - 1
     title_len = len(str(pos))
-    print(str(b[i]).rjust(title_len), end=" ")
+    print(str(b[pos]).rjust(title_len), end=" ")
 
   return ""
 
