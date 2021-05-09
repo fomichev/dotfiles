@@ -8,10 +8,6 @@ say() {
 	echo ">> $@" | $HOME/bin/colorify
 }
 
-notify() {
-	notify-send "Restic backup!" "$@"
-}
-
 if [ -z "$REPO" ]; then
 	say '$REPO is not specified!'
 	exit 1
@@ -27,7 +23,6 @@ do_rstc() {
 }
 
 if [ $# -eq 0 ]; then
-	notify "Starting restic backup..."
 	trap finish EXIT
 
 	if [ -d $HOME/Drive ]; then
