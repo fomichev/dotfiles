@@ -3,12 +3,15 @@
 set -e
 set -x
 
+#JACKCTL=qjackctl
+JACKCTL=carla
+
 function cleanup {
 	set +e
 
 	jack_control stop
 
-	pkill qjackctl
+	pkill $JACKCTL
 	pkill alsa_out
 	pkill guitarix
 	pkill ardour5
@@ -16,14 +19,14 @@ function cleanup {
 }
 trap cleanup EXIT
 
-CARDS=/proc/asound/cards
-
 wait_for_card() {
+	local cards=/proc/asound/cards
+
 	while :; do
-		if grep -q "USB-Audio - Jam" $CARDS; then
+		if grep -q "USB-Audio - Jam" $cards; then
 			echo "hw:Jam"
 			return
-		elif grep -q "USB-Audio - M2" $CARDS; then
+		elif grep -q "USB-Audio - M2" $cards; then
 			echo "hw:M2"
 			return
 		fi
@@ -63,31 +66,41 @@ esac
 
 echo "Using $DEV_IN -> $DEV_OUT"
 
-pasuspender -- jackd -d alsa -d "$DEV_IN" \
-	--rate $JACK_RATE \
-	--nperiods $JACK_NPERIODS \
-	--period $JACK_PERIOD \
-	$JACK_MODE &
+native_jack() {
+	pasuspender -- jackd -d alsa -d "$DEV_IN" \
+		--rate $JACK_RATE \
+		--nperiods $JACK_NPERIODS \
+		--period $JACK_PERIOD \
+		$JACK_MODE &
 
-if [ "$DEV_OUT" = "hw:PCH" ]; then
+	if [ "$DEV_OUT" = "hw:PCH" ]; then
+		sleep 1
+		alsa_out -d "$DEV_OUT" &
+	fi
+
 	sleep 1
-	alsa_out -d "$DEV_OUT" &
-fi
 
-sleep 1
+	guitarix -i system:capture_1 &
+	$JACKCTL &
 
-guitarix -i system:capture_1 &
-qjackctl &
+	sleep 3
+	jack_lsp -c
 
-sleep 3
-jack_lsp -c
+	# M2
+	jack_connect "system:playback_1" "gx_head_fx:out_0" || :
+	jack_connect "system:playback_2" "gx_head_fx:out_1" || :
 
-# M2
-jack_connect "system:playback_1" "gx_head_fx:out_0" || :
-jack_connect "system:playback_2" "gx_head_fx:out_1" || :
+	# Jam
+	jack_connect "alsa_out:playback_1" "gx_head_fx:out_0" || :
+	jack_connect "alsa_out:playback_2" "gx_head_fx:out_1" || :
+}
 
-# Jam
-jack_connect "alsa_out:playback_1" "gx_head_fx:out_0" || :
-jack_connect "alsa_out:playback_2" "gx_head_fx:out_1" || :
+pipewire_jack() {
+	PIPEWIRE_LATENCY=256/48000 guitarix &
+	$JACKCTL &
+}
+
+#native_jack
+pipewire_jack
 
 wait
