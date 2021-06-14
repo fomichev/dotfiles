@@ -13,6 +13,7 @@ Options:
   -p <pattern>  Search files that match given pattern
   -d <dir>      Search in specified directory
 
+  -B            Same as -p '*.sh'
   -C            Same as -p '*.c'
   -H            Same as -p '*.h'
   -M            Same as -p '[M|m]akefile.*'
@@ -85,7 +86,7 @@ else
 	grep_opts="$grep_opts --color=never"
 fi
 
-ARGS=`getopt slivwd:p:hHCMK "$@"`
+ARGS=`getopt slivwd:p:hBHCMK "$@"`
 [ ! $? -eq 0 ] && { exit $?; }
 eval set -- $ARGS
 
@@ -132,6 +133,11 @@ while true; do
 	-d)
 		find_dir="$2"
 		shift
+		shift
+		;;
+
+	-B)
+		find_include "*.sh"
 		shift
 		;;
 
