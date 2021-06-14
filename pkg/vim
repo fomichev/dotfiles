@@ -11,6 +11,7 @@ configure_flags+=(
 		--disable-netbeans
 		--enable-rubyinterp=yes
 		--enable-pythoninterp=yes
+		--enable-python3interp=yes
 		--with-x
 		--with-gnome
 		--enable-multibyte
