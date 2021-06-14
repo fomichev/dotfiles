@@ -157,24 +157,24 @@ guest() {
 	mount -n -t devpts -o gid=tty,mode=620,noexec,nosuid devpts /dev/pts
 	mount -n -t tmpfs -o mode=1777,nosuid,nodev tmpfs /dev/shm
 
-	if [ -d $DIR_KERNEL ]; then
+	if [ -d "$DIR_KERNEL" ]; then
 		local kver="`uname -r`"
 		local mods="$(find /sys/devices -type f -name modalias -print0 | xargs -0 cat | sort | uniq)"
 		local mods_nr=$(echo "$mods" | wc -w)
 
 		say modules /lib/modules/$kver $mods_nr modules
-		mount -n -t 9p -o trans=virtio /dev/kernel $DIR_KERNEL
+		mount -n -t 9p -o trans=virtio /dev/kernel "$DIR_KERNEL"
 		mount -n -t tmpfs tmpfs /lib/modules
 		mkdir "/lib/modules/$kver"
-		ln -s $DIR_KERNEL "/lib/modules/$kver/source"
-		ln -s $DIR_KERNEL "/lib/modules/$kver/build"
+		ln -s "$DIR_KERNEL" "/lib/modules/$kver/source"
+		ln -s "$DIR_KERNEL" "/lib/modules/$kver/build"
 
 		# make sure config points to the right place
 		mount -n -t tmpfs tmpfs /boot
-		ln -s $DIR_KERNEL/.config /boot/config-$kver
+		ln -s "$DIR_KERNEL/.config" /boot/config-$kver
 
 		if [ "$MODULES" = "y" ]; then
-			if [ ! -e $DIR_KERNEL/modules.dep.bin ]; then
+			if [ ! -e "$DIR_KERNEL/modules.dep.bin" ]; then
 				say modules.dep.bin not found, running depmod, may take awhile
 				depmod -a 2>/dev/null
 			fi
@@ -242,8 +242,10 @@ guest() {
 
 	local rcfile=/tmp/.bashrc
 	export PATH=$HOME/local/bin:$PATH
-	export PATH=$DIR_KERNEL/tools/bpf/bpftool:$PATH
-	export PATH=$DIR_KERNEL/tools/perf:$PATH
+	if [ -d "$DIR_KERNEL" ]; then
+		export PATH="$DIR_KERNEL/tools/bpf/bpftool:$PATH"
+		export PATH="$DIR_KERNEL/tools/perf:$PATH"
+	fi
 	export NO_BASE16=y # hack for my bashrc to disable colors
 
 	cat << EOF > $rcfile
@@ -255,9 +257,10 @@ guest() {
 	fi
 EOF
 
-	source $DIR_KERNEL/tools/bpf/bpftool/bash-completion/bpftool
-
-	cd $DIR_KERNEL
+	if [ -d "$DIR_KERNEL" ]; then
+		source "$DIR_KERNEL/tools/bpf/bpftool/bash-completion/bpftool"
+		cd "$DIR_KERNEL"
+	fi
 
 	if [ -n "$SCRIPT" ]; then
 		say non-interactive bash script
