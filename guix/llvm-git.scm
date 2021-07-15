@@ -1,10 +1,11 @@
-(define-module (gnu packages llvm-git)
+(define-module (llvm-git)
                #:use-module (guix packages)
                #:use-module (guix git-download)
                #:use-module (guix build-system cmake)
-               #:use-module (guix licenses)
+               #:use-module ((guix licenses) #:prefix license:)
                #:use-module (gnu packages compression)
                #:use-module (gnu packages gcc)
+               #:use-module (gnu packages linux)
                #:use-module (gnu packages ncurses)
                #:use-module (gnu packages python)
                #:use-module (gnu packages xml))
@@ -28,20 +29,30 @@
     (build-system cmake-build-system)
     (arguments '(#:tests? #f
                  #:build-type "Release"
-                 #:configure-flags '("-DLLVM_ENABLE_PROJECTS=clang"
-                                     "-DLLVM_ENABLE_TERMINFO=off")
-                 #:phases (modify-phases %standard-phases
-                                         (add-after 'unpack 'patch-configure
-                                                    (lambda _ (chdir "llvm"))))))
+                 #:configure-flags
+                   (list
+                     "-DLLVM_ENABLE_PROJECTS=clang"
+                     "-DLLVM_ENABLE_TERMINFO=off"
+                     (string-append
+                       "-DCMAKE_CXX_FLAGS=-I"
+                       (assoc-ref %build-inputs "linux-libre-headers-5.13")
+                       "/include"))
+                 #:phases (modify-phases
+                            %standard-phases
+                            (add-after
+                              'unpack 'patch-configure
+                              (lambda _
+                                (chdir "llvm"))))))
     (native-inputs
       `(("gcc@11" ,gcc-11)
         ("python" ,python)
         ("zlib" ,zlib)
+        ("linux-libre-headers-5.13" ,linux-libre-headers-5.13)
         ("libxml2" ,libxml2)
         ("ncurses" ,ncurses)))
     (home-page "https://llvm.org")
     (synopsis "llvm from git HEAD")
     (description "llvm from git HEAD")
-    (license asl2.0)))
+    (license license:asl2.0)))
 
 llvm-git

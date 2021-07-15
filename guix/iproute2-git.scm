@@ -1,8 +1,8 @@
-(define-module (gnu packages iproute2-git)
+(define-module (iproute2-git)
                #:use-module (guix packages)
                #:use-module (guix git-download)
                #:use-module (guix build-system gnu)
-               #:use-module (guix licenses)
+               #:use-module ((guix licenses) #:prefix license:)
                #:use-module (gnu packages base)
                #:use-module (gnu packages compression)
                #:use-module (gnu packages elf)
@@ -65,7 +65,7 @@
                                      V=99
                                      TC_CONFIG_NO_XT=y")))
                                      #t))))))
-    (inputs
+  (inputs
       `(("elfutils" ,elfutils)
         ("libc-static" ,glibc "static")
         ("zlib:static" ,zlib "static")))
@@ -76,6 +76,6 @@
     (home-page "https://wiki.linuxfoundation.org/networking/iproute2")
     (synopsis "iroute2 from git HEAD + static")
     (description "iroute2 from git HEAD + static")
-    (license gpl2)))
+    (license license:gpl2)))
 
 iproute2-git

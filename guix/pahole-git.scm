@@ -1,8 +1,8 @@
-(define-module (gnu packages pahole-git)
+(define-module (pahole-git)
                #:use-module (guix packages)
                #:use-module (guix git-download)
                #:use-module (guix build-system cmake)
-               #:use-module (guix licenses)
+               #:use-module ((guix licenses) #:prefix license:)
                #:use-module (gnu packages elf)
                #:use-module (gnu packages compression))
 
@@ -31,6 +31,6 @@
     (home-page "https://git.kernel.org/pub/scm/devel/pahole/pahole.git")
     (synopsis "pahole from git HEAD")
     (description "pahole from git HEAD")
-    (license gpl2)))
+    (license license:gpl2)))
 
 pahole-git

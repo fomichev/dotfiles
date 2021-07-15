@@ -28,35 +28,35 @@ all: install init update
 
 GUIX_VERSION=1.3.0
 
+GUIX_PACKAGES+=go
+GUIX_PACKAGES+=vim-full
+GUIX_PACKAGES+=tmux
+GUIX_PACKAGES+=neomutt
+GUIX_PACKAGES+=l2md
+GUIX_PACKAGES+=pahole-git
+GUIX_PACKAGES+=iproute2-git
+GUIX_PACKAGES+=llvm-git
+
 guix_prepare:
-	sudo mkdir /var/guix /gnu /var/log/guix /etc/guix
-	sudo chown -R $(USER):$(USER) /var/guix/ /gnu /var/log/guix /etc/guix
+	sudo mkdir -p /var/guix /gnu /var/log/guix /etc/guix
+	sudo chown -R $(USER):$(shell id -gn) /var/guix/ /gnu /var/log/guix /etc/guix
+	cd ~/tmp && \
 	curl -LO https://ftp.gnu.org/gnu/guix/guix-binary-$(GUIX_VERSION).x86_64-linux.tar.xz
-	tar xf guix-binary-$(GUIX_VERSION)-linux.tar.xz
-	mv gnu/* /gnu/
+	tar xf guix-binary-$(GUIX_VERSION).x86_64-linux.tar.xz && \
+	mv gnu/* /gnu/ && \
 	mv var/guix/* /var/guix/
 	mkdir -p ~/.config/guix
-	ln -sf /var/guix/profiles/per-user/root/current-guix /home/$(USER)/.config/guix/current
-	ln -sf /var/guix/profiles/per-user/root /var/guix/profiles/per-user/$(USER)
+	ln -sf /var/guix/profiles/per-user/root/current-guix ~/.config/guix/current
 
 guix_allow_prebuilt:
 	guix archive --authorize < ~/.config/guix/current/share/guix/ci.guix.gnu.org.pub
 	guix archive --authorize < ~/.config/guix/current/share/guix/ci.guix.info.pub
 
 guix_daemon:
-	TMPDIR=~/tmp /home/$(USER)/.config/guix/current/bin/guix-daemon --disable-chroot
+	TMPDIR=~/tmp ~/.config/guix/current/bin/guix-daemon --disable-chroot
 
 guix_install:
-	guix install go
-	guix install vim-full
-	guix install tmux
-	guix install neomutt
-	guix install l2md
-
-guix_install_latest:
-	for pkg in pahole llvm iproute2: do \
-		guix build -f ./guix/$(pkg)-git.scm -r ~/opt/$(pkg); \
-	done
+	guix install $(GUIX_PACKAGES)
 
 nix_prepare:
 	sudo mkdir /nix
