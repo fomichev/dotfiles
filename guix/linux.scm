@@ -24,6 +24,10 @@
 
 (define extra-config-options
   `(
+    ; TODO:
+    ; mount cgroup2 /sys/fs/cgroup
+    ; (CONFIG_CGROUP_FREEZER, n)
+
     ; (CONFIG_FYZ, y)
   ))
 
