@@ -19,11 +19,6 @@ path_prepend ~/go/bin
 path_prepend /usr/local/bin
 path_prepend /usr/local/share/python
 
-export GUIX_PACKAGE_PATH="$HOME/src/dotfiles/guix"
-export GUIX_PROFILE="$HOME/.guix-profile"
-try_source "$GUIX_PROFILE/etc/profile"
-path_prepend ~/.config/guix/current/bin
-
 # }}}
 # Include aliases {{{
 
