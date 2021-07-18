@@ -1,8 +1,53 @@
 #!/bin/bash
 
 if [ $# -eq 0 ]; then
-	set update update_aur update_python orphaned foreign cleanup
+	set update update_aur update_python orphaned foreign unmanaged_files cleanup
 fi
+
+unmanaged_files() {
+	comm -23 <(find / \( \
+		-path '/dev' -o \
+		-path '/etc' -o \
+		-path '/sys' -o \
+		-path '/run' -o \
+		-path '/tmp' -o \
+		-path '/mnt' -o \
+		-path '/srv' -o \
+		-path '/proc' -o \
+		-path '/boot' -o \
+		-path '/home' -o \
+		-path '/root' -o \
+		-path '/media' -o \
+		-path '/opt' -o \
+		-path '/usr/share/.mono' -o \
+		-path '/usr/share/mime' -o \
+		-path '/usr/lib/udev/hwdb.bin' -o \
+		-path '/usr/local/bin/bootloadHID' -o \
+		-path '/usr/share/applications/mimeinfo.cache' -o \
+		-path '/usr/share/glib-2.0/schemas/gschemas.compiled' -o \
+		-path '/usr/share/icons/Adwaita/icon-theme.cache' -o \
+		-path '/usr/share/icons/hicolor/icon-theme.cache' -o \
+		-path '/usr/share/icons/HighContrast/icon-theme.cache' -o \
+		-path '/usr/share/info/dir' -o \
+		-path '/usr/lib/python3.6/site-packages' -o \
+		-path '/usr/lib/gdk-pixbuf-2.0/2.10.0/loaders.cache' -o \
+		-path '/usr/lib/gio/modules/giomodule.cache' -o \
+		-path '/usr/lib/graphviz/config6' -o \
+		-path '/usr/lib/gtk-2.0/2.10.0/immodules.cache' -o \
+		-path '/usr/lib/gtk-3.0/3.0.0/immodules.cache' -o \
+		-path '/usr/lib/gtk-4.0/4.0.0/media/giomodule.cache' -o \
+		-path '/usr/lib/gtk-4.0/4.0.0/printbackends/giomodule.cache' -o \
+		-path '/usr/lib/locale/locale-archive' -o \
+		-path '/var/db' -o \
+		-path '/var/cache' -o \
+		-path '/var/tmp' -o \
+		-path '/var/lib' -o \
+		-path '/var/log' -o \
+		-path '/var/.updated' -o \
+		-path '/var/cache/pacman' \) \
+		-prune -o \
+		-type f -print 2>/dev/null | sort -u) <(pacman -Qlq | sort -u)
+}
 
 foreign() {
 	pacman -Qm
