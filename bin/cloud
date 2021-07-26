@@ -2,6 +2,7 @@
 
 DIR=$HOME/Drive
 DRY=${DRY:-y}
+REPO=stfomichev_at_gmail_dot_com
 
 do_sync() {
 	[ $DRY = y ] || {
@@ -19,14 +20,19 @@ do_sync() {
 	done
 }
 
-case "$1" in
+cmd="$1"
+shift
+repo="${1:-$REPO}"
+if [ $# -gt 0 ]; then
+	shift
+fi
+
+case "$cmd" in
 	"push")
-		shift
-		do_sync "$DIR/$@" "remote:$@"
+		do_sync "$DIR/$@" "${repo}:"
 		;;
 	"pull")
-		shift
-		do_sync "remote:$@" "$DIR/$@"
+		do_sync "${repo}:" "$DIR/$@"
 		;;
         "setup")
 		rclone config
