@@ -30,6 +30,7 @@ unmanaged_files() {
 		-path '/usr/share/icons/HighContrast/icon-theme.cache' -o \
 		-path '/usr/share/info/dir' -o \
 		-path '/usr/lib/python3.6/site-packages' -o \
+		-path '/usr/lib/python3.9/site-packages' -o \
 		-path '/usr/lib/gdk-pixbuf-2.0/2.10.0/loaders.cache' -o \
 		-path '/usr/lib/gio/modules/giomodule.cache' -o \
 		-path '/usr/lib/graphviz/config6' -o \

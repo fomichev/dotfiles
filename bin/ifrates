@@ -5,6 +5,8 @@ declare -A prev_tx_bytes
 declare -A prev_rx_packets
 declare -A prev_tx_packets
 
+INTERVAL=3
+
 iface_stats() {
 	local iface="$1"
 
@@ -18,11 +20,11 @@ iface_stats() {
 	local next_tx_packets=$(cat "/sys/class/net/$iface/statistics/tx_packets")
 
 	if [ ! -z "${prev_rx_bytes[$iface]}" ]; then
-		local rx_bps=$(bc <<< "scale=2; ($next_rx_bytes - ${prev_rx_bytes[$iface]}) / 1024 / 1024")
-		local tx_bps=$(bc <<< "scale=2; ($next_tx_bytes - ${prev_tx_bytes[$iface]}) / 1024 / 1024")
+		local rx_bps=$(bc <<< "scale=2; ($next_rx_bytes - ${prev_rx_bytes[$iface]}) / 1024 / 1024 / $INTERVAL")
+		local tx_bps=$(bc <<< "scale=2; ($next_tx_bytes - ${prev_tx_bytes[$iface]}) / 1024 / 1024 / $INTERVAL")
 
-		local rx_pps=$(bc <<< "scale=2; ($next_rx_packets - ${prev_rx_packets[$iface]}) / 1024")
-		local tx_pps=$(bc <<< "scale=2; ($next_tx_packets - ${prev_tx_packets[$iface]}) / 1024")
+		local rx_pps=$(bc <<< "scale=2; ($next_rx_packets - ${prev_rx_packets[$iface]}) / 1024 / $INTERVAL")
+		local tx_pps=$(bc <<< "scale=2; ($next_tx_packets - ${prev_tx_packets[$iface]}) / 1024 / $INTERVAL")
 
 		printf "%-7s rx_mbps: %-6s tx_mbps: %-6s rx_kpps: %-6s tx_kpps: %-6s\n" \
 			$iface \
@@ -38,9 +40,16 @@ iface_stats() {
 	prev_tx_packets[$iface]=$next_tx_packets
 }
 
+if [ $# -eq 0 ]; then
+	ifaces=$(ls -1 /sys/class/net)
+else
+	ifaces="$@"
+fi
+
 while :; do
-	for iface in $(ls -1 /sys/class/net); do
+	for iface in $ifaces; do
 		iface_stats "$iface"
 	done
-	sleep 1
+
+	sleep $INTERVAL
 done

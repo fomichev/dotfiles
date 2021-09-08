@@ -23,6 +23,7 @@ path_prepend /usr/local/share/python
 # Include aliases {{{
 
 export EDITOR=vim
+export SYSTEMD_EDITOR=$EDITOR
 export BROWSER=w3m
 
 try_source ~/.bash_aliases
