@@ -13,6 +13,7 @@ usage() {
 	echo "options:"
 	echo "    m - run depmod and modprobe"
 	echo "    c - pass extra kernel cmdline options"
+	echo "    d - start SSH server"
 	echo "    s - run script instead of interactive bash"
 	exit 1
 }
@@ -47,6 +48,9 @@ host() {
 
 	local net
 	net+=" -netdev user,id=virtual"
+	if [ "$SSH" = "y" ]; then
+		net+=",hostfwd=tcp:127.0.0.1:$SSH_PORT-:22"
+	fi
 	net+=" -device virtio-net-pci,netdev=virtual"
 
 	local opts
@@ -123,6 +127,16 @@ say() {
 	tput sgr0
 }
 
+mask_file() {
+	touch "/tmp/$1"
+	mount -n --bind "/tmp/$1" "$1"
+}
+
+mask_dir() {
+	mkdir -m 0755 -p "/tmp/$1"
+	mount -n --bind "/tmp/$1" "$1"
+}
+
 # This function is called _AFTER_ QEMU starts (on guest).
 guest() {
 	say early setup
@@ -144,8 +158,7 @@ guest() {
 
 	mkdir -p -m 0755 /tmp/etc
 
-	touch /tmp/etc/fstab
-	mount -n --bind /{tmp/etc,etc}/fstab
+	mask_file /etc/fstab
 
 	mount -n -t proc -o nosuid,noexec,nodev proc /proc/
 	mount -n -t configfs configfs /sys/kernel/config
@@ -171,7 +184,6 @@ guest() {
 		ln -s "$DIR_KERNEL" "/lib/modules/$kver/kernel"
 
 		cp "$DIR_KERNEL/modules.builtin" "/lib/modules/$kver/modules.builtin"
-		cp "$DIR_KERNEL/modules.builtin.modinfo" "/lib/modules/$kver/modules.builtin.modinfo"
 		cp "$DIR_KERNEL/modules.order" "/lib/modules/$kver/modules.order"
 
 		# make sure config points to the right place
@@ -193,8 +205,7 @@ guest() {
 
 	if [ -n "$(command -v hostname)" ]; then
 		hostname q
-		touch /tmp/etc/hostname
-		mount -n --bind /{tmp/etc,etc}/hostname
+		mask_file /etc/hostname
 		echo q > /tmp/etc/hostname
 	else
 		say "hostname is not found, don't set hostname"
@@ -203,10 +214,8 @@ guest() {
 	ip link set dev lo up
 
 	if [ -n "$(command -v busybox)" ]; then
-		touch /tmp/etc/resolv.conf
-		mount -n --bind /{tmp/etc,etc}/resolv.conf
-		mkdir -p -m 0755 /tmp/etc/resolvconf/run
-		mount -n --bind /{tmp/etc,etc}/resolvconf/run
+		mask_file /etc/resolv.conf
+		mask_dir /etc/resolvconf/run
 		mkdir /run/resolvconf
 		echo "nameserver 8.8.8.8" > /run/resolvconf/resolv.conf
 
@@ -236,10 +245,41 @@ guest() {
 	ulimit -n 819200 &>/dev/null
 	ulimit -a &>/dev/null
 
+	if [ "$SSH" = "y" ]; then
+		say setup sshd
+		say "$ ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null root@localhost -p $SSH_PORT"
+
+		mask_dir /etc/ssh
+		mask_dir /etc/pam.d
+		mkdir -p /var/run/sshd
+
+		mask_file /etc/passwd
+		echo "root:x:0:0:root:/:/bin/bash" > /etc/passwd
+		echo "sshd:x:123:65534::/var/run/sshd:/usr/sbin/nologin" >> /etc/passwd
+
+		mask_file /etc/shadow
+		echo "root:*:17785:0:99999:7:::" > /etc/shadow
+
+		mask_file /etc/group
+
+		cat $HOME/.ssh/id_rsa.pub >> /etc/ssh/authorized_keys
+
+		ssh-keygen -A
+		`which sshd` \
+			-p 22 \
+			-o UsePAM=no \
+			-o PermitRootLogin=yes \
+			-o X11Forwarding=yes \
+			-o X11UseLocalhost=yes \
+			-o AuthorizedKeysFile=/etc/ssh/authorized_keys \
+			-f /dev/null \
+			-E /var/log/sshd
+	fi
+
 	say root environment
 	touch /tmp/etc/{profile,bash.bashrc}
-	mount -n --bind /{tmp/etc,etc}/profile
-	mount -n --bind /{tmp/etc,etc}/bash.bashrc
+	mask_file /etc/profile
+	mask_file /etc/bash.bashrc
 
 	mkdir -m 0755 /tmp/root
 	touch /tmp/root/.bashrc
@@ -293,10 +333,12 @@ GUEST=n
 MODULES=n
 TTY=ttyS0
 
+SSH=n
+
 NRCPU=4
 MEMORY=15872
 
-while getopts "hgms:c:k:r:A:H:N:M:T:" opt; do
+while getopts "dhgms:c:k:r:A:H:N:M:T:" opt; do
 	case $opt in
 		h) usage ;;
 		g) GUEST=y ;;
@@ -304,6 +346,7 @@ while getopts "hgms:c:k:r:A:H:N:M:T:" opt; do
 		k) DIR_KERNEL="$OPTARG" ;;
 		r) DIR_ROOT="$OPTARG" ;;
 		c) CMDLINE="$OPTARG" ;;
+		d) SSH="y" ;;
 		s) SCRIPT="$OPTARG" ;;
 		A) ARCH="$OPTARG" ;;
 		H) export HOME=$OPTARG ;;
