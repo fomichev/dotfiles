@@ -168,6 +168,11 @@ guest() {
 		mkdir "/lib/modules/$kver"
 		ln -s "$DIR_KERNEL" "/lib/modules/$kver/source"
 		ln -s "$DIR_KERNEL" "/lib/modules/$kver/build"
+		ln -s "$DIR_KERNEL" "/lib/modules/$kver/kernel"
+
+		cp "$DIR_KERNEL/modules.builtin" "/lib/modules/$kver/modules.builtin"
+		cp "$DIR_KERNEL/modules.builtin.modinfo" "/lib/modules/$kver/modules.builtin.modinfo"
+		cp "$DIR_KERNEL/modules.order" "/lib/modules/$kver/modules.order"
 
 		# make sure config points to the right place
 		mount -n -t tmpfs tmpfs /boot
