@@ -1,0 +1,120 @@
+#!/bin/bash
+
+if [ "$EUID" -ne 0 ]; then
+	echo "Run as root!"
+	exit
+fi
+
+dev_uuids+=" 5e725824-a277-4fcc-afe1-a48f78644852"
+dev_uuids+=" 68290674-5f28-4740-9021-6d54c4d1c7bc"
+
+ACTION="do_mount"
+SOURCE=""
+
+ARGS=`getopt lsu "$@"`
+[ ! $? -eq 0 ] && { exit $?; }
+eval set -- $ARGS
+
+while true; do
+	case "$1" in
+	--)
+		shift
+		break
+		;;
+
+	-u)
+		ACTION="do_umount"
+		shift
+		;;
+
+	-l)
+		ACTION="do_list"
+		shift
+		;;
+
+	-s)
+		ACTION="do_sync"
+
+		i=0
+		for dev in $dev_uuids; do
+			echo "$i) $dev"
+			i=$(( $i + 1 ))
+		done
+
+		read -p "Enter source: " source_nr
+
+		i=0
+		for dev in $dev_uuids; do
+			if [ $source_nr = $i ]; then
+				SOURCE=/run/$dev
+				break
+			fi
+			i=$(( $i + 1 ))
+		done
+
+		if [ -z "$SOURCE" ]; then
+			echo "Not found source #$source_nr"
+		fi
+
+		found=0
+		for dev in $dev_uuids; do
+			if [ "/run/$dev" = "$SOURCE" ]; then
+				found=1
+			fi
+		done
+
+		if [ $found -eq 0 ]; then
+			echo "$SOURCE is not on the list"
+			exit
+		fi
+
+
+		shift
+		;;
+
+	esac
+done
+
+do_mount() {
+	local dev="$1"
+	echo mounting $dev
+
+	cryptsetup open /dev/disk/by-uuid/$dev $dev
+	mkdir -p /run/$dev
+	mount /dev/mapper/$dev /run/$dev
+}
+
+do_umount() {
+	local dev="$1"
+	echo unmounting $dev
+
+	umount /dev/mapper/$dev
+	cryptsetup close $dev
+}
+
+do_sync() {
+	local dev="$1"
+
+	if [ "/run/$dev" = "$SOURCE" ]; then
+		echo skipping source $dev
+		return
+	fi
+
+	echo syncing to $dev
+
+	rsync -a ${SOURCE}/ /run/$dev
+}
+
+do_list() {
+	local dev="$1"
+	echo listing $dev
+	ls -la /run/$dev
+}
+
+for dev in $dev_uuids; do
+	if [ -e /dev/disk/by-uuid/$dev ]; then
+		eval $ACTION $dev
+	fi
+done
+
+sync
