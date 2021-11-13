@@ -8,12 +8,53 @@ fi
 dev_uuids+=" 5e725824-a277-4fcc-afe1-a48f78644852"
 dev_uuids+=" 68290674-5f28-4740-9021-6d54c4d1c7bc"
 
+HOME=/home
+
 ACTION="do_mount"
 SOURCE=""
 
-ARGS=`getopt lsu "$@"`
+ARGS=`getopt elsu "$@"`
 [ ! $? -eq 0 ] && { exit $?; }
 eval set -- $ARGS
+
+kill_gpg() {
+	pkill -9 gpg-agent
+}
+
+pick_source() {
+	local i=0
+	for dev in $dev_uuids; do
+		echo "$i) $dev"
+		i=$(( $i + 1 ))
+	done
+
+	read -p "Enter source: " source_nr
+
+	i=0
+	for dev in $dev_uuids; do
+		if [ $source_nr = $i ]; then
+			SOURCE=/run/$dev
+			break
+		fi
+		i=$(( $i + 1 ))
+	done
+
+	if [ -z "$SOURCE" ]; then
+		echo "Not found source #$source_nr"
+	fi
+
+	local found=0
+	for dev in $dev_uuids; do
+		if [ "/run/$dev" = "$SOURCE" ]; then
+			found=1
+		fi
+	done
+
+	if [ $found -eq 0 ]; then
+		echo "$SOURCE is not on the list"
+		exit
+	fi
+}
 
 while true; do
 	case "$1" in
@@ -34,41 +75,13 @@ while true; do
 
 	-s)
 		ACTION="do_sync"
+		pick_source
+		shift
+		;;
 
-		i=0
-		for dev in $dev_uuids; do
-			echo "$i) $dev"
-			i=$(( $i + 1 ))
-		done
-
-		read -p "Enter source: " source_nr
-
-		i=0
-		for dev in $dev_uuids; do
-			if [ $source_nr = $i ]; then
-				SOURCE=/run/$dev
-				break
-			fi
-			i=$(( $i + 1 ))
-		done
-
-		if [ -z "$SOURCE" ]; then
-			echo "Not found source #$source_nr"
-		fi
-
-		found=0
-		for dev in $dev_uuids; do
-			if [ "/run/$dev" = "$SOURCE" ]; then
-				found=1
-			fi
-		done
-
-		if [ $found -eq 0 ]; then
-			echo "$SOURCE is not on the list"
-			exit
-		fi
-
-
+	-e)
+		ACTION="do_export"
+		pick_source
 		shift
 		;;
 
@@ -82,14 +95,29 @@ do_mount() {
 	cryptsetup open /dev/disk/by-uuid/$dev $dev
 	mkdir -p /run/$dev
 	mount /dev/mapper/$dev /run/$dev
+
+	echo "verifying checksums"
+	(cd /run/$dev && sha512sum -c SHA512SUM | grep -v OK)
 }
 
 do_umount() {
 	local dev="$1"
-	echo unmounting $dev
 
+	echo "updating checksums"
+	(cd /run/$dev && \
+		find \
+			-type f \
+			-not -name SHA512SUM \
+			-not -path './.password-store/*' \
+			-print0 \
+		| xargs -0 sha512sum > SHA512SUM)
+
+	kill_gpg
+
+	echo unmounting $dev
 	umount /dev/mapper/$dev
 	cryptsetup close $dev
+	umount $HOME
 }
 
 do_sync() {
@@ -102,7 +130,22 @@ do_sync() {
 
 	echo syncing to $dev
 
-	rsync -a ${SOURCE}/ /run/$dev
+	rsync -av --exclude='lost+found' --delete ${SOURCE}/ /run/$dev
+}
+
+do_export() {
+	local dev="$1"
+
+	if [ "/run/$dev" != "$SOURCE" ]; then
+		echo skipping source $dev
+		return
+	fi
+
+	echo exporting $dev
+
+	mount --bind $SOURCE $HOME
+	kill_gpg
+	gpg-agent --daemon
 }
 
 do_list() {
