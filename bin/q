@@ -15,6 +15,7 @@ usage() {
 	echo "    c - pass extra kernel cmdline options"
 	echo "    d - start SSH server"
 	echo "    s - run script instead of interactive bash"
+	echo "    r - path to custom rootfs"
 	exit 1
 }
 
@@ -46,21 +47,23 @@ host() {
 		cmdline+=" console=$TTY,115200"
 	fi
 
+	local opts
+	[ "$MODULES" = "y" ] && opts+=" -m"
+
 	local net
 	net+=" -netdev user,id=virtual"
 	if [ "$SSH" = "y" ]; then
 		net+=",hostfwd=tcp:127.0.0.1:$SSH_PORT-:22"
+		opts+=" -d"
 	fi
 	net+=" -device virtio-net-pci,netdev=virtual"
-
-	local opts
-	[ "$MODULES" = "y" ] && opts+=" -m"
 
 	cmdline+=" rootfstype=9p"
 	cmdline+=" rootflags=version=9p2000.L,trans=virtio,access=any"
 	cmdline+=" ro"
 	cmdline+=" nokaslr"
 	cmdline+=" $CMDLINE"
+
 
 	local accel
 	if [ "$(arch)" = "${ARCH}" ]; then
@@ -122,29 +125,48 @@ host() {
 
 say() {
 	trap 'tput sgr0' 2 #SIGINT
-	tput setaf 2
+	# tput setaf 2
+	printf "\33[32m"
 	echo ">" "$@"
-	tput sgr0
+	# tput sgr0
+	printf "\33(B\33[m"
 }
 
-mask_file() {
-	touch "/tmp/$1"
-	mount -n --bind "/tmp/$1" "$1"
-}
+mask-dir() {
+	local upper_dir="/mnt/base-root/tmp/rootdir-overlay/upper/$1"
 
-mask_dir() {
-	mkdir -m 0755 -p "/tmp/$1"
-	mount -n --bind "/tmp/$1" "$1"
+	mkdir -p "$upper_dir"
+	setfattr -n trusted.overlay.opaque -v y "$upper_dir"
+	mount -o remount /
 }
 
 # This function is called _AFTER_ QEMU starts (on guest).
 guest() {
+	export PATH=/bin:/sbin:/usr/bin:/usr/sbin:/bb
+
+	say pivot root
+
+	local overlay="/tmp/rootdir-overlay"
+
+	mount -n -t proc -o nosuid,noexec,nodev proc /proc/
+
+	mount -n -t tmpfs tmpfs /tmp
+	mkdir -p $overlay/{lower,upper,work,mnt}
+	mount --bind / $overlay/lower
+	mount -t overlay overlay -o lowerdir=$overlay/lower,upperdir=$overlay/upper,workdir=$overlay/work $overlay/mnt
+	pivot_root $overlay/mnt{,/tmp}
+	cd /
+	mount -n -t proc -o nosuid,noexec,nodev proc /proc/
+
+	mount -n -t tmpfs tmpfs /mnt
+	mkdir /mnt/base-root
+	mount --move /tmp /mnt/base-root
+
 	say early setup
 
-	export PATH=/bin:/sbin:/usr/bin:/usr/sbin
 	mount -n -t sysfs -o nosuid,noexec,nodev sys /sys/
-	mount -t securityfs security /sys/kernel/security
 
+	mount -n -t tmpfs tmpfs /tmp
 	mount -n -t tmpfs tmpfs /var/log
 	mount -n -t tmpfs tmpfs /run
 
@@ -158,15 +180,15 @@ guest() {
 
 	mkdir -p -m 0755 /tmp/etc
 
-	mask_file /etc/fstab
+	> /etc/fstab
 
-	mount -n -t proc -o nosuid,noexec,nodev proc /proc/
 	mount -n -t configfs configfs /sys/kernel/config
 	mount -n -t debugfs debugfs /sys/kernel/debug
+	mount -n -t securityfs security /sys/kernel/security
 	mount -n -t devtmpfs -o mode=0755,nosuid,noexec devtmpfs /dev
 
 	mkdir -p -m 0755 /dev/shm /dev/pts /dev/cgroup
-	mkdir -p -m 0755 /dev/cgroup/{cpu,cpuset,net}
+	mkdir -p -m 0755 /dev/cgroup/{cpu,cpuset,net} 2>/dev/null
 	mount -n -t devpts -o gid=tty,mode=620,noexec,nosuid devpts /dev/pts
 	mount -n -t tmpfs -o mode=1777,nosuid,nodev tmpfs /dev/shm
 
@@ -205,7 +227,6 @@ guest() {
 
 	if [ -n "$(command -v hostname)" ]; then
 		hostname q
-		mask_file /etc/hostname
 		echo q > /tmp/etc/hostname
 	else
 		say "hostname is not found, don't set hostname"
@@ -214,9 +235,8 @@ guest() {
 	ip link set dev lo up
 
 	if [ -n "$(command -v busybox)" ]; then
-		mask_file /etc/resolv.conf
-		mask_dir /etc/resolvconf/run
-		mkdir /run/resolvconf
+		mask-dir /etc/resolvconf/run
+		mkdir -p /run/resolvconf
 		echo "nameserver 8.8.8.8" > /run/resolvconf/resolv.conf
 
 		local dev=$(ls -d /sys/bus/virtio/drivers/virtio_net/virtio* |sort -g |head -n1)
@@ -247,20 +267,18 @@ guest() {
 
 	if [ "$SSH" = "y" ]; then
 		say setup sshd
-		say "$ ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null root@localhost -p $SSH_PORT"
+		say ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null root@localhost -p $SSH_PORT
 
-		mask_dir /etc/ssh
-		mask_dir /etc/pam.d
+		mask-dir /etc/ssh
+		mask-dir /etc/pam.d
 		mkdir -p /var/run/sshd
 
-		mask_file /etc/passwd
 		echo "root:x:0:0:root:/:/bin/bash" > /etc/passwd
 		echo "sshd:x:123:65534::/var/run/sshd:/usr/sbin/nologin" >> /etc/passwd
 
-		mask_file /etc/shadow
 		echo "root:*:17785:0:99999:7:::" > /etc/shadow
 
-		mask_file /etc/group
+		echo "" > /etc/group
 
 		cat $HOME/.ssh/id_rsa.pub >> /etc/ssh/authorized_keys
 
@@ -278,8 +296,8 @@ guest() {
 
 	say root environment
 	touch /tmp/etc/{profile,bash.bashrc}
-	mask_file /etc/profile
-	mask_file /etc/bash.bashrc
+	> /etc/profile
+	> /etc/bash.bashrc
 
 	mkdir -m 0755 /tmp/root
 	touch /tmp/root/.bashrc
@@ -294,12 +312,29 @@ guest() {
 	export NO_BASE16=y # hack for my bashrc to disable colors
 
 	cat << EOF > $rcfile
-	if [ -e "$HOME/.bashrc" ]; then
-		source $HOME/.bashrc
-	fi
-	if [ -n "$(command -v resize)" ]; then
-		resize
-	fi
+export DIR_KERNEL="$DIR_KERNEL"
+
+export PATH=\$HOME/local/bin:\$PATH
+export PATH=\$DIR_KERNEL/tools/bpf/bpftool:\$PATH
+export PATH=\$DIR_KERNEL/tools/perf:\$PATH
+
+mask-dir () {
+	local upper_dir="/mnt/base-root/tmp/rootdir-overlay/upper/\$1"
+
+	mkdir -p "\$upper_dir"
+	setfattr -n trusted.overlay.opaque -v y "\$upper_dir"
+	mount -o remount /
+}
+
+if [ -e "\$HOME/.bashrc" ]; then
+	source \$HOME/.bashrc
+fi
+if [ -e "\$DIR_KERNEL" ]; then
+	source "\$DIR_KERNEL/tools/bpf/bpftool/bash-completion/bpftool"
+fi
+if [ -n "\$(command -v resize)" ]; then
+	resize &>/dev/null
+fi
 EOF
 
 	if [ -d "$DIR_KERNEL" ]; then
@@ -334,6 +369,7 @@ MODULES=n
 TTY=ttyS0
 
 SSH=n
+SSH_PORT=42222
 
 NRCPU=4
 MEMORY=15872
