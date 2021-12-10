@@ -19,6 +19,17 @@ usage() {
 	exit 1
 }
 
+fixup() {
+	local stage="$1"
+
+	if [ -z "$IMAGE_FIXUP" ]; then
+		return
+	fi
+
+	say FIXUP $stage
+	${stage}_fixup
+}
+
 # This function is called _BEFORE_ QEMU starts (on host).
 host() {
 	local kernel="$1"
@@ -62,11 +73,9 @@ host() {
 	cmdline+=" rootflags=version=9p2000.L,trans=virtio,access=any"
 	cmdline+=" ro"
 	cmdline+=" nokaslr"
-	cmdline+=" netbase.bond=noglag netbase.hsid=vanadium-vanadium.virtio_net.gab"
 
 	if [ ! -z "$IMAGE" ]; then
 		fs+=" -drive format=raw,file=$IMAGE"
-		cmdline+=" netbase.bond=noglag netbase.hsid=vanadium-vanadium.virtio_net.gab"
 		opts+=" -i $IMAGE"
 	fi
 
@@ -75,6 +84,8 @@ host() {
 		accel+=" -machine accel=kvm:tcg"
 		accel+=" -enable-kvm"
 	fi
+
+	fixup host
 
 	local cpu
 	local qemu_flavor=$ARCH
@@ -256,49 +267,29 @@ guest() {
 
 	if [ ! -z "$IMAGE" ]; then
 		say fsck
-		fsck -T -y -v -r /dev/sda1
+		fsck -T -y -v -r "/dev/$IMAGE_PART"
 
 		say mount disk
 		mkdir /mnt/root
-		mount -n /dev/sda1 /mnt/root
+		mount -n "/dev/$IMAGE_PART" /mnt/root
 
-		say install kernel
-		tar -xJf $DIR_KERNEL/pkgs/LATEST.tar.xz -C /mnt/root
-		say install gtests
-		rsync -a $DIR_KERNEL/gtests /mnt/root/root
-		sync
+		fixup guest_pre_pivot
 
 		say pivot root
 		pivot_root /mnt/root{,/tmp}
 		cd /
 
-		# mkdir -p /mnt/9p-overlay
-		# mount --move /tmp /mnt/9p-overlay
-		#umount -l /tmp
+		umount /tmp/{tmp,var/log,run}
 
-		cat > /etc/sysconfig/network << 'EOF'
-# Necessary for VM networking
-VEX=true
-NETWORKING=yes
-HOSTNAME=q
-EOF
+		mkdir -p /root/9p-overlay
+		mount --move /tmp /root/9p-overlay
+		mount -n -t tmpfs tmpfs /root/9p-overlay
 
-		rm -f /etc/rcS.d/S15mountfsck-post
+		fixup guest_post_pivot
 
 		say exec init
-		if [ -n "$SCRIPT" ]; then
-			cat << EOF > /etc/rc.machine
-dmesg --console-off
-/root/gtests/run
-EOF
-		else
-			cat << EOF > /etc/rc.machine
-dmesg --console-off
-EOF
-		fi
 		mount -n -o remount,ro /
-		exec /sbin/init.real
-		exit
+		exec "$IMAGE_INIT"
 	fi
 
 	say setup cgroups
@@ -416,6 +407,8 @@ DIR_Q="$(dirname $0)"
 DIR_EXPORT=/export/hda3/tmp
 DIR_ROOT=/
 IMAGE=""
+IMAGE_PART="sda1"
+IMAGE_INIT="/sbin/init.real"
 
 GUEST=n
 MODULES=n
@@ -446,6 +439,15 @@ while getopts "i:dhgms:c:k:r:A:H:N:M:T:" opt; do
 	esac
 done
 shift $((OPTIND -1))
+
+if [ ! -z "$IMAGE" -a -e "${IMAGE/.img/.fixup}" ]; then
+	IMAGE_FIXUP="${IMAGE/.img/.fixup}"
+fi
+
+if [ ! -z "$IMAGE_FIXUP" ]; then
+	say Using fixup script ${IMAGE_FIXUP}!
+	. "$IMAGE_FIXUP"
+fi
 
 if [ "$GUEST" = "y" ]; then
 	guest
