@@ -62,8 +62,13 @@ host() {
 	cmdline+=" rootflags=version=9p2000.L,trans=virtio,access=any"
 	cmdline+=" ro"
 	cmdline+=" nokaslr"
-	cmdline+=" $CMDLINE"
+	cmdline+=" netbase.bond=noglag netbase.hsid=vanadium-vanadium.virtio_net.gab"
 
+	if [ ! -z "$IMAGE" ]; then
+		fs+=" -drive format=raw,file=$IMAGE"
+		cmdline+=" netbase.bond=noglag netbase.hsid=vanadium-vanadium.virtio_net.gab"
+		opts+=" -i $IMAGE"
+	fi
 
 	local accel
 	if [ "$(arch)" = "${ARCH}" ]; then
@@ -142,7 +147,7 @@ mask-dir() {
 
 # This function is called _AFTER_ QEMU starts (on guest).
 guest() {
-	export PATH=/bin:/sbin:/usr/bin:/usr/sbin:/bb
+	export PATH=/bin:/sbin:/usr/bin:/usr/sbin
 
 	say pivot root
 
@@ -247,6 +252,53 @@ guest() {
 			-s /etc/udhcpc/default.script -q -t 1 -n -f
 	else
 		say "busybox is not found, skipping udhcpc"
+	fi
+
+	if [ ! -z "$IMAGE" ]; then
+		say fsck
+		fsck -T -y -v -r /dev/sda1
+
+		say mount disk
+		mkdir /mnt/root
+		mount -n /dev/sda1 /mnt/root
+
+		say install kernel
+		tar -xJf $DIR_KERNEL/pkgs/LATEST.tar.xz -C /mnt/root
+		say install gtests
+		rsync -a $DIR_KERNEL/gtests /mnt/root/root
+		sync
+
+		say pivot root
+		pivot_root /mnt/root{,/tmp}
+		cd /
+
+		# mkdir -p /mnt/9p-overlay
+		# mount --move /tmp /mnt/9p-overlay
+		#umount -l /tmp
+
+		cat > /etc/sysconfig/network << 'EOF'
+# Necessary for VM networking
+VEX=true
+NETWORKING=yes
+HOSTNAME=q
+EOF
+
+		rm -f /etc/rcS.d/S15mountfsck-post
+
+		say exec init
+		if [ -n "$SCRIPT" ]; then
+			cat << EOF > /etc/rc.machine
+dmesg --console-off
+/root/gtests/run
+EOF
+		else
+			cat << EOF > /etc/rc.machine
+dmesg --console-off
+EOF
+		fi
+		mount -n -o remount,ro /
+		exec /sbin/init.real
+		exit
 	fi
 
 	say setup cgroups
@@ -363,6 +415,7 @@ EOF
 DIR_Q="$(dirname $0)"
 DIR_EXPORT=/export/hda3/tmp
 DIR_ROOT=/
+IMAGE=""
 
 GUEST=n
 MODULES=n
@@ -374,9 +427,10 @@ SSH_PORT=42222
 NRCPU=4
 MEMORY=15872
 
-while getopts "dhgms:c:k:r:A:H:N:M:T:" opt; do
+while getopts "i:dhgms:c:k:r:A:H:N:M:T:" opt; do
 	case $opt in
 		h) usage ;;
+		i) IMAGE="$OPTARG" ;;
 		g) GUEST=y ;;
 		m) MODULES=y ;;
 		k) DIR_KERNEL="$OPTARG" ;;
