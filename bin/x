@@ -1,20 +1,20 @@
 #!/bin/sh
 
-[ -z "$1" ] && { echo "Please specify input file" && exit 1; }
-[ ! -f "$1" ] && { echo "'$1' is not a file" && exit 1; }
+[ -z "$@" ] && { echo "Please specify input file" && exit 1; }
+[ ! -f "$@" ] && { echo "'$1' is not a file" && exit 1; }
 
-case "$1" in
-	*.tar.bz2)	tar xjf $1 ;;
-	*.tar.gz)	tar xzf $1 ;;
-	*.bz2)		bunzip2 $1 ;;
-	*.rar)		unrar e $1 ;;
-	*.gz)		gunzip $1 ;;
-	*.tar)		tar xf $1 ;;
-	*.tbz2)		tar xjf $1 ;;
-	*.xz)		xzdec $1 > $(echo "$1" | sed 's/.xz//');;
-	*.tgz)		tar xzf $1 ;;
-	*.zip)		unzip $1 ;;
-	*.Z)		uncompress $1 ;;
-	*.7z)		7z x $1 ;;
-	*)		echo "Have no idea how to extract '$1'" && exit 1 ;;
+case "$@" in
+	*.tar.bz2)	tar xjf "$@" ;;
+	*.tar.gz)	tar xzf "$@" ;;
+	*.bz2)		bunzip2 "$@" ;;
+	*.rar)		unrar e "$@" ;;
+	*.gz)		gunzip "$@" ;;
+	*.tar)		tar xf "$@" ;;
+	*.tbz2)		tar xjf "$@" ;;
+	*.xz)		xzdec "$@" > $(echo "$@" | sed 's/.xz//');;
+	*.tgz)		tar xzf "$@" ;;
+	*.zip)		unzip "$@" ;;
+	*.Z)		uncompress "$@" ;;
+	*.7z)		7z x "$@" ;;
+	*)		echo "Have no idea how to extract '$@'" && exit 1 ;;
 esac
