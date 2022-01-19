@@ -1,8 +1,14 @@
 #!/bin/bash
 
 if [ $# -eq 0 ]; then
-	set update update_aur update_python orphaned foreign unmanaged_files
+	set standard_notes update update_aur update_python orphaned foreign unmanaged_files
 fi
+
+standard_notes() {
+	local oldest_backup=$(find ~/Downloads/ -name 'Standard Notes *' -type f -printf '%T+ %p\n' | sort | head -n 1 | awk '{$1=""; print}')
+	echo "Saving oldest notes backup: $oldest_backup"
+	unzip -c "$oldest_backup" 'Standard Notes Backup and Import File.txt' | pass insert -mf notes
+}
 
 unmanaged_files() {
 	comm -23 <(find / \( \
