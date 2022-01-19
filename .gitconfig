@@ -43,7 +43,7 @@
 [sendemail]
 	chainreplyto = false
 	smtpserver = smtp.gmail.com:587
-	smtpuser = sdf@fomichev.me
+	smtpuser = s@fomichev.me
 	smtpencryption = tls
 	confirm = always
 
