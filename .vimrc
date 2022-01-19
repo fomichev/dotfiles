@@ -277,6 +277,13 @@ nnoremap <leader>s :w<CR>
 " execute current file
 nnoremap <leader>e :!%:p<CR>
 
+" moving with Up/Down/Left/Right over wrapped lines
+
+nnoremap <Left> gh
+nnoremap <Down> gj
+nnoremap <Up> gk
+nnoremap <Right> gl
+
 " 2}}}
 " Windows {{{2
 
