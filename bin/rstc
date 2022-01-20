@@ -22,21 +22,42 @@ do_rstc() {
 	sudo -E restic -r "$REPO" "$@" 2>&1 | cat
 }
 
-if [ $# -eq 0 ]; then
-	trap finish EXIT
-
+system_upgrade() {
 	say 'update system'
 	$HOME/bin/aur
+}
 
+standard_notes() {
+	local oldest_backup=$(find ~/Downloads/ -name 'Standard Notes *' -type f -printf '%T+ %p\n' | sort | head -n 1 | awk '{$1=""; print}')
+	if [ -z "$oldest_backup" ]; then
+		echo "Skipping notes backup!"
+		return
+	fi
+	echo "Saving oldest notes backup: $oldest_backup"
+	unzip -c "$oldest_backup" 'Standard Notes Backup and Import File.txt' | pass insert -mf notes
+}
+
+google_drive() {
 	if [ -d $HOME/Drive ]; then
 		say 'pull could data'
 		DRY=n $HOME/bin/cloud pull
 	fi
+}
 
+google_photos() {
 	if [ -d $HOME/Pictures/Google ]; then
 		say 'fetch google photos'
 		gphotos-sync ~/Pictures/Google/
 	fi
+}
+
+if [ $# -eq 0 ]; then
+	trap finish EXIT
+
+	system_upgrade
+	standard_notes
+	google_drive
+	google_photos
 
 	do_rstc \
 		--verbose \
