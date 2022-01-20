@@ -25,6 +25,9 @@ do_rstc() {
 if [ $# -eq 0 ]; then
 	trap finish EXIT
 
+	say 'update system'
+	$HOME/bin/aur
+
 	if [ -d $HOME/Drive ]; then
 		say 'pull could data'
 		DRY=n $HOME/bin/cloud pull
