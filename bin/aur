@@ -6,6 +6,10 @@ fi
 
 standard_notes() {
 	local oldest_backup=$(find ~/Downloads/ -name 'Standard Notes *' -type f -printf '%T+ %p\n' | sort | head -n 1 | awk '{$1=""; print}')
+	if [ -z "$oldest_backup" ]; then
+		echo "Skipping notes backup!"
+		return
+	fi
 	echo "Saving oldest notes backup: $oldest_backup"
 	unzip -c "$oldest_backup" 'Standard Notes Backup and Import File.txt' | pass insert -mf notes
 }
