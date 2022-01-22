@@ -1,7 +1,7 @@
 #!/bin/bash
 
 if [ $# -eq 0 ]; then
-	set update update_aur update_python remove_orphaned foreign unmanaged_files
+	set update update_aur update_python remove_orphaned foreign unmanaged_files adblock cleanup
 fi
 
 unmanaged_files() {
@@ -97,6 +97,21 @@ update_python() {
 
 update() {
 	yes | sudo pacman -Syu
+}
+
+adblock() {
+	local target=/etc/unbound/adservers.conf
+
+	if [ ! -e "$target" ]; then
+		echo "No $target, skipping unbound!"
+		return
+	fi
+
+	curl -sS -L --compressed \
+		"http://pgl.yoyo.org/adservers/serverlist.php?hostformat=unbound&showintro=0&mimetype=plaintext&useip=127.0.0.1" \
+		| sudo tee /etc/unbound/adservers.conf > /dev/null
+
+	sudo systemctl restart unbound.service
 }
 
 cleanup() {
