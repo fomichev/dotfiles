@@ -54,7 +54,6 @@ google_photos() {
 if [ $# -eq 0 ]; then
 	trap finish EXIT
 
-	system_upgrade
 	standard_notes
 	google_drive
 	google_photos
@@ -71,6 +70,8 @@ if [ $# -eq 0 ]; then
 	do_rstc snapshots
 	do_rstc forget --keep-within 95d --prune
 	do_rstc stats
+
+	system_upgrade
 	exit
 fi
 
