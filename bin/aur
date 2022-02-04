@@ -120,7 +120,13 @@ cleanup() {
 	yes | sudo pacman -Scc
 }
 
+say() {
+	tput setaf 1
+	echo "$@"
+	tput sgr0
+}
+
 for f in "$@"; do
-	echo "$f" | colorify
+	say "$f"
 	$f
 done
