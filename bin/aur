@@ -116,7 +116,7 @@ adblock() {
 
 cleanup() {
 	sudo journalctl --vacuum-time=7d
-	sudo flatpak uninstall --unused
+	sudo flatpak uninstall --unused || :
 	yes | sudo pacman -Scc
 }
 
