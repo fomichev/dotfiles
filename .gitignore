@@ -26,3 +26,8 @@ ignore
 .gnupg
 
 .tmux/
+
+bin/gkectl
+bin/govc
+bin/kubeadm
+bin/monarch-policies
