@@ -2,7 +2,7 @@
 
 usage() {
 	if [ -n "$*" ]; then
-		echo "error: %@"
+		echo "error: $@"
 		echo
 	fi
 
@@ -16,6 +16,7 @@ usage() {
 	echo "    d - start SSH server"
 	echo "    s - run script instead of interactive bash"
 	echo "    r - path to custom rootfs"
+	echo "    e - extra environment arguments"
 	exit 1
 }
 
@@ -114,7 +115,7 @@ host() {
 	init+=" && "
 	init+="mount -n -t 9p -o trans=virtio /tmp/dir_q /tmp/dir_q"
 	init+=" && "
-	init+="/tmp/dir_q/q -g $opts -T $TTY -r $DIR_ROOT -H $HOME -k '$(pwd)' -s '$SCRIPT'"
+	init+="/tmp/dir_q/q -g $opts -T $TTY -r $DIR_ROOT $ENVIRON_ARG -H $HOME -k '$(pwd)' -s '$SCRIPT'"
 
 	cmdline+=" init=/bin/sh -- -c \"$init\""
 
@@ -420,7 +421,9 @@ SSH_PORT=42222
 NRCPU=4
 MEMORY=15872
 
-while getopts "i:dhgms:c:k:r:A:H:N:M:T:" opt; do
+ENVIRON_ARG=
+
+while getopts "i:dhgms:c:e:k:r:A:H:N:M:T:" opt; do
 	case $opt in
 		h) usage ;;
 		i) IMAGE="$OPTARG" ;;
@@ -430,6 +433,7 @@ while getopts "i:dhgms:c:k:r:A:H:N:M:T:" opt; do
 		r) DIR_ROOT="$OPTARG" ;;
 		c) CMDLINE="$OPTARG" ;;
 		d) SSH="y" ;;
+		e) ENVIRON_ARG+=" -e "$OPTARG"" ; eval export ${OPTARG}; ;;
 		s) SCRIPT="$OPTARG" ;;
 		A) ARCH="$OPTARG" ;;
 		H) export HOME=$OPTARG ;;
