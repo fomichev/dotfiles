@@ -51,6 +51,13 @@ google_photos() {
 	fi
 }
 
+if [ -z "$INVOCATION_ID" -a $# -eq 0 ]; then
+	# Started manually via shell, start systemd service instead.
+	systemctl --user start restic.service
+	journalctl --user -fu restic.service
+	exit
+fi
+
 if [ $# -eq 0 ]; then
 	trap finish EXIT
 
