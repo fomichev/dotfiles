@@ -19,6 +19,8 @@ path_prepend ~/go/bin
 path_prepend /usr/local/bin
 path_prepend /usr/local/share/python
 
+export LD_LIBRARY_PATH=/usr/local/google/home/sdf/opt/sysroot/lib
+
 # }}}
 # Include aliases {{{
 
