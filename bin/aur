@@ -4,6 +4,10 @@ if [ $# -eq 0 ]; then
 	set update update_aur update_python remove_orphaned foreign unmanaged_files adblock cleanup
 fi
 
+_() {
+	sudo -E "$@"
+}
+
 unmanaged_files() {
 	comm -23 <(find / \( \
 		-path '/dev' -o \
@@ -55,7 +59,7 @@ foreign() {
 }
 
 remove_orphaned() {
-	yes | sudo pacman -Rs $(pacman -Qqtd)
+	yes | _ pacman -Rs $(pacman -Qqtd)
 }
 
 aur_for_each() {
@@ -96,7 +100,7 @@ update_python() {
 }
 
 update() {
-	yes | sudo pacman -Syu
+	yes | _ pacman -Syu
 }
 
 adblock() {
@@ -109,15 +113,15 @@ adblock() {
 
 	curl -sS -L --compressed \
 		"http://pgl.yoyo.org/adservers/serverlist.php?hostformat=unbound&showintro=0&mimetype=plaintext&useip=127.0.0.1" \
-		| sudo tee /etc/unbound/adservers.conf > /dev/null
+		| _ tee /etc/unbound/adservers.conf > /dev/null
 
-	sudo systemctl restart unbound.service
+	_ systemctl restart unbound.service
 }
 
 cleanup() {
-	sudo journalctl --vacuum-time=7d
-	sudo flatpak uninstall --unused || :
-	yes | sudo pacman -Scc
+	_ journalctl --vacuum-time=7d
+	_ flatpak uninstall --unused || :
+	yes | _ pacman -Scc
 }
 
 say() {

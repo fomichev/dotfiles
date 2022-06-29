@@ -1,5 +1,6 @@
 #!/bin/bash
 
+set -x
 set -eo pipefail
 
 source ~/.secret/restic-settings
@@ -47,7 +48,7 @@ google_drive() {
 google_photos() {
 	if [ -d $HOME/Pictures/Google ]; then
 		say 'fetch google photos'
-		gphotos-sync ~/Pictures/Google/
+		$HOME/.local/bin/gphotos-sync ~/Pictures/Google/
 	fi
 }
 
