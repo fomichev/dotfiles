@@ -23,5 +23,5 @@ pre_build() {
 }
 
 post_build() {
-	cp -a $S/runtime/keymap $PREFIX/share/vim/vim73/
+	cp -a $S/runtime/keymap $R/usr/share/vim/vim73/
 }

@@ -16,6 +16,6 @@ post_build() {
 	)
 
 	for bin in ${binary[@]}; do
-		ln -sf xtables-nft-multi $PREFIX/sbin/$bin
+		ln -sf xtables-nft-multi $R/sbin/$bin
 	done
 }

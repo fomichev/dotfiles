@@ -4,5 +4,5 @@ source=(git://git.kernel.org/pub/scm/linux/kernel/git/dborkman/l2md.git)
 skip_steps=(install)
 
 post_build() {
-	ln -sf $S/l2md $PREFIX/bin
+	ln -sf $S/l2md $R/bin
 }

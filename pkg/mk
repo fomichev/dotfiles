@@ -8,10 +8,9 @@ __usage() {
 	exit 1
 }
 
-R="$HOME/opt"
-STAMP="$R/stamp"
-SRC="$R/src"
-PREFIX="$R/sysroot"
+BASEDIR="$HOME/opt"
+STAMP="$BASEDIR/stamp"
+SRC="$BASEDIR/src"
 
 FILE="$1"
 PKG="$(basename "$FILE")"
@@ -23,9 +22,12 @@ if [ ! -z "$1" ]; then
 fi
 
 S="$SRC/$PKG"
-B="$R/build/$PKG"
+B="$BASEDIR/build/$PKG"
+R="$BASEDIR/sysroot"
 PKG_STAMP_FETCH="$STAMP/${PKG}_fetch"
 PKG_STAMP_BUILD="$STAMP/${PKG}_build"
+
+PREFIX="$R"
 
 # PACKAGES CAN CONFIGURE THESE
 # {{{
@@ -47,7 +49,7 @@ post_build() { :; }
 # {{{
 # S - source directory
 # B - build directory
-# PREFIX - target install prefix
+# R - install root directory
 # }}}
 
 MAX_NPROC=64
@@ -60,19 +62,26 @@ die() { echo "${PKG}: $@"; exit 1; }
 
 [ -z "$PKG" ] && { die "Specify package name!"; }
 
-say "NPROC=$NPROC PREFIX=$PREFIX"
+say "NPROC=$NPROC PREFIX=$PREFIX R=$R"
 
-ENV_PATH=$(mktemp /tmp/mk.XXXXXX)
-finish() {
+ENV_PATH=
+__finish() {
 	RET=$?
 	if [ $RET -ne 0 ]; then
 		echo "FAILED: $RET"
 	fi
-	rm $ENV_PATH
-}
-trap finish EXIT
 
-with_clean_env() {
+	if [ ! -z "$ENV_PATH" ]; then
+		rm $ENV_PATH
+	fi
+}
+trap __finish EXIT
+
+__with_clean_env() {
+	if [ -z "$ENV_PATH" ]; then
+		ENV_PATH=$(mktemp /tmp/mk.XXXXXX)
+	fi
+
 	# Save all environment variables into a temporary file.
 	export -p > $ENV_PATH
 
@@ -92,7 +101,7 @@ with_clean_env() {
 			UID) continue ;;
 			# API between the script and package definitions.
 			PATH) continue ;;
-			PREFIX) continue ;;
+			R) continue ;;
 			B) continue ;;
 			S) continue ;;
 			# The rest is cleared.
@@ -171,10 +180,10 @@ __invoke_step() {
 }
 
 __build_cmake() {
-	cmake -DCMAKE_INSTALL_PREFIX=$PREFIX ${cmake_flags[@]} "$1"
+	cmake -DCMAKE_INSTALL_PREFIX=$R ${cmake_flags[@]} "$1"
 	cmake --build .
 	cmake ${install_flags[@]} \
-		-DCMAKE_INSTALL_PREFIX=$PREFIX \
+		-DCMAKE_INSTALL_PREFIX=$R \
 		-P cmake_install.cmake
 }
 
@@ -186,17 +195,8 @@ __build_autoconf() {
 }
 
 __build_make() {
-	make_flags+=(PREFIX=$PREFIX)
-	install_flags+=(PREFIX=$PREFIX)
-
 	make -j$NPROC "${make_flags[@]}"
 	__invoke_step install && make "${install_flags[@]}" install || :
-}
-
-extract_to_prefix() {
-	for s in ${source[@]}; do
-		(cd $PREFIX && tar xf $SRC/$(basename $s))
-	done
 }
 
 __src_path() {
@@ -234,12 +234,12 @@ build() {
 	exit 1
 } || source "$FILE"
 
-checksum() {
+__checksum() {
 	sha256sum "$1" 2>&1 | cut -d' ' -f1
 }
 
-checksum_matches() {
-	test "$(checksum "$1")" = "$(checksum "$2")"
+__checksum_matches() {
+	test "$(__checksum "$1")" = "$(__checksum "$2")"
 }
 
 __clean() {
@@ -258,19 +258,19 @@ __clean() {
 }
 
 __build() {
-	mkdir -p "$SRC" "$STAMP" "$PREFIX/bin"
+	mkdir -p "$SRC" "$STAMP" "$R/bin"
 
 	say "fetch $S"
 	(cd $SRC && fetch)
 
-	if checksum_matches "$PKG_STAMP_FETCH" "$PKG_STAMP_BUILD"; then
+	if __checksum_matches "$PKG_STAMP_FETCH" "$PKG_STAMP_BUILD"; then
 		say "build is up to date"
 		say "run '$0 $FILE clean' to force rebuild"
 		exit 0
 	fi
 
 	say "pre build $B"
-	[ -e "$S" ] && (cd $S && with_clean_env pre_build)
+	[ -e "$S" ] && (cd $S && __with_clean_env pre_build)
 	__invoke_step build && {
 		say "build $B"
 		rm -rf "$B"
@@ -278,7 +278,7 @@ __build() {
 		cd $B && build
 	} || :
 	say "post build $B"
-	(cd $B && with_clean_env post_build)
+	(cd $B && __with_clean_env post_build)
 
 	cp "$PKG_STAMP_FETCH" "$PKG_STAMP_BUILD"
 }
