@@ -12,7 +12,11 @@ def parse(val):
     str_ip = val
 
   ip = None
-  if '.' in str_ip or ':' in str_ip:
+  if '\\' in str_ip:
+    str_ip = bytes(str_ip, "utf-8").decode("unicode_escape")
+    str_ip = bytes(str_ip, "utf-8")
+    ip = ipaddress.ip_address(str_ip)
+  elif '.' in str_ip or ':' in str_ip:
     ip = ipaddress.ip_address(str_ip)
   else:
     b = bytearray.fromhex(str_ip)
