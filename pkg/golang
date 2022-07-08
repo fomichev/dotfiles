@@ -1,9 +1,10 @@
 #!/bin/bash
 
-ver=1.13.1
-source=(https://storage.googleapis.com/golang/go${ver}.linux-amd64.tar.gz)
+ver=1.18.3
+source=(https://go.dev/dl/go${ver}.linux-amd64.tar.gz)
+skip_steps=(build)
 
-build() {
-	cp -a $S/* $PWD
-	ln -sf $PWD/go $PREFIX/go
+post_build() {
+	cp -a $S/* $B
+	ln -sf $B/go $PREFIX/go
 }

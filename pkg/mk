@@ -29,15 +29,25 @@ PKG_STAMP_BUILD="$STAMP/${PKG}_build"
 
 # PACKAGES CAN CONFIGURE THESE
 # {{{
+ver=
+source=
+
 configure_flags=(--prefix=$PREFIX)
 make_flags=()
 cmake_flags=()
 install_flags=()
 src_subdir="" # cd into this sub-directory before trying to build
-invoke_install=true
+skip_steps=() # skip "build" or "install" step
 
 pre_build() { :; }
 post_build() { :; }
+# }}}
+
+# PACKAGES WILL GET THE FOLLOWING EXPORTED TO pre_build AND post_build
+# {{{
+# S - source directory
+# B - build directory
+# PREFIX - target install prefix
 # }}}
 
 MAX_NPROC=64
@@ -52,13 +62,49 @@ die() { echo "${PKG}: $@"; exit 1; }
 
 say "NPROC=$NPROC PREFIX=$PREFIX"
 
+ENV_PATH=$(mktemp /tmp/mk.XXXXXX)
 finish() {
 	RET=$?
 	if [ $RET -ne 0 ]; then
 		echo "FAILED: $RET"
 	fi
+	rm $ENV_PATH
 }
 trap finish EXIT
+
+with_clean_env() {
+	# Save all environment variables into a temporary file.
+	export -p > $ENV_PATH
+
+	# Unexport most of the things we don't care about.
+	while IFS='=' read -rd '' var value ; do
+		case "$var" in
+			# Bash read only.
+			BASHOPTS) continue ;;
+			BASH_ARGC) continue ;;
+			BASH_ARGV) continue ;;
+			BASH_LINENO) continue ;;
+			BASH_SOURCE) continue ;;
+			BASH_VERSINFO) continue ;;
+			EUID) continue ;;
+			PPID) continue ;;
+			SHELLOPTS) continue ;;
+			UID) continue ;;
+			# API between the script and package definitions.
+			PATH) continue ;;
+			PREFIX) continue ;;
+			B) continue ;;
+			S) continue ;;
+			# The rest is cleared.
+			*) unset "$var" ;;
+		esac
+	done < /proc/self/environ
+
+	eval "$@"
+
+	# Restore original environment.
+	source $ENV_PATH
+}
 
 __fetch_git() {
 	local s="$1"
@@ -115,6 +161,15 @@ fetch() {
 	done
 }
 
+__invoke_step() {
+	for step in ${skip_steps[@]}; do
+		if [ "$step" = "$1" ]; then
+			return 1
+		fi
+	done
+	return 0
+}
+
 __build_cmake() {
 	cmake -DCMAKE_INSTALL_PREFIX=$PREFIX ${cmake_flags[@]} "$1"
 	cmake --build .
@@ -127,7 +182,7 @@ __build_autoconf() {
 	[ -x "$S/autogen.sh" ] && (cd "$S" && ./autogen.sh) || :
 	$S/configure --prefix=$PREFIX ${configure_flags[@]}
 	make -j$NPROC "${make_flags[@]}"
-	[ "$invoke_install" = "true" ] && make "${install_flags[@]}" install || :
+	__invoke_step install && make "${install_flags[@]}" install || :
 }
 
 __build_make() {
@@ -135,7 +190,7 @@ __build_make() {
 	install_flags+=(PREFIX=$PREFIX)
 
 	make -j$NPROC "${make_flags[@]}"
-	[ "$invoke_install" = "true" ] && make "${install_flags[@]}" install || :
+	__invoke_step install && make "${install_flags[@]}" install || :
 }
 
 extract_to_prefix() {
@@ -205,7 +260,7 @@ __clean() {
 __build() {
 	mkdir -p "$SRC" "$STAMP" "$PREFIX/bin"
 
-	say "fetch"
+	say "fetch $S"
 	(cd $SRC && fetch)
 
 	if checksum_matches "$PKG_STAMP_FETCH" "$PKG_STAMP_BUILD"; then
@@ -214,14 +269,16 @@ __build() {
 		exit 0
 	fi
 
-	say "pre build"
-	[ -e "$S" ] && (cd $S && pre_build)
-	say "build"
-	rm -rf "$B"
-	mkdir -p "$B"
-	(cd $B && build)
-	say "post build"
-	(cd $B && post_build)
+	say "pre build $B"
+	[ -e "$S" ] && (cd $S && with_clean_env pre_build)
+	__invoke_step build && {
+		say "build $B"
+		rm -rf "$B"
+		mkdir -p "$B"
+		cd $B && build
+	} || :
+	say "post build $B"
+	(cd $B && with_clean_env post_build)
 
 	cp "$PKG_STAMP_FETCH" "$PKG_STAMP_BUILD"
 }
