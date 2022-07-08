@@ -1,0 +1,21 @@
+#!/bin/bash
+
+source=(git://git.netfilter.org/iptables)
+configure_flags+=(
+		--disable-static
+)
+
+post_build() {
+	binary+=(
+		iptables
+		iptables-save
+		iptables-restore
+		ip6tables
+		ip6tables-save
+		ip6tables-restore
+	)
+
+	for bin in ${binary[@]}; do
+		ln -sf xtables-nft-multi $PREFIX/sbin/$bin
+	done
+}
