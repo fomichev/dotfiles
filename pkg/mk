@@ -102,6 +102,11 @@ fetch() {
 		local fullname="$(basename $s)"
 		local extension="${fullname##*.}"
 		local dirname="${fullname%.*}"
+		local protocol="$(echo "$s" | sed -e's,^\(.*\)://.*,\1,g')"
+
+		if [ "$protocol" = "git" ]; then
+			extension=git
+		fi
 
 		case "$extension" in
 			git) __fetch_git "$s" "$dirname" ;;
@@ -185,7 +190,13 @@ checksum_matches() {
 __clean() {
 	say "clean"
 
-	(cd $SRC && for s in ${source[@]}; do rm -f $(basename $s); done)
+	pushd $SRC
+	for s in ${source[@]}; do
+		if [ -e "$s" ]; then
+			rm -f $(basename $s)
+		fi
+	done
+	popd
 
 	rm -f  $PKG_STAMP_FETCH $PKG_STAMP_BUILD
 	rm -rf $B $S
