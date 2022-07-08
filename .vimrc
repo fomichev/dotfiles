@@ -192,7 +192,9 @@ endif
 set termguicolors
 
 " uncomment on mosh
-"set notermguicolors
+" https://github.com/mobile-shell/mosh/commit/fa9335f737a057c0b43fe9165dc0ef0f32a5887f
+" https://github.com/mobile-shell/mosh/commit/ce7ba37ad4e493769a126db2b39b8a9aa9121278
+set notermguicolors
 
 " :help xterm-true-color (for vim inside of tmux)
 let &t_8f = "\<Esc>[38;2;%lu;%lu;%lum"
