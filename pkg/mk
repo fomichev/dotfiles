@@ -240,11 +240,6 @@ build() {
 	fi
 }
 
-[ ! -e "$FILE" ] && {
-	echo "File '$FILE' not found"
-	exit 1
-} || source "$FILE"
-
 __checksum() {
 	sha256sum "$1" 2>&1 | cut -d' ' -f1
 }
@@ -307,6 +302,13 @@ __build() {
 
 	cp "$PKG_STAMP_FETCH" "$PKG_STAMP_BUILD"
 }
+
+if [ ! -e "$FILE" ]; then
+	echo "File '$FILE' not found"
+	exit 1
+fi
+
+source "$FILE"
 
 case "$CMD" in
 	clean) __clean ;;
