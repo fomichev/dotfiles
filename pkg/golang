@@ -1,10 +1,10 @@
 #!/bin/bash
 
 ver=1.18.3
-source=(https://go.dev/dl/go${ver}.linux-amd64.tar.gz)
+src=(https://go.dev/dl/go${ver}.linux-amd64.tar.gz)
 skip_steps=(build)
 
 post_build() {
 	cp -a $S/* $B
-	ln -sf $B/go $R/go
+	ln -sf $B $R/go
 }

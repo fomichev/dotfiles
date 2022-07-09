@@ -4,4 +4,4 @@ cmake_flags=(
 	-D__LIB=lib
 )
 
-source=(git://git.kernel.org/pub/scm/devel/pahole/pahole.git)
+src=(git://git.kernel.org/pub/scm/devel/pahole/pahole.git)

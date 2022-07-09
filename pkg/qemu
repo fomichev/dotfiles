@@ -1,6 +1,6 @@
 #!/bin/bash
 
-source=(git://git.qemu-project.org/qemu.git)
+src=(git://git.qemu-project.org/qemu.git)
 
 configure_flags+=(
 		--enable-virtfs

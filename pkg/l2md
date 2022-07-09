@@ -1,6 +1,6 @@
 #!/bin/bash
 
-source=(git://git.kernel.org/pub/scm/linux/kernel/git/dborkman/l2md.git)
+src=(git://git.kernel.org/pub/scm/linux/kernel/git/dborkman/l2md.git)
 skip_steps=(install)
 
 post_build() {

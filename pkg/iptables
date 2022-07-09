@@ -1,6 +1,6 @@
 #!/bin/bash
 
-source=(git://git.netfilter.org/iptables)
+src=(git://git.netfilter.org/iptables)
 configure_flags+=(
 		--disable-static
 )

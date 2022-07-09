@@ -9,6 +9,13 @@ __usage() {
 }
 
 BASEDIR="$HOME/opt"
+while getopts "b:" opt; do
+	case $opt in
+		b) BASEDIR="$OPTARG" ;;
+	esac
+done
+shift $((OPTIND -1))
+
 STAMP="$BASEDIR/stamp"
 SRC="$BASEDIR/src"
 
@@ -31,15 +38,13 @@ PREFIX="$R"
 
 # PACKAGES CAN CONFIGURE THESE
 # {{{
-ver=
-source=
-
+src=
 configure_flags=(--prefix=$PREFIX)
 make_flags=()
 cmake_flags=()
 install_flags=()
 src_subdir="" # cd into this sub-directory before trying to build
-skip_steps=() # skip "build" or "install" step
+skip_steps=() # skip "fetch", "build" or "install" step
 
 pre_build() { :; }
 post_build() { :; }
@@ -99,6 +104,7 @@ __with_clean_env() {
 			PPID) continue ;;
 			SHELLOPTS) continue ;;
 			UID) continue ;;
+			LD_LIBRARY_PATH) continue ;;
 			# API between the script and package definitions.
 			PATH) continue ;;
 			R) continue ;;
@@ -134,13 +140,14 @@ __fetch_git() {
 
 __fetch_tar() {
 	local s="$1"
+	shift
 
 	if [ ! -e "$(basename $s)" ]; then
-		say "fetching $s into $PWD"
+		say "downloading $s into $PWD"
 		curl -LO "$s"
 		say "extracting $s into $S"
 		mkdir -p "$S"
-		tar xf "$(basename $s)" -C "$S"
+		tar xf "$(basename $s)" "$@" -C "$S"
 	fi
 
 	echo "$s" >> $PKG_STAMP_FETCH
@@ -149,11 +156,13 @@ __fetch_tar() {
 fetch() {
 	rm -f $PKG_STAMP_FETCH
 
-	if [ -e "$source" ]; then
+	if [ -e "$src" ]; then
 		die "No source specified!"
 	fi
 
-	for s in ${source[@]}; do
+	local tar_flags="--strip-components=1"
+
+	for s in ${src[@]}; do
 		local fullname="$(basename $s)"
 		local extension="${fullname##*.}"
 		local dirname="${fullname%.*}"
@@ -165,8 +174,12 @@ fetch() {
 
 		case "$extension" in
 			git) __fetch_git "$s" "$dirname" ;;
-			*) __fetch_tar "$s" ;;
+			*) __fetch_tar "$s" $tar_flags ;;
 		esac
+
+		# The first source is root. Subsequent sources
+		# keep top subdir.
+		tar_flags=""
 	done
 }
 
@@ -213,8 +226,6 @@ build() {
 	if [ -f "$src/CMakeLists.txt" ]; then
 		__build_cmake "$src"
 	elif [ -f "$src/configure" -o -f "$src/configure.ac" ]; then
-		# build in the source tree
-		B="$src"
 		cd "$B"
 
 		__build_autoconf
@@ -245,23 +256,37 @@ __checksum_matches() {
 __clean() {
 	say "clean"
 
+	echo rm $PKG_STAMP_BUILD
+	rm -f  $PKG_STAMP_BUILD
+}
+
+__mrproper() {
+	say "clean"
+
 	pushd $SRC
-	for s in ${source[@]}; do
-		if [ -e "$s" ]; then
-			rm -f $(basename $s)
+	for s in ${src[@]}; do
+		local f=$(basename $s)
+
+		echo rm $f
+		if [ -e "$f" ]; then
+			rm -f $f
 		fi
 	done
 	popd
 
+	echo rm $PKG_STAMP_FETCH
+	echo rm $PKG_STAMP_BUILD
 	rm -f  $PKG_STAMP_FETCH $PKG_STAMP_BUILD
 	rm -rf $B $S
 }
 
 __build() {
-	mkdir -p "$SRC" "$STAMP" "$R/bin"
+	mkdir -p "$SRC" "$STAMP" "$B" "$R/bin"
 
-	say "fetch $S"
-	(cd $SRC && fetch)
+	if __invoke_step fetch; then
+		say "fetch $S"
+		(cd $SRC && fetch)
+	fi
 
 	if __checksum_matches "$PKG_STAMP_FETCH" "$PKG_STAMP_BUILD"; then
 		say "build is up to date"
@@ -271,12 +296,12 @@ __build() {
 
 	say "pre build $B"
 	[ -e "$S" ] && (cd $S && __with_clean_env pre_build)
-	__invoke_step build && {
+	if __invoke_step build; then
 		say "build $B"
 		rm -rf "$B"
 		mkdir -p "$B"
 		cd $B && build
-	} || :
+	fi
 	say "post build $B"
 	(cd $B && __with_clean_env post_build)
 
@@ -285,6 +310,7 @@ __build() {
 
 case "$CMD" in
 	clean) __clean ;;
+	mrproper) __mrproper ;;
 	help) __usage ;;
 	*) __build ;;
 esac
