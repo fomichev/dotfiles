@@ -141,10 +141,15 @@ __fetch_git() {
 __fetch_tar() {
 	local s="$1"
 	shift
+	local have_dir="$1"
+	shift
 
 	if [ ! -e "$(basename $s)" ]; then
 		say "downloading $s into $PWD"
 		curl -LO "$s"
+	fi
+
+	if [ "$have_dir" = "false" ]; then
 		say "extracting $s into $S"
 		mkdir -p "$S"
 		tar xf "$(basename $s)" "$@" -C "$S"
@@ -160,7 +165,12 @@ fetch() {
 		die "No source specified!"
 	fi
 
+	local have_dir=false
 	local tar_flags="--strip-components=1"
+
+	if [ -e "$S" ]; then
+		have_dir=true
+	fi
 
 	for s in ${src[@]}; do
 		local fullname="$(basename $s)"
@@ -174,7 +184,7 @@ fetch() {
 
 		case "$extension" in
 			git) __fetch_git "$s" "$dirname" ;;
-			*) __fetch_tar "$s" $tar_flags ;;
+			*) __fetch_tar "$s" $have_dir $tar_flags ;;
 		esac
 
 		# The first source is root. Subsequent sources
@@ -202,7 +212,7 @@ __build_cmake() {
 
 __build_autoconf() {
 	[ -x "$S/autogen.sh" ] && (cd "$S" && ./autogen.sh) || :
-	$S/configure --prefix=$PREFIX ${configure_flags[@]}
+	$S/configure ${configure_flags[@]}
 	make -j$NPROC "${make_flags[@]}"
 	__invoke_step install && make "${install_flags[@]}" install || :
 }
