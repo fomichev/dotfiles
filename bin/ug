@@ -1,0 +1,44 @@
+#!/bin/bash
+
+set -e
+
+usage() {
+	echo "ug [options]"
+	echo
+	echo "options:"
+	echo "    a - allow"
+	echo "    e - enable"
+	echo "    d - disable"
+	exit 1
+}
+
+do_enable() {
+	sudo systemctl start usbguard.service
+
+	exit 0
+}
+
+do_disable() {
+	sudo systemctl stop usbguard.service
+	for f in /sys/bus/usb/devices/usb*/authorized_default; do echo 1 | sudo tee $f > /dev/null; done
+	grep . /sys/bus/usb/devices/usb*/authorized_default
+
+	exit 0
+}
+
+do_allow() {
+	sudo usbguard allow-device $(sudo usbguard list-devices | grep block | head -n1 | cut -d: -f1)
+
+	exit 0
+}
+
+while getopts "aed" opt; do
+	case $opt in
+		h) usage ;;
+		a) do_allow ;;
+		e) do_enable ;;
+		d) do_disable ;;
+		*) usage ;;
+	esac
+done
+shift $((OPTIND -1))
