@@ -1,7 +1,7 @@
 #!/bin/bash
 
 usage() {
-	if [ -n "$*" ]; then
+	if [[ -n "$*" ]]; then
 		echo "error: $@"
 		echo
 	fi
@@ -24,7 +24,7 @@ usage() {
 fixup() {
 	local stage="$1"
 
-	if [ -z "$IMAGE_FIXUP" ]; then
+	if [[ -z "$IMAGE_FIXUP" ]]; then
 		return
 	fi
 
@@ -36,7 +36,7 @@ fixup() {
 host() {
 	local kernel="$1"
 
-	[ -e ".config" ] || usage
+	[[ -e ".config" ]] || usage
 
 	local cmdline
 
@@ -54,7 +54,7 @@ host() {
 	console+=" -display none"
 	console+=" -serial mon:stdio"
 
-	if [ "${ARCH}" != "arm64" ]; then
+	if [[ "${ARCH}" != "arm64" ]]; then
 		# TODO: figure this out
 		cmdline+=" earlyprintk=serial,$TTY,115200"
 		cmdline+=" console=$TTY,115200"
@@ -80,13 +80,13 @@ host() {
 	$GDB && gdb+=" -s"
 	$GDB && opts+=" -g"
 
-	if [ ! -z "$IMAGE" ]; then
+	if [[ ! -z "$IMAGE" ]]; then
 		fs+=" -drive format=raw,file=$IMAGE"
 		opts+=" -i $IMAGE"
 	fi
 
 	local accel
-	if [ "$(arch)" = "${ARCH}" ]; then
+	if [[ "$(arch)" = "${ARCH}" ]]; then
 		accel+=" -machine accel=kvm:tcg"
 		accel+=" -enable-kvm"
 	fi
@@ -97,12 +97,12 @@ host() {
 	local qemu_flavor=$ARCH
 	case "${ARCH}" in
 		x86_64)
-			if [ "$(arch)" = "${ARCH}" ]; then
+			if [[ "$(arch)" = "${ARCH}" ]]; then
 				cpu="host"
 			fi
 			;;
 		arm64)
-			if [ "$(arch)" = "${ARCH}" ]; then
+			if [[ "$(arch)" = "${ARCH}" ]]; then
 				cpu="host"
 			else
 				accel+=" -machine virt"
@@ -124,7 +124,7 @@ host() {
 
 	cmdline+=" init=/bin/sh -- -c \"$init\""
 
-	if [ -z "$cpu" ]; then
+	if [[ -z "$cpu" ]]; then
 		echo "unknown cpu for ${ARCH} arch"
 		exit 1
 	fi
@@ -193,7 +193,7 @@ guest() {
 	mount -n -t tmpfs tmpfs /var/log
 	mount -n -t tmpfs tmpfs /run
 
-	if [ -d /export ]; then
+	if [[ -d /export ]]; then
 		mount -n -t tmpfs tmpfs /export
 		mkdir -p $DIR_EXPORT
 		mount -n -t 9p -o trans=virtio $DIR_EXPORT $DIR_EXPORT
@@ -213,7 +213,7 @@ guest() {
 	mount -n -t devpts -o gid=tty,mode=620,noexec,nosuid devpts /dev/pts
 	mount -n -t tmpfs -o mode=1777,nosuid,nodev tmpfs /dev/shm
 
-	if [ -d "$DIR_KERNEL" ]; then
+	if [[ -d "$DIR_KERNEL" ]]; then
 		local kver="`uname -r`"
 		local mods="$(find /sys/devices -type f -name modalias -print0 | xargs -0 cat | sort | uniq)"
 		local mods_nr=$(echo "$mods" | wc -w)
@@ -234,7 +234,7 @@ guest() {
 		ln -s "$DIR_KERNEL/.config" /boot/config-$kver
 
 		if $MODULES; then
-			if [ ! -e "$DIR_KERNEL/modules.dep.bin" ]; then
+			if [[ ! -e "$DIR_KERNEL/modules.dep.bin" ]]; then
 				say modules.dep.bin not found, running depmod, may take awhile
 				depmod -a 2>/dev/null
 			fi
@@ -246,7 +246,7 @@ guest() {
 
 	say networking
 
-	if [ -n "$(command -v hostname)" ]; then
+	if [[ -n "$(command -v hostname)" ]]; then
 		hostname "$HOSTNAME"
 		echo "$HOSTNAME" > /etc/hostname
 
@@ -258,7 +258,7 @@ guest() {
 
 	ip link set dev lo up
 
-	if [ -n "$(command -v busybox)" ]; then
+	if [[ -n "$(command -v busybox)" ]]; then
 		mask-dir /etc/resolvconf/run
 		mkdir -p /run/resolvconf
 		echo "nameserver 8.8.8.8" > /run/resolvconf/resolv.conf
@@ -273,7 +273,7 @@ guest() {
 		say "busybox is not found, skipping udhcpc"
 	fi
 
-	if [ ! -z "$IMAGE" ]; then
+	if [[ ! -z "$IMAGE" ]]; then
 		say fsck
 		fsck -T -y -v -r "/dev/$IMAGE_PART"
 
@@ -347,8 +347,7 @@ guest() {
 
 	if $GDB; then
 		local kconfig=$(zcat /proc/config.gz | grep CONFIG_GDB_SCRIPT)
-		if [ ! "$kconfig" = "CONFIG_GDB_SCRIPTS=y" ]; then
-
+		if [[ ! "$kconfig" = "CONFIG_GDB_SCRIPTS=y" ]]; then
 			say requested GDB, but missing CONFIG_GDB_SCRIPTS=y
 		fi
 	fi
@@ -364,7 +363,7 @@ guest() {
 
 	local rcfile=/tmp/.bashrc
 	export PATH=$HOME/local/bin:$PATH
-	if [ -d "$DIR_KERNEL" ]; then
+	if [[ -d "$DIR_KERNEL" ]]; then
 		export PATH="$DIR_KERNEL/tools/bpf/bpftool:$PATH"
 		export PATH="$DIR_KERNEL/tools/perf:$PATH"
 	fi
@@ -385,26 +384,26 @@ mask-dir () {
 	mount -o remount /
 }
 
-if [ -e "\$HOME/.bashrc" ]; then
+if [[ -e "\$HOME/.bashrc" ]]; then
 	source \$HOME/.bashrc
 fi
-if [ -e "\$DIR_KERNEL" ]; then
+if [[ -e "\$DIR_KERNEL" ]]; then
 	source "\$DIR_KERNEL/tools/bpf/bpftool/bash-completion/bpftool"
 fi
-if [ -n "\$(command -v resize)" ]; then
+if [[ -n "\$(command -v resize)" ]]; then
 	resize &>/dev/null
 fi
 EOF
 
-	if [ -d "$DIR_KERNEL" ]; then
+	if [[ -d "$DIR_KERNEL" ]]; then
 		source "$DIR_KERNEL/tools/bpf/bpftool/bash-completion/bpftool"
 		cd "$DIR_KERNEL"
 	fi
 
-	if [ -n "$SCRIPT" ]; then
+	if [[ -n "$SCRIPT" ]]; then
 		say non-interactive bash script
 		setsid bash --rcfile $rcfile -c "$SCRIPT"
-		if [ ! $? -eq 0 ]; then
+		if [[ ! $? -eq 0 ]]; then
 			say script failed, starting interactive console
 			setsid bash --rcfile $rcfile 0<>"/dev/$TTY" 1>&0 2>&0
 		fi
@@ -465,11 +464,11 @@ while getopts "i:dhgms:c:e:k:r:A:H:GN:M:T:" opt; do
 done
 shift $((OPTIND -1))
 
-if [ ! -z "$IMAGE" -a -e "${IMAGE/.img/.fixup}" ]; then
+if [[ ! -z "$IMAGE" && -e "${IMAGE/.img/.fixup}" ]]; then
 	IMAGE_FIXUP="${IMAGE/.img/.fixup}"
 fi
 
-if [ ! -z "$IMAGE_FIXUP" ]; then
+if [[ ! -z "$IMAGE_FIXUP" ]]; then
 	say Using fixup script ${IMAGE_FIXUP}!
 	. "$IMAGE_FIXUP"
 fi
@@ -480,10 +479,10 @@ else
 	kernel="$1"
 	shift
 
-	if [ -z "$kernel" ]; then
-		if [ -e "arch/x86/boot/bzImage" ]; then
+	if [[ -z "$kernel" ]]; then
+		if [[ -e "arch/x86/boot/bzImage" ]]; then
 			kernel="arch/x86/boot/bzImage"
-		elif [ -e "arch/arm64/boot/Image" ]; then
+		elif [[ -e "arch/arm64/boot/Image" ]]; then
 			kernel="arch/arm64/boot/Image"
 		fi
 	fi
@@ -494,8 +493,8 @@ else
 		ARCH=arm64
 	fi
 
-	if [ ! "$ARCH" = "$(arch)" ]; then
-		if [ "$DIR_ROOT" = "/" ]; then
+	if [[ ! "$ARCH" = "$(arch)" ]]; then
+		if [[ "$DIR_ROOT" = "/" ]]; then
 			DIR_ROOT="$HOME/src/$(arch)"
 			say "$ARCH on $(arch), using $DIR_ROOT rootfs"
 		fi
