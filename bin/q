@@ -61,11 +61,11 @@ host() {
 	fi
 
 	local opts
-	[ "$MODULES" = "y" ] && opts+=" -m"
+	$MODULES && opts+=" -m"
 
 	local net
 	net+=" -netdev user,id=virtual"
-	if [ "$SSH" = "y" ]; then
+	if $SSH; then
 		net+=",hostfwd=tcp:127.0.0.1:$SSH_PORT-:22"
 		opts+=" -d"
 	fi
@@ -233,7 +233,7 @@ guest() {
 		mount -n -t tmpfs tmpfs /boot
 		ln -s "$DIR_KERNEL/.config" /boot/config-$kver
 
-		if [ "$MODULES" = "y" ]; then
+		if $MODULES; then
 			if [ ! -e "$DIR_KERNEL/modules.dep.bin" ]; then
 				say modules.dep.bin not found, running depmod, may take awhile
 				depmod -a 2>/dev/null
@@ -316,7 +316,7 @@ guest() {
 	ulimit -n 819200 &>/dev/null
 	ulimit -a &>/dev/null
 
-	if [ "$SSH" = "y" ]; then
+	if $SSH; then
 		say setup sshd
 		say ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null root@localhost -p $SSH_PORT
 
@@ -358,7 +358,7 @@ guest() {
 	> /etc/profile
 	> /etc/bash.bashrc
 
-	mkdir -m 0755 /root
+	mkdir -pm 0755 /root
 	touch /root/.bashrc
 	touch /root/.bash_profile
 
@@ -368,7 +368,7 @@ guest() {
 		export PATH="$DIR_KERNEL/tools/bpf/bpftool:$PATH"
 		export PATH="$DIR_KERNEL/tools/perf:$PATH"
 	fi
-	export NO_BASE16=y # hack for my bashrc to disable colors
+	export NO_BASE16=true # hack for my bashrc to disable colors
 
 	cat << EOF > $rcfile
 export DIR_KERNEL="$DIR_KERNEL"
@@ -427,11 +427,11 @@ IMAGE_PART="sda1"
 IMAGE_INIT="/sbin/init.real"
 
 GDB=false
-GUEST=n
-MODULES=n
+GUEST=false
+MODULES=false
 TTY=ttyS0
 
-SSH=n
+SSH=false
 SSH_PORT=42222
 
 NRCPU=4
@@ -448,12 +448,12 @@ while getopts "i:dhgms:c:e:k:r:A:H:GN:M:T:" opt; do
 		h) usage ;;
 		i) IMAGE="$OPTARG" ;;
 		g) GDB=true ;;
-		G) GUEST=y ;;
-		m) MODULES=y ;;
+		G) GUEST=true ;;
+		m) MODULES=true ;;
 		k) DIR_KERNEL="$OPTARG" ;;
 		r) DIR_ROOT="$OPTARG" ;;
 		c) CMDLINE="$OPTARG" ;;
-		d) SSH="y" ;;
+		d) SSH=true ;;
 		e) ENVIRON_ARG+=" -e "$OPTARG"" ; eval export ${OPTARG}; ;;
 		s) SCRIPT="$OPTARG" ;;
 		A) ARCH="$OPTARG" ;;
@@ -474,7 +474,7 @@ if [ ! -z "$IMAGE_FIXUP" ]; then
 	. "$IMAGE_FIXUP"
 fi
 
-if [ "$GUEST" = "y" ]; then
+if $GUEST; then
 	guest
 else
 	kernel="$1"
@@ -492,9 +492,12 @@ else
 		ARCH=x86_64
 	elif file $kernel | grep -q ARM64; then
 		ARCH=arm64
+	fi
 
+	if [ ! "$ARCH" = "$(arch)" ]; then
 		if [ "$DIR_ROOT" = "/" ]; then
-			DIR_ROOT="$HOME/src/aarch64"
+			DIR_ROOT="$HOME/src/$(arch)"
+			say "$ARCH on $(arch), using $DIR_ROOT rootfs"
 		fi
 	fi
 
