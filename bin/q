@@ -6,7 +6,7 @@ usage() {
 		echo
 	fi
 
-	echo "q [options] [path to bzImage]"
+	echo "q [options] -i [path to bzImage]"
 	echo
 	echo "Run it from the kernel directory (make sure .config is there)"
 	echo
@@ -17,6 +17,7 @@ usage() {
 	echo "    s - run script instead of interactive bash"
 	echo "    r - path to custom rootfs"
 	echo "    e - extra environment arguments"
+	echo "    g - support attaching with gdb"
 	exit 1
 }
 
@@ -75,6 +76,10 @@ host() {
 	cmdline+=" ro"
 	cmdline+=" nokaslr"
 
+	local gdb
+	$GDB && gdb+=" -s"
+	$GDB && opts+=" -g"
+
 	if [ ! -z "$IMAGE" ]; then
 		fs+=" -drive format=raw,file=$IMAGE"
 		opts+=" -i $IMAGE"
@@ -115,7 +120,7 @@ host() {
 	init+=" && "
 	init+="mount -n -t 9p -o trans=virtio /tmp/dir_q /tmp/dir_q"
 	init+=" && "
-	init+="/tmp/dir_q/q -g $opts -T $TTY -r $DIR_ROOT $ENVIRON_ARG -H $HOME -k '$(pwd)' -s '$SCRIPT'"
+	init+="/tmp/dir_q/q -G $opts -T $TTY -r $DIR_ROOT $ENVIRON_ARG -H $HOME -k '$(pwd)' -s '$SCRIPT'"
 
 	cmdline+=" init=/bin/sh -- -c \"$init\""
 
@@ -136,6 +141,7 @@ host() {
 		$fs \
 		$console \
 		$net \
+		$gdb \
 		-kernel "$kernel" \
 		-append "$cmdline"
 }
@@ -195,8 +201,6 @@ guest() {
 		say "$/expor mount point doesn't exist, not mounting $DIR_EXPORT"
 	fi
 
-	mkdir -p -m 0755 /tmp/etc
-
 	> /etc/fstab
 
 	mount -n -t configfs configfs /sys/kernel/config
@@ -243,8 +247,11 @@ guest() {
 	say networking
 
 	if [ -n "$(command -v hostname)" ]; then
-		hostname q
-		echo q > /tmp/etc/hostname
+		hostname "$HOSTNAME"
+		echo "$HOSTNAME" > /etc/hostname
+
+		ip -6 addr add "${V6_ADDR}/${V6_PREFIX}" dev eth0
+		echo "$V6_ADDR ${HOSTNAME}.prod.google.com "$HOSTNAME"" >> /etc/hosts
 	else
 		say "hostname is not found, don't set hostname"
 	fi
@@ -338,14 +345,22 @@ guest() {
 			-E /var/log/sshd
 	fi
 
+	if $GDB; then
+		local kconfig=$(zcat /proc/config.gz | grep CONFIG_GDB_SCRIPT)
+		if [ ! "$kconfig" = "CONFIG_GDB_SCRIPTS=y" ]; then
+
+			say requested GDB, but missing CONFIG_GDB_SCRIPTS=y
+		fi
+	fi
+
 	say root environment
-	touch /tmp/etc/{profile,bash.bashrc}
+	touch /etc/{profile,bash.bashrc}
 	> /etc/profile
 	> /etc/bash.bashrc
 
-	mkdir -m 0755 /tmp/root
-	touch /tmp/root/.bashrc
-	touch /tmp/root/.bash_profile
+	mkdir -m 0755 /root
+	touch /root/.bashrc
+	touch /root/.bash_profile
 
 	local rcfile=/tmp/.bashrc
 	export PATH=$HOME/local/bin:$PATH
@@ -411,6 +426,7 @@ IMAGE=""
 IMAGE_PART="sda1"
 IMAGE_INIT="/sbin/init.real"
 
+GDB=false
 GUEST=n
 MODULES=n
 TTY=ttyS0
@@ -423,11 +439,16 @@ MEMORY=15872
 
 ENVIRON_ARG=
 
-while getopts "i:dhgms:c:e:k:r:A:H:N:M:T:" opt; do
+V6_ADDR="2002:ad6:c2c4::1"
+V6_PREFIX="128"
+HOSTNAME="q"
+
+while getopts "i:dhgms:c:e:k:r:A:H:GN:M:T:" opt; do
 	case $opt in
 		h) usage ;;
 		i) IMAGE="$OPTARG" ;;
-		g) GUEST=y ;;
+		g) GDB=true ;;
+		G) GUEST=y ;;
 		m) MODULES=y ;;
 		k) DIR_KERNEL="$OPTARG" ;;
 		r) DIR_ROOT="$OPTARG" ;;
