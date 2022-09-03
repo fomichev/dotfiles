@@ -8,7 +8,7 @@
 	au = add -u :/
 	b = branch
 	bl = blame -w -s
-	ca = commit --amend
+	ca = commit --amend --allow-empty
 	ci = commit -s
 	co = checkout
 	cp = cherry-pick
