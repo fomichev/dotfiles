@@ -212,6 +212,7 @@ __build_cmake() {
 
 __build_autoconf() {
 	[ -x "$S/autogen.sh" ] && (cd "$S" && ./autogen.sh) || :
+	[ -e "$S/configure.ac" -a ! -e "$S/configure" ] && (cd "$S" && autoreconf -fi) || :
 	$S/configure ${configure_flags[@]}
 	make -j$NPROC "${make_flags[@]}"
 	__invoke_step install && make "${install_flags[@]}" install || :
