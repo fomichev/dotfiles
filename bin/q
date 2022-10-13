@@ -1,23 +1,57 @@
 #!/bin/bash
 
+# External variables, users can override:
+# {{{
+SSH_PORT=${SSH_PORT:-42222}
+
+NRCPU=${NRCPU:-4}
+MEMORY=${MEMORY:-15872}
+
+V4_ADDR=${V4_ADDR:-} # dhcp by default
+V4_PREFIX=${V4_PREFIX:-} # dhcp by default
+V6_ADDR=${V6_ADDR:-"2002:ad6:c2c4::1"}
+V6_PREFIX=${V6_PREFIX:-128}
+
+HOST=${HOST:-q}
+# }}}
+
+# Internal variables:
+# {{{
+DIR_Q="$(dirname $0)"
+DIR_EXPORT=/export/hda3/tmp
+DIR_ROOT=${DIR_ROOT:-/}
+DIR_KERNEL=${DIR_KERNEL:-}
+IMAGE=${IMAGE:-}
+IMAGE_PART="sda1"
+IMAGE_INIT="/sbin/init.real"
+SCRIPT=${SCRIPT:-}
+ENVIRON_ARG=${ENVIRON_ARG:-}
+
+GDB=${GDB:-false}
+GUEST=${GUEST:-false}
+MODULES=${MODULES:-false}
+TTY=${TTY:-ttyS0}
+SSH=${SSH:-false}
+# }}}
+
 usage() {
 	if [[ -n "$*" ]]; then
 		echo "error: $@"
 		echo
 	fi
 
-	echo "q [options] -i [path to bzImage]"
+	echo "q [options] [path to bzImage]"
 	echo
 	echo "Run it from the kernel directory (make sure .config is there)"
 	echo
 	echo "options:"
+	echo "    i - use specified disk image instead of rootfs"
+	echo "    g - support attaching with gdb"
 	echo "    m - run depmod and modprobe"
 	echo "    c - pass extra kernel cmdline options"
 	echo "    d - start SSH server"
 	echo "    s - run script instead of interactive bash"
-	echo "    r - path to custom rootfs"
-	echo "    e - extra environment arguments"
-	echo "    g - support attaching with gdb"
+	echo "    2 - disable cgroup v1, run only v2"
 	exit 1
 }
 
@@ -60,14 +94,10 @@ host() {
 		cmdline+=" console=$TTY,115200"
 	fi
 
-	local opts
-	$MODULES && opts+=" -m"
-
 	local net
 	net+=" -netdev user,id=virtual"
 	if $SSH; then
 		net+=",hostfwd=tcp:127.0.0.1:$SSH_PORT-:22"
-		opts+=" -d"
 	fi
 	net+=" -device virtio-net-pci,netdev=virtual"
 
@@ -78,11 +108,9 @@ host() {
 
 	local gdb
 	$GDB && gdb+=" -s"
-	$GDB && opts+=" -g"
 
 	if [[ ! -z "$IMAGE" ]]; then
 		fs+=" -drive format=raw,file=$IMAGE"
-		opts+=" -i $IMAGE"
 	fi
 
 	local accel
@@ -120,9 +148,19 @@ host() {
 	init+=" && "
 	init+="mount -n -t 9p -o trans=virtio /tmp/dir_q /tmp/dir_q"
 	init+=" && "
+	init+="GUEST='true' "
+	init+="IMAGE='$IMAGE' "
+	init+="GDB='$GDB' "
+	init+="TTY='$TTY' "
 	init+="HOSTNAME='$HOSTNAME' "
 	init+="HOME='$HOME' "
-	init+="/tmp/dir_q/q -G $opts -T $TTY -r $DIR_ROOT $ENVIRON_ARG -k '$(pwd)' -s '$SCRIPT'"
+	init+="DIR_ROOT='$DIR_ROOT' "
+	init+="DIR_KERNEL='$(pwd)' "
+	init+="MODULES='$MODULES' "
+	init+="SSH='$SSH' "
+	init+="SCRIPT='$SCRIPT' "
+	init+="$ENVIRON_ARG "
+	init+="/tmp/dir_q/q"
 
 	cmdline+=" init=/bin/sh -- -c \"$init\""
 
@@ -277,7 +315,7 @@ guest() {
 	ip link set dev lo up
 
 	if [[ -n "$(command -v busybox)" ]]; then
-		if [[ -e /etc/udhcpc/default.script ]]; then
+		if [[ -e "/etc/udhcpc/default.script" ]]; then
 			mask-dir /etc/resolvconf/run
 			mkdir -p /run/resolvconf
 			echo "nameserver 8.8.8.8" > /run/resolvconf/resolv.conf
@@ -453,51 +491,16 @@ EOF
 	sleep 30
 }
 
-DIR_Q="$(dirname $0)"
-DIR_EXPORT=/export/hda3/tmp
-DIR_ROOT=/
-IMAGE=""
-IMAGE_PART="sda1"
-IMAGE_INIT="/sbin/init.real"
-
-GDB=false
-GUEST=false
-MODULES=false
-TTY=ttyS0
-
-SSH=false
-SSH_PORT=42222
-
-NRCPU=4
-MEMORY=15872
-
-ENVIRON_ARG=""
-
-# {{{
-V4_ADDR=${V4_ADDR:-} # dhcp by default
-V4_PREFIX=${V4_PREFIX:-} # dhcp by default
-V6_ADDR=${V6_ADDR:-"2002:ad6:c2c4::1"}
-V6_PREFIX=${V6_PREFIX:-128}
-HOST=${HOST:-q}
-# }}}
-
-while getopts "i:dhgms:c:e:k:r:A:GN:M:T:" opt; do
+while getopts "2i:dhgms:c:" opt; do
 	case $opt in
 		h) usage ;;
+		2) CMDLINE+=" cgroup_no_v1=all" ;;
 		i) IMAGE="$OPTARG" ;;
 		g) GDB=true ;;
-		G) GUEST=true ;;
 		m) MODULES=true ;;
-		k) DIR_KERNEL="$OPTARG" ;;
-		r) DIR_ROOT="$OPTARG" ;;
 		c) CMDLINE="$OPTARG" ;;
 		d) SSH=true ;;
-		e) ENVIRON_ARG+=" -e "$OPTARG"" ; eval export ${OPTARG}; ;;
 		s) SCRIPT="$OPTARG" ;;
-		A) ARCH="$OPTARG" ;;
-		M) MEMORY="$OPTARG" ;;
-		N) NRCPU="$OPTARG" ;;
-		T) TTY="$OPTARG" ;;
 	esac
 done
 shift $((OPTIND -1))
@@ -527,10 +530,12 @@ else
 		fi
 	fi
 
-	if file $kernel | grep -q x86; then
-		ARCH=x86_64
-	elif file $kernel | grep -q ARM64; then
-		ARCH=arm64
+	if [[ -z "$ARCH" ]]; then
+		if file $kernel | grep -q x86; then
+			ARCH=x86_64
+		elif file $kernel | grep -q ARM64; then
+			ARCH=arm64
+		fi
 	fi
 
 	if [[ ! "$ARCH" = "$(arch)" ]]; then
