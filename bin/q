@@ -101,6 +101,7 @@ host() {
 	fi
 	net+=" -device virtio-net-pci,netdev=virtual"
 
+	cmdline+=" $CMDLINE"
 	cmdline+=" rootfstype=9p"
 	cmdline+=" rootflags=version=9p2000.L,trans=virtio,access=any"
 	cmdline+=" ro"
