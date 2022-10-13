@@ -120,7 +120,9 @@ host() {
 	init+=" && "
 	init+="mount -n -t 9p -o trans=virtio /tmp/dir_q /tmp/dir_q"
 	init+=" && "
-	init+="/tmp/dir_q/q -G $opts -T $TTY -r $DIR_ROOT $ENVIRON_ARG -H $HOME -k '$(pwd)' -s '$SCRIPT'"
+	init+="HOSTNAME='$HOSTNAME' "
+	init+="HOME='$HOME' "
+	init+="/tmp/dir_q/q -G $opts -T $TTY -r $DIR_ROOT $ENVIRON_ARG -k '$(pwd)' -s '$SCRIPT'"
 
 	cmdline+=" init=/bin/sh -- -c \"$init\""
 
@@ -161,6 +163,23 @@ mask-dir() {
 	mkdir -p "$upper_dir"
 	setfattr -n trusted.overlay.opaque -v y "$upper_dir"
 	mount -o remount /
+}
+
+append_to_hosts() {
+	local addr="$1"
+
+	local prefix=$(echo "$HOSTNAME" | cut -d. -f1)
+	local suffix=$(echo "$HOSTNAME" | cut -d. -f2-)
+
+	if [[ ! -z "$suffix" ]]; then
+		suffix=".${suffix}"
+	fi
+
+	if ! echo "$addr" | grep -q ':'; then
+		prefix="${prefix}-v4"
+	fi
+
+	echo "$addr ${prefix}${suffix} ${prefix}" >> /etc/hosts
 }
 
 # This function is called _AFTER_ QEMU starts (on guest).
@@ -205,7 +224,9 @@ guest() {
 
 	mount -n -t configfs configfs /sys/kernel/config
 	mount -n -t debugfs debugfs /sys/kernel/debug
-	mount -n -t securityfs security /sys/kernel/security
+	if [[ -d /sys/kernel/security ]]; then
+		mount -n -t securityfs security /sys/kernel/security
+	fi
 	mount -n -t devtmpfs -o mode=0755,nosuid,noexec devtmpfs /dev
 
 	mkdir -p -m 0755 /dev/shm /dev/pts /dev/cgroup
@@ -244,14 +265,11 @@ guest() {
 		say "$DIR_KERNEL mount point doesn't exist, not mounting"
 	fi
 
-	say networking
+	say networking as $HOSTNAME
 
 	if [[ -n "$(command -v hostname)" ]]; then
 		hostname "$HOSTNAME"
 		echo "$HOSTNAME" > /etc/hostname
-
-		ip -6 addr add "${V6_ADDR}/${V6_PREFIX}" dev eth0
-		echo "$V6_ADDR ${HOSTNAME}.prod.google.com "$HOSTNAME"" >> /etc/hosts
 	else
 		say "hostname is not found, don't set hostname"
 	fi
@@ -259,18 +277,35 @@ guest() {
 	ip link set dev lo up
 
 	if [[ -n "$(command -v busybox)" ]]; then
-		mask-dir /etc/resolvconf/run
-		mkdir -p /run/resolvconf
-		echo "nameserver 8.8.8.8" > /run/resolvconf/resolv.conf
+		if [[ -e /etc/udhcpc/default.script ]]; then
+			mask-dir /etc/resolvconf/run
+			mkdir -p /run/resolvconf
+			echo "nameserver 8.8.8.8" > /run/resolvconf/resolv.conf
 
-		local dev=$(ls -d /sys/bus/virtio/drivers/virtio_net/virtio* |sort -g |head -n1)
-		local iface=$(ls $dev/net)
-		say dhcp on iface $iface
-		ip link set dev $iface up
-		busybox udhcpc -i $iface -p /run/udhcpc \
-			-s /etc/udhcpc/default.script -q -t 1 -n -f
+			local dev=$(ls -d /sys/bus/virtio/drivers/virtio_net/virtio* |sort -g |head -n1)
+			local iface=$(ls $dev/net)
+			say dhcp on iface $iface
+			ip link set dev $iface up
+			busybox udhcpc -i $iface -p /run/udhcpc \
+				-s /etc/udhcpc/default.script -q -t 1 -n -f
+
+			local v4_addr=$(ip -o -4 addr show dev eth0 | awk '{print $4}' | cut -d/ -f1)
+			append_to_hosts "$v4_addr"
+		else
+			say "busybox is found, but no /etc/udhcpc/default.script, skipping udhcpc"
+		fi
 	else
 		say "busybox is not found, skipping udhcpc"
+	fi
+
+	if [[ ! -z "$V6_ADDR" ]]; then
+		ip -6 addr add "${V6_ADDR}/${V6_PREFIX}" dev eth0
+		append_to_hosts "$V6_ADDR"
+	fi
+
+	if [[ ! -z "$V4_ADDR" ]]; then
+		ip -4 addr add "${V4_ADDR}/${V4_PREFIX}" dev eth0
+		append_to_hosts "$V4_ADDR"
 	fi
 
 	if [[ ! -z "$IMAGE" ]]; then
@@ -358,8 +393,8 @@ guest() {
 	> /etc/bash.bashrc
 
 	mkdir -pm 0755 /root
-	touch /root/.bashrc
-	touch /root/.bash_profile
+	touch /root/.bashrc &>/dev/null
+	touch /root/.bash_profile &>/dev/null
 
 	local rcfile=/tmp/.bashrc
 	export PATH=$HOME/local/bin:$PATH
@@ -436,13 +471,17 @@ SSH_PORT=42222
 NRCPU=4
 MEMORY=15872
 
-ENVIRON_ARG=
+ENVIRON_ARG=""
 
-V6_ADDR="2002:ad6:c2c4::1"
-V6_PREFIX="128"
-HOSTNAME="q"
+# {{{
+V4_ADDR=${V4_ADDR:-} # dhcp by default
+V4_PREFIX=${V4_PREFIX:-} # dhcp by default
+V6_ADDR=${V6_ADDR:-"2002:ad6:c2c4::1"}
+V6_PREFIX=${V6_PREFIX:-128}
+HOST=${HOST:-q}
+# }}}
 
-while getopts "i:dhgms:c:e:k:r:A:H:GN:M:T:" opt; do
+while getopts "i:dhgms:c:e:k:r:A:GN:M:T:" opt; do
 	case $opt in
 		h) usage ;;
 		i) IMAGE="$OPTARG" ;;
@@ -456,7 +495,6 @@ while getopts "i:dhgms:c:e:k:r:A:H:GN:M:T:" opt; do
 		e) ENVIRON_ARG+=" -e "$OPTARG"" ; eval export ${OPTARG}; ;;
 		s) SCRIPT="$OPTARG" ;;
 		A) ARCH="$OPTARG" ;;
-		H) export HOME=$OPTARG ;;
 		M) MEMORY="$OPTARG" ;;
 		N) NRCPU="$OPTARG" ;;
 		T) TTY="$OPTARG" ;;
@@ -478,6 +516,8 @@ if $GUEST; then
 else
 	kernel="$1"
 	shift
+
+	export HOSTNAME="$HOST"
 
 	if [[ -z "$kernel" ]]; then
 		if [[ -e "arch/x86/boot/bzImage" ]]; then
