@@ -5,6 +5,8 @@ set -eo pipefail
 
 source ~/.secret/restic-settings
 
+SERVICE=restic.service
+
 say() {
 	echo ">> $@" | $HOME/bin/colorify
 }
@@ -15,7 +17,7 @@ if [ -z "$REPO" ]; then
 fi
 
 finish() {
-	$HOME/bin/systemd-email s@fomichev.me restic
+	$HOME/bin/systemd-email s@fomichev.me $SERVICE
 }
 
 do_rstc() {
@@ -59,8 +61,14 @@ google_photos() {
 
 if [ -z "$INVOCATION_ID" -a $# -eq 0 ]; then
 	# Started manually via shell, start systemd service instead.
-	systemctl --user start restic.service
-	journalctl --user -fu restic.service
+	systemctl --user start $SERVICE
+	journalctl --user -fu $SERVICE &
+
+	while [ $(systemctl is-active $SERVICE) == "active" ]; do
+			sleep 60
+	done
+	system_upgrade
+
 	exit
 fi
 
