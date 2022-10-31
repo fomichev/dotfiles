@@ -26,13 +26,14 @@ do_rstc() {
 }
 
 system_upgrade() {
-	if [ ! $(SUDO_ASKPASS=/bin/false sudo -A whoami 2>&1 | wc -l) = "2" ]; then
+	if [ $(SUDO_ASKPASS=/bin/false sudo -A whoami 2>&1 | wc -l) = "2" ]; then
 		say "Don't have passwordless sudo, skip system upgrade!"
 		return
 	fi
 
 	say 'update system'
 	$HOME/bin/aur
+	$HOME/bin/systemd-email s@fomichev.me "$(hostname) update"
 }
 
 standard_notes() {
@@ -67,7 +68,6 @@ if [ -z "$INVOCATION_ID" -a $# -eq 0 ]; then
 	while [ $(systemctl is-active $SERVICE) == "active" ]; do
 			sleep 60
 	done
-	system_upgrade
 
 	exit
 fi
@@ -91,6 +91,8 @@ if [ $# -eq 0 ]; then
 	do_rstc snapshots
 	do_rstc forget --keep-within 95d --prune
 	do_rstc stats
+	$HOME/bin/systemd-email s@fomichev.me "$(hostname) backup"
+	trap '' ERR
 
 	system_upgrade
 	exit
