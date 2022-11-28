@@ -1,11 +1,15 @@
 #!/bin/bash
 
+to="$1"
+service="$2"
+subj="$3"
+
 /usr/bin/msmtp -t <<ERRMAIL
-To: $1
-Subject: $2
+To: $to
+Subject: $subj
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain; charset=UTF-8
 
-$(systemctl --user status --lines=1000 --full "$2")
+$(systemctl --user status --lines=500 --full "$service")
 ERRMAIL
 

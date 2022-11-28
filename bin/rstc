@@ -16,8 +16,8 @@ if [ -z "$REPO" ]; then
 	exit 1
 fi
 
-finish() {
-	$HOME/bin/systemd-email s@fomichev.me $SERVICE
+failure() {
+	$HOME/bin/systemd-email s@fomichev.me $SERVICE "$(hostname) error"
 }
 
 do_rstc() {
@@ -33,7 +33,7 @@ system_upgrade() {
 
 	say 'update system'
 	$HOME/bin/aur
-	$HOME/bin/systemd-email s@fomichev.me "$(hostname) update"
+	$HOME/bin/systemd-email s@fomichev.me $SERVICE "$(hostname) update"
 }
 
 standard_notes() {
@@ -73,7 +73,7 @@ if [ -z "$INVOCATION_ID" -a $# -eq 0 ]; then
 fi
 
 if [ $# -eq 0 ]; then
-	trap finish EXIT
+	trap failure EXIT
 
 	standard_notes
 	google_drive
@@ -91,8 +91,8 @@ if [ $# -eq 0 ]; then
 	do_rstc snapshots
 	do_rstc forget --keep-within 95d --prune
 	do_rstc stats
-	$HOME/bin/systemd-email s@fomichev.me "$(hostname) backup"
-	trap '' ERR
+	$HOME/bin/systemd-email s@fomichev.me $SERVICE "$(hostname) backup"
+	trap -
 
 	system_upgrade
 	exit
