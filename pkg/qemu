@@ -2,6 +2,11 @@
 
 src=(git://git.qemu-project.org/qemu.git)
 
+patch=(
+  ["https://gitlab.com/lheckemann/qemu/-/commit/ca8c4a95a320dba9854c3fd4159ff4f52613311f.patch"]="896cc960380cabe94f706d256a2996ec4d9f40dd2589076f81da3b3667296e28"
+)
+
 configure_flags+=(
+		--enable-slirp
 		--enable-virtfs
 )
