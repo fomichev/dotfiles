@@ -1,3 +1,0 @@
-#!/bin/bash
-
-src=(https://github.com/neovim/neovim.git)
