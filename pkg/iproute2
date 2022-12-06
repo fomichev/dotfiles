@@ -1,5 +1,7 @@
 #!/bin/bash
 
 src=(git://git.kernel.org/pub/scm/network/iproute2/iproute2.git)
-make_flags=(V=99 SHARED_LIBS=n LDFLAGS="-static -lelf -lz")
+configure_flags+=(--libbpf_force on)
+build_in_src=true
+#make_flags=(V=99 SHARED_LIBS=n LDFLAGS="-static -lelf -lz")
 install_flags=(DESTDIR=$R)
