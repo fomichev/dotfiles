@@ -133,6 +133,8 @@ set noswapfile
 
 " searching includes is too slow
 set complete-=i
+" and tags...
+set complete-=t
 
 " try to show last line (at least partially)
 set display+=lastline
