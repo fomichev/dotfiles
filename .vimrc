@@ -8,7 +8,19 @@ if empty(glob('~/.local/share/nvim/site/autoload/plug.vim'))
   autocmd VimEnter * PlugInstall --sync | source ~/.vimrc
 endif
 
-call plug#begin('~/.vim/bundle')
+if has("nvim")
+	if empty(glob('~/.local/share/nvim/site/pack/packer/start/packer.nvim'))
+		silent !git clone --depth 1 https://github.com/wbthomason/packer.nvim
+					\ ~/.local/share/nvim/site/pack/packer/start/packer.nvim
+		autocmd VimEnter * PlugInstall --sync | source ~/.vimrc
+	endif
+
+	syntax off
+	set mouse=
+	lua require('nvim')
+endif
+
+call plug#begin('~/.config/nvim/bundle')
 Plug 'will133/vim-dirdiff'
 Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
 Plug 'bling/vim-airline'
@@ -183,6 +195,8 @@ if version >= 703
 	" set undo directory
 	if has('win32')
 		set undodir=$HOME/.vim/tmp
+	elseif has("nvim")
+		set undodir=~/.config/vim/tmp
 	else
 		set undodir=~/.vim/tmp
 	endif
@@ -202,7 +216,10 @@ set notermguicolors
 let &t_8f = "\<Esc>[38;2;%lu;%lu;%lum"
 let &t_8b = "\<Esc>[48;2;%lu;%lu;%lum"
 
-syntax enable
+if !has("nvim")
+    syntax enable
+endif
+
 if filereadable(expand("~/.vimrc_background"))
   let base16colorspace=256
   source ~/.vimrc_background
@@ -233,7 +250,11 @@ function! MyFoldText()
 	return line . ' ' . repeat(" ",fillcharcount) . foldedlinecount . ' '
 endfunction
 
-set foldtext=MyFoldText()
+if !has("nvim")
+	set foldtext=MyFoldText()
+else
+	set foldexpr=nvim_treesitter#foldexpr()
+endif
 
 " 1}}}
 " Mappings {{{1
@@ -330,13 +351,15 @@ nnoremap zO zCzO
 
 nnoremap <c-\> :tab split<cr><c-]>
 
-" :tag and C-] always use cscope when available
-set cscopetag
-" search cstope database first
-set cscopetagorder=0
-" automatically pick up local cscope database
-if filereadable("cscope.out")
-	cs add cscope.out
+if !has("nvim")
+	" :tag and C-] always use cscope when available
+	set cscopetag
+	" search cstope database first
+	set cscopetagorder=0
+	" automatically pick up local cscope database
+	if filereadable("cscope.out")
+		cs add cscope.out
+	endif
 endif
 
 " quick search for function callers
