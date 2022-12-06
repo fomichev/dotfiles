@@ -39,12 +39,14 @@ PREFIX="$R"
 # PACKAGES CAN CONFIGURE THESE
 # {{{
 src=
-configure_flags=(--prefix=$PREFIX)
+declare -A patch
+configure_flags=(--prefix "$PREFIX")
 make_flags=()
 cmake_flags=()
 install_flags=()
 src_subdir="" # cd into this sub-directory before trying to build
 skip_steps=() # skip "fetch", "build" or "install" step
+build_in_src=false
 
 pre_build() { :; }
 post_build() { :; }
@@ -126,12 +128,27 @@ __fetch_git() {
 	local dirname="$2"
 
 	if [ -d "$dirname" ]; then
+		if [ ${#patch[@]} -gt 0 ]; then
+			(cd $dirname && git reset --hard)
+		fi
+
 		(cd $dirname && git pull --ff-only)
 	else
 		git clone $s $dirname
 	fi
 
 	(cd $dirname && git describe --always) >> $PKG_STAMP_FETCH
+
+	for url in ${!patch[@]}; do
+		local sha256=${patch[$url]}
+
+		say "applying $url"
+
+		(cd $dirname && \
+			curl -L "$url" > .patch &&
+			echo "$sha256 .patch" | sha256sum -c &&
+			patch -p1 < ".patch")
+	done
 
 	if [ ! -e "$PKG" ]; then
 		ln -s $dirname $PKG
@@ -237,7 +254,11 @@ build() {
 	if [ -f "$src/CMakeLists.txt" ]; then
 		__build_cmake "$src"
 	elif [ -f "$src/configure" -o -f "$src/configure.ac" ]; then
-		cd "$B"
+		if $build_in_src; then
+			cd "$S"
+		else
+			cd "$B"
+		fi
 
 		__build_autoconf
 	elif [ -f "$src/Makefile" ]; then
@@ -283,6 +304,8 @@ __mrproper() {
 	echo rm $PKG_STAMP_FETCH
 	echo rm $PKG_STAMP_BUILD
 	rm -f  $PKG_STAMP_FETCH $PKG_STAMP_BUILD
+	echo rm $B
+	echo rm $S
 	rm -rf $B $S
 }
 
