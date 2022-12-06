@@ -3,6 +3,6 @@
 src=(https://github.com/neovim/neovim.git)
 
 build() {
-	make -C $S CMAKE_BUILD_TYPE=Release
-	make CMAKE_INSTALL_PREFIX=$PREFIX
+	make -C $S CMAKE_BUILD_TYPE=Release CMAKE_INSTALL_PREFIX=$PREFIX
+	make -C $S install
 }
