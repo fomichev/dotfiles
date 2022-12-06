@@ -174,7 +174,8 @@ host() {
 		-nographic \
 		-no-reboot \
 		$accel \
-		-watchdog i6300esb \
+		-device i6300esb,id=watchdog0 \
+		-watchdog-action pause \
 		-device virtio-rng-pci \
 		-cpu $cpu \
 		-smp $NRCPU \
