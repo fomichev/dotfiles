@@ -21,16 +21,9 @@ if has("nvim")
 endif
 
 call plug#begin('~/.config/nvim/bundle')
-Plug 'will133/vim-dirdiff'
-Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
-Plug 'bling/vim-airline'
-Plug 'vim-airline/vim-airline-themes'
-Plug 'nelstrom/vim-markdown-folding'
-Plug 'tpope/vim-rsi'
-Plug 'tpope/vim-speeddating'
-Plug 'bronson/vim-trailing-whitespace'
 Plug 'chriskempson/base16-vim'
-Plug 'fatih/vim-go'
+Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': { -> fzf#install() } }
+Plug 'will133/vim-dirdiff'
 call plug#end()
 
 "1}}}
@@ -176,6 +169,9 @@ set spelllang=en_us,ru
 set spellfile=$HOME/.vim/spell/all.add
 set spell
 
+autocmd FileType help setlocal nospell
+autocmd FileType qf setlocal nospell
+
 " use homegrown grep wrapper
 set grepprg=g\ $*
 noremap <Leader>g :Grep<space>
@@ -212,11 +208,11 @@ set termguicolors
 " https://github.com/mobile-shell/mosh/commit/ce7ba37ad4e493769a126db2b39b8a9aa9121278
 set notermguicolors
 
-" :help xterm-true-color (for vim inside of tmux)
-let &t_8f = "\<Esc>[38;2;%lu;%lu;%lum"
-let &t_8b = "\<Esc>[48;2;%lu;%lu;%lum"
-
 if !has("nvim")
+    " :help xterm-true-color (for vim inside of tmux)
+    let &t_8f = "\<Esc>[38;2;%lu;%lu;%lum"
+    let &t_8b = "\<Esc>[48;2;%lu;%lu;%lum"
+
     syntax enable
 endif
 
@@ -225,35 +221,29 @@ if filereadable(expand("~/.vimrc_background"))
   source ~/.vimrc_background
 endif
 
-" Color scheme enhancements {{{2
-
-" highlight trailing white spaces
-match ErrorMsg /\s\+$\| \+\ze\t/
-
-" 2}}}
 " 1}}}
 " Folding {{{1
 
-function! MyFoldText()
-	let line = getline(v:foldstart)
-
-	let nucolwidth = &fdc + &number * &numberwidth
-	let windowwidth = winwidth(0) - nucolwidth - 2
-	let foldedlinecount = v:foldend - v:foldstart
-
-	" expand tabs into spaces
-	let onetab = strpart('          ', 0, &tabstop)
-	let line = substitute(line, '\t', onetab, 'g')
-
-	let line = strpart(line, 0, windowwidth - 2 -len(foldedlinecount))
-	let fillcharcount = windowwidth - len(line) - len(foldedlinecount)
-	return line . ' ' . repeat(" ",fillcharcount) . foldedlinecount . ' '
-endfunction
-
-if !has("nvim")
-	set foldtext=MyFoldText()
-else
+if has("nvim")
 	set foldexpr=nvim_treesitter#foldexpr()
+else
+	function! MyFoldText()
+		let line = getline(v:foldstart)
+
+		let nucolwidth = &fdc + &number * &numberwidth
+		let windowwidth = winwidth(0) - nucolwidth - 2
+		let foldedlinecount = v:foldend - v:foldstart
+
+		" expand tabs into spaces
+		let onetab = strpart('          ', 0, &tabstop)
+		let line = substitute(line, '\t', onetab, 'g')
+
+		let line = strpart(line, 0, windowwidth - 2 -len(foldedlinecount))
+		let fillcharcount = windowwidth - len(line) - len(foldedlinecount)
+		return line . ' ' . repeat(" ",fillcharcount) . foldedlinecount . ' '
+	endfunction
+
+	set foldtext=MyFoldText()
 endif
 
 " 1}}}
@@ -303,7 +293,6 @@ nnoremap <leader>s :w<CR>
 nnoremap <leader>e :!%:p<CR>
 
 " moving with Up/Down/Left/Right over wrapped lines
-
 nnoremap <Left> gh
 nnoremap <Down> gj
 nnoremap <Up> gk
@@ -324,19 +313,6 @@ inoremap <C-k> <Esc><C-w>ki
 inoremap <C-l> <Esc><C-w>li
 
 " 2}}}
-"" Tabs {{{2
-
-nmap <leader>1 <Plug>AirlineSelectTab1
-nmap <leader>2 <Plug>AirlineSelectTab2
-nmap <leader>3 <Plug>AirlineSelectTab3
-nmap <leader>4 <Plug>AirlineSelectTab4
-nmap <leader>5 <Plug>AirlineSelectTab5
-nmap <leader>6 <Plug>AirlineSelectTab6
-nmap <leader>7 <Plug>AirlineSelectTab7
-nmap <leader>8 <Plug>AirlineSelectTab8
-nmap <leader>9 <Plug>AirlineSelectTab9
-
-"" 2}}}
 " Folding {{{2
 
 " use space to open/close folds
@@ -360,18 +336,14 @@ if !has("nvim")
 	if filereadable("cscope.out")
 		cs add cscope.out
 	endif
+
+    " quick search for function callers
+    nnoremap <leader><c-]> :cs find c <C-R>=expand("<cword>")<cr><cr>
 endif
 
-" quick search for function callers
-nnoremap <leader><c-]> :cs find c <C-R>=expand("<cword>")<cr><cr>
 " 2}}}
 " 1}}}
 " Plugins {{{1
-" Alternative (header/source) {{{2
-
-nnoremap <silent> <Leader>a :A<CR>
-
-" 2}}}
 " Netrw {{{2
 
 let g:netrw_fastbrowse = 2
@@ -381,35 +353,9 @@ let g:netrw_special_syntax = 1
 let g:netrw_browse_split = 0
 
 " 2}}}
-" Matchit {{{2
-
-runtime macros/matchit.vim
-
-" 2}}}
 " DirDiff {{{2
 
 let g:DirDiffExcludes = ".hg,.git,*.o,*.a"
-
-" 2}}}
-" Gitv {{{2
-
-let g:Gitv_DoNotMapCtrlKey = 1
-
-" 2}}}
-" Airline {{{2
-
-let g:airline_powerline_fonts = 1
-let g:airline#extensions#whitespace#enabled = 0
-let g:airline#extensions#tabline#enabled = 1
-let g:airline#extensions#tabline#tab_nr_type = 1
-let g:airline#extensions#tabline#show_tab_type = 0
-let g:airline#extensions#tabline#buffer_idx_mode = 1
-let g:airline#extensions#tabline#show_close_button = 0
-
-let g:airline#extensions#tabline#show_splits = 0
-let g:airline#extensions#tabline#show_buffers = 0
-
-let g:airline_detect_spell = 0
 
 " 2}}}
 " 1}}}

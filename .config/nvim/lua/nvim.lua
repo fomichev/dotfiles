@@ -24,3 +24,6 @@ require'nvim-treesitter.configs'.setup {
 		enable = true,
 	},
 }
+
+-- Disable all diagnositcs
+vim.lsp.handlers["textDocument/publishDiagnostics"] = function() end
