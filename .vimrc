@@ -20,7 +20,7 @@ if has("nvim")
 	lua require('nvim')
 endif
 
-call plug#begin('~/.config/nvim/bundle')
+call plug#begin('~/.vim/bundle')
 Plug 'chriskempson/base16-vim'
 Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': { -> fzf#install() } }
 Plug 'will133/vim-dirdiff'

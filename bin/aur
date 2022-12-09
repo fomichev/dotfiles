@@ -121,7 +121,7 @@ adblock() {
 cleanup() {
 	_ journalctl --vacuum-time=7d || :
 	if command -v flatpak &> /dev/null; then
-		_ flatpak uninstall --unused || :
+		flatpak uninstall --unused || :
 	fi
 	yes | _ pacman -Scc || :
 }
