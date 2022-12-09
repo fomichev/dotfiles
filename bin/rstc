@@ -92,7 +92,7 @@ if [ $# -eq 0 ]; then
 	do_rstc forget --keep-within 95d --prune
 	do_rstc stats
 	$HOME/bin/systemd-email s@fomichev.me $SERVICE "$(hostname) backup"
-	trap -
+	trap - EXIT
 
 	system_upgrade
 	exit
