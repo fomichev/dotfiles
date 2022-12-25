@@ -65,7 +65,7 @@ if [ -z "$INVOCATION_ID" -a $# -eq 0 ]; then
 	systemctl --user start $SERVICE
 	journalctl --user -fu $SERVICE &
 
-	while [ $(systemctl is-active $SERVICE) == "active" ]; do
+	while [ $(systemctl --user is-active $SERVICE) == "active" ]; do
 			sleep 60
 	done
 
