@@ -29,7 +29,7 @@ __diff() {
 
 ediff() { __diff $EDITOR "$1" "$2"; }
 
-alias s='e ~/s'
+alias s='e ~/scratch.txt'
 alias scratch='s'
 
 # }}}
@@ -72,15 +72,6 @@ d() { builtin cd "$@" &>/dev/null && echo "$(pwd):" | colorify && l; }
 complete -o filenames -o nospace -F _cd d
 
 # }}}
-# n {{{
-
-_n() {
-	local cur="${COMP_WORDS[COMP_CWORD]}"
-	COMPREPLY=( $(n -l | grep "^${cur}") )
-}
-complete -o nospace -F _n n
-
-# }}}
 # notify {{{
 
 notify() {
@@ -93,8 +84,6 @@ alias ??='tmux show-messages'
 
 # }}}
 # version control {{{
-
-[ -e $HOME/local/bin/v ] || alias v="git"
 
 [ -e /usr/share/bash-completion/completions/git ] && {
 	. /usr/share/bash-completion/completions/git

@@ -25,7 +25,8 @@ export LD_LIBRARY_PATH=/usr/local/google/home/sdf/opt/sysroot/lib
 # }}}
 # Include aliases {{{
 
-export EDITOR=vim
+#export EDITOR=vim
+export EDITOR=nvim
 export SYSTEMD_EDITOR=$EDITOR
 export BROWSER=w3m
 
@@ -47,13 +48,25 @@ shopt -s no_empty_cmd_completion
 # keep up to a million history entries (up from default 64k)
 export HISTFILESIZE=1000000
 export HISTSIZE=$HISTFILESIZE
-# ignore one or two line commands
-# HISTIGNORE subsumes the function of HISTCONTROL:
-# ?    - one character commands
-# ??   - two character commands
-# &    - ignoredupes
-# [ ]* - ignorespace
-export HISTIGNORE='?:??:&:[ ]*:..:...:....:.....'
+
+# ignore duplicates
+_ignore+="&:"
+# ignore everything starting with a space
+_ignore+="[ ]*:"
+# ignore cd shortcuts
+_ignore+="..:...:....:....."
+# ignore specific commands
+_ignore+="a:"
+_ignore+="e:"
+_ignore+="d:"
+_ignore+="df:"
+_ignore+="du:"
+_ignore+="j:"
+_ignore+="l:"
+_ignore+="p:"
+_ignore+="s:"
+export HISTIGNORE="$_ignore"
+
 # don't waste space in history file with timestamps
 unset HISTTIMEFORMAT
 

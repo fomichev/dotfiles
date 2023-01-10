@@ -127,12 +127,6 @@ set wildignore+=*.orig
 " show non-ASCII
 set isprint=
 
-" start with all folds closed
-set foldlevelstart=0
-
-" support only root fold for syntax
-set foldnestmax=1
-
 " don't use swap files
 set noswapfile
 
@@ -171,6 +165,7 @@ set spell
 
 autocmd FileType help setlocal nospell
 autocmd FileType qf setlocal nospell
+autocmd FileType gitsendemail setlocal nospell
 
 " use homegrown grep wrapper
 set grepprg=g\ $*
@@ -224,9 +219,7 @@ endif
 " 1}}}
 " Folding {{{1
 
-if has("nvim")
-	set foldexpr=nvim_treesitter#foldexpr()
-else
+if !has("nvim")
 	function! MyFoldText()
 		let line = getline(v:foldstart)
 
@@ -244,7 +237,15 @@ else
 	endfunction
 
 	set foldtext=MyFoldText()
+
+	" start with all folds closed
+	set foldlevelstart=0
+
+	" support only root fold for syntax
+	set foldnestmax=1
 endif
+
+set nofoldenable
 
 " 1}}}
 " Mappings {{{1
