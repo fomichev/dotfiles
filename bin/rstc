@@ -32,7 +32,16 @@ system_upgrade() {
 	fi
 
 	say 'update system'
-	$HOME/bin/aur
+	yes | sudo pacman -Syu
+	say 'remove orphans'
+	yes | sudo pacman -Rs $(pacman -Qqtd)
+	say 'cleanup'
+	_ journalctl --vacuum-time=7d || :
+	if command -v flatpak &> /dev/null; then
+		flatpak uninstall --unused || :
+	fi
+	yes | _ pacman -Scc || :
+
 	$HOME/bin/systemd-email s@fomichev.me $SERVICE "$(hostname) update"
 }
 

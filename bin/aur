@@ -1,7 +1,7 @@
 #!/bin/bash
 
 if [ $# -eq 0 ]; then
-	set update update_aur update_python remove_orphaned foreign unmanaged_files adblock cleanup
+	set update_aur update_python foreign unmanaged_files adblock
 fi
 
 _() {
@@ -58,10 +58,6 @@ foreign() {
 	pacman -Qm
 }
 
-remove_orphaned() {
-	yes | _ pacman -Rs $(pacman -Qqtd)
-}
-
 aur_for_each() {
 	for d in $(ls -1); do
 		echo "${d}:"
@@ -99,10 +95,6 @@ update_python() {
 	pip3 install md2pdf
 }
 
-update() {
-	yes | _ pacman -Syu
-}
-
 adblock() {
 	local target=/etc/unbound/adservers.conf
 
@@ -116,14 +108,6 @@ adblock() {
 		| _ tee /etc/unbound/adservers.conf > /dev/null
 
 	_ systemctl restart unbound.service
-}
-
-cleanup() {
-	_ journalctl --vacuum-time=7d || :
-	if command -v flatpak &> /dev/null; then
-		flatpak uninstall --unused || :
-	fi
-	yes | _ pacman -Scc || :
 }
 
 say() {
