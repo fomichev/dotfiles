@@ -342,7 +342,13 @@ if [ ! -e "$FILE" ]; then
 	exit 1
 fi
 
-source "$FILE"
+if [[ $FILE == ./* ]]; then
+	source "$FILE"
+elif [[ $FILE == /* ]]; then
+	source "$FILE"
+else
+	source "./$FILE"
+fi
 
 case "$CMD" in
 	clean) __clean ;;
