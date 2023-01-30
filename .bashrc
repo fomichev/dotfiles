@@ -25,8 +25,12 @@ export LD_LIBRARY_PATH=/usr/local/google/home/sdf/opt/sysroot/lib
 # }}}
 # Include aliases {{{
 
-#export EDITOR=vim
-export EDITOR=nvim
+export EDITOR=vim
+
+if [[ -e /usr/bin/nvim ]]; then
+	export EDITOR=nvim
+fi
+
 export SYSTEMD_EDITOR=$EDITOR
 export BROWSER=w3m
 
