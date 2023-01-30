@@ -11,7 +11,7 @@ say() {
 	echo ">> $@" | $HOME/bin/colorify
 }
 
-if [ -z "$REPO" ]; then
+if [[ -z "$REPO" ]]; then
 	say '$REPO is not specified!'
 	exit 1
 fi
@@ -26,28 +26,23 @@ do_rstc() {
 }
 
 system_upgrade() {
-	if [ $(SUDO_ASKPASS=/bin/false sudo -A whoami 2>&1 | wc -l) = "2" ]; then
-		say "Don't have passwordless sudo, skip system upgrade!"
-		return
-	fi
-
 	say 'update system'
 	yes | sudo pacman -Syu
 	say 'remove orphans'
 	yes | sudo pacman -Rs $(pacman -Qqtd)
 	say 'cleanup'
-	_ journalctl --vacuum-time=7d || :
-	if command -v flatpak &> /dev/null; then
-		flatpak uninstall --unused || :
-	fi
-	yes | _ pacman -Scc || :
+	sudo journalctl --vacuum-time=7d || :
+	#if command -v flatpak &> /dev/null; then
+	#	flatpak uninstall --unused || :
+	#fi
+	yes | sudo pacman -Scc || :
 
 	$HOME/bin/systemd-email s@fomichev.me $SERVICE "$(hostname) update"
 }
 
 standard_notes() {
 	local oldest_backup=$(ls -t ~/Downloads/Standard\ Notes\ Backup\ -\ S*.zip | head -n1)
-	if [ -z "$oldest_backup" ]; then
+	if [[ -z "$oldest_backup" ]]; then
 		echo "Skipping notes backup!"
 		return
 	fi
@@ -56,32 +51,43 @@ standard_notes() {
 }
 
 google_drive() {
-	if [ -d $HOME/Drive ]; then
+	if [[ -d $HOME/Drive ]]; then
 		say 'pull could data'
 		DRY=n $HOME/bin/cloud pull
 	fi
 }
 
 google_photos() {
-	if [ -d $HOME/Pictures/Google ]; then
+	if [[ -d $HOME/Pictures/Google ]]; then
 		say 'fetch google photos'
 		$HOME/.local/bin/gphotos-sync ~/Pictures/Google/
 	fi
 }
 
-if [ -z "$INVOCATION_ID" -a $# -eq 0 ]; then
+is_running() {
+	[[ $(systemctl --user is-active $SERVICE) == "active" ]]
+}
+
+tail_journal() {
+	journalctl --user -fu $SERVICE
+}
+
+# Started without arguments.
+if [[ $# -eq 0 ]]; then
+	# Already running, tail journal.
+	if is_running; then
+		tail_journal
+		exit
+	fi
+
 	# Started manually via shell, start systemd service instead.
-	systemctl --user start $SERVICE
-	journalctl --user -fu $SERVICE &
+	if [[ -z "$INVOCATION_ID" ]]; then
+		systemctl --user start $SERVICE
+		tail_journal
+		exit
+	fi
 
-	while [ $(systemctl --user is-active $SERVICE) == "active" ]; do
-			sleep 60
-	done
-
-	exit
-fi
-
-if [ $# -eq 0 ]; then
+	# Otherwise, run default actions.
 	trap failure EXIT
 
 	standard_notes
