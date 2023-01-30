@@ -17,6 +17,7 @@ if [[ -z "$REPO" ]]; then
 fi
 
 failure() {
+	do_notify "Backup finished with errors!"
 	$HOME/bin/systemd-email s@fomichev.me $SERVICE "$(hostname) error"
 }
 
@@ -72,6 +73,12 @@ tail_journal() {
 	journalctl --user -fu $SERVICE
 }
 
+do_notify() {
+	if command -v notify-send &> /dev/null; then
+		notify-send "$@"
+	fi
+}
+
 # Started without arguments.
 if [[ $# -eq 0 ]]; then
 	# Already running, tail journal.
@@ -90,6 +97,7 @@ if [[ $# -eq 0 ]]; then
 	# Otherwise, run default actions.
 	trap failure EXIT
 
+	do_notify "Starting backup"
 	standard_notes
 	google_drive
 	google_photos
@@ -110,6 +118,7 @@ if [[ $# -eq 0 ]]; then
 	trap - EXIT
 
 	system_upgrade
+	do_notify "Backup finished successfully"
 	exit
 fi
 
