@@ -76,6 +76,8 @@ tail_journal() {
 do_notify() {
 	if command -v notify-send &> /dev/null; then
 		notify-send "$@"
+	elif command -v telegram-send &> /dev/null; then
+		telegram-send "$@"
 	fi
 }
 
