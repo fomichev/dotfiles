@@ -83,14 +83,14 @@ do_notify() {
 
 # Started without arguments.
 if [[ $# -eq 0 ]]; then
-	# Already running, tail journal.
-	if is_running; then
-		tail_journal
-		exit
-	fi
-
 	# Started manually via shell, start systemd service instead.
 	if [[ -z "$INVOCATION_ID" ]]; then
+		# Already running, tail journal.
+		if is_running; then
+			tail_journal
+			exit
+		fi
+
 		systemctl --user start $SERVICE
 		tail_journal
 		exit
