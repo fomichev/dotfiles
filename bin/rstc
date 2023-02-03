@@ -17,8 +17,7 @@ if [[ -z "$REPO" ]]; then
 fi
 
 failure() {
-	do_notify "Backup finished with errors!"
-	$HOME/bin/systemd-email s@fomichev.me $SERVICE "$(hostname) error"
+	do_notify "error"
 }
 
 do_rstc() {
@@ -28,17 +27,18 @@ do_rstc() {
 
 system_upgrade() {
 	say 'update system'
-	yes | sudo pacman -Syu
-	say 'remove orphans'
-	yes | sudo pacman -Rs $(pacman -Qqtd)
+	sudo /usr/bin/pacman --noconfirm -Syu
+	local orphans="$(pacman -Qqtd)"
+	if [[ ! -z "$orphans" ]]; then
+		say 'remove orphans'
+		sudo /usr/bin/pacman --noconfirm -Rs $(pacman -Qqtd)
+	fi
 	say 'cleanup'
-	sudo journalctl --vacuum-time=7d || :
-	#if command -v flatpak &> /dev/null; then
-	#	flatpak uninstall --unused || :
-	#fi
-	yes | sudo pacman -Scc || :
-
-	$HOME/bin/systemd-email s@fomichev.me $SERVICE "$(hostname) update"
+	sudo /usr/bin/journalctl --vacuum-time=7d || :
+	if command -v flatpak &> /dev/null; then
+		flatpak uninstall --assumeyes --noninteractive --unused || :
+	fi
+	sudo /usr/bin/pacman --noconfirm -Scc || :
 }
 
 standard_notes() {
@@ -79,6 +79,8 @@ do_notify() {
 	elif command -v telegram-send &> /dev/null; then
 		telegram-send "$@"
 	fi
+
+	$HOME/bin/systemd-email s@fomichev.me $SERVICE "$(hostname) backup $@"
 }
 
 # Started without arguments.
@@ -99,7 +101,7 @@ if [[ $# -eq 0 ]]; then
 	# Otherwise, run default actions.
 	trap failure EXIT
 
-	do_notify "Starting backup"
+	do_notify "started"
 	standard_notes
 	google_drive
 	google_photos
@@ -116,11 +118,10 @@ if [[ $# -eq 0 ]]; then
 	do_rstc snapshots
 	do_rstc forget --keep-within 95d --prune
 	do_rstc stats
-	$HOME/bin/systemd-email s@fomichev.me $SERVICE "$(hostname) backup"
-	trap - EXIT
-
+	do_notify "finished"
 	system_upgrade
-	do_notify "Backup finished successfully"
+	do_notify "updated"
+	trap - EXIT
 	exit
 fi
 
