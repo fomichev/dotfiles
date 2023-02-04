@@ -1,0 +1,7 @@
+[Unit]
+Description=Index Photos
+
+[Service]
+Type=simple
+Nice=10
+ExecStart=/home/sdf/bin/systemd-index-photos
