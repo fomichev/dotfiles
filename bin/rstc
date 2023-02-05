@@ -25,6 +25,17 @@ do_rstc() {
 	sudo -E restic -r "$REPO" "$@" 2>&1 | cat
 }
 
+docker_update() {
+	say 'update docker'
+	for d in $HOME/src/docker/*; do
+		pushd $d
+		docker compose pull
+		docker compose stop
+		docker compose up -d
+		popd
+	done
+}
+
 system_upgrade() {
 	say 'update system'
 	sudo /usr/bin/pacman --noconfirm -Syu
@@ -33,6 +44,9 @@ system_upgrade() {
 		say 'remove orphans'
 		sudo /usr/bin/pacman --noconfirm -Rs $(pacman -Qqtd)
 	fi
+}
+
+system_cleanup() {
 	say 'cleanup'
 	sudo /usr/bin/journalctl --vacuum-time=7d || :
 	if command -v flatpak &> /dev/null; then
@@ -119,7 +133,9 @@ if [[ $# -eq 0 ]]; then
 	do_rstc forget --keep-within 95d --prune
 	do_rstc stats
 	do_notify "finished"
+	docker_update
 	system_upgrade
+	system_cleanup
 	do_notify "updated"
 	trap - EXIT
 	exit
