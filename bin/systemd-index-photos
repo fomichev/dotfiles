@@ -4,4 +4,4 @@ set -e
 set -x
 
 cd ~/src/docker/photoprism/
-docker-compose exec -T photoprism photoprism mv
+docker-compose exec -T photoprism photoprism import
