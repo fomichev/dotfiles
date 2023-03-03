@@ -26,6 +26,10 @@ do_rstc() {
 }
 
 docker_update() {
+	if [ ! -d $HOME/src/docker ]; then
+		return
+	fi
+
 	say 'update docker'
 	for d in $HOME/src/docker/*; do
 		pushd $d
