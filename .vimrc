@@ -24,6 +24,8 @@ call plug#begin('~/.vim/bundle')
 Plug 'chriskempson/base16-vim'
 Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': { -> fzf#install() } }
 Plug 'will133/vim-dirdiff'
+Plug 'fatih/vim-go'
+Plug 'rust-lang/rust.vim'
 call plug#end()
 
 "1}}}
@@ -357,6 +359,11 @@ let g:netrw_browse_split = 0
 " DirDiff {{{2
 
 let g:DirDiffExcludes = ".hg,.git,*.o,*.a"
+
+" 2}}}
+" Rust {{{2
+
+let g:rustfmt_autosave = 1
 
 " 2}}}
 " 1}}}
