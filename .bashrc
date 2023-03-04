@@ -33,6 +33,7 @@ fi
 
 export SYSTEMD_EDITOR=$EDITOR
 export BROWSER=w3m
+export MOZ_ENABLE_WAYLAND=1
 
 try_source ~/.bash_aliases
 
