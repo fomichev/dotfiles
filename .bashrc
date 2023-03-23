@@ -27,7 +27,7 @@ export LD_LIBRARY_PATH=/usr/local/google/home/sdf/opt/sysroot/lib
 
 export EDITOR=vim
 
-if [[ -e /usr/bin/nvim ]]; then
+if  command -v nvim &> /dev/null; then
 	export EDITOR=nvim
 fi
 

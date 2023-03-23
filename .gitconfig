@@ -34,6 +34,9 @@
 	mrproper = clean -xdf
 	wt = worktree
 
+[checkout]
+	workers = 0 # num_cpu
+
 [color]
 	diff = auto
 	status = auto
