@@ -24,6 +24,7 @@
 /home/sdf/.cargo
 /home/sdf/.xargo
 /home/sdf/.bundle
+/home/sdf/.local/share/containers/
 /home/sdf/src/dotfiles/.local/share/Trash
 /home/sdf/src/dotfiles/.config/chromium
 /home/sdf/src/dotfiles/.config/epiphany
@@ -36,6 +37,8 @@
 /home/sdf/src/dotfiles/.vim/tmp
 /home/sdf/src/pmbootstrap
 /home/sdf/src/pmbootstrap_chroot
+/home/sdf/src/gpt-2
+/home/sdf/src/llm.c
 /home/sdf/docker
 /home/sdf/Downloads
 /home/sdf/Mail
