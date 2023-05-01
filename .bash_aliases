@@ -12,10 +12,16 @@ alias a='ls -lah'
 [ "$EDITOR" != "vim" ] && alias vim=$EDITOR
 
 e() {
-	if [ $# -eq 0 ]; then
+	if [[ $# -eq 0 ]]; then
+		if [[ -e ./net/core/filter.c ]]; then
+			$EDITOR ./net/core/filter.c
+			return
+		fi
 		$EDITOR .
+		return
 	else
 		$EDITOR "$@"
+		return
 	fi
 }
 
