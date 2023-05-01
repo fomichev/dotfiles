@@ -22,7 +22,15 @@ failure() {
 
 do_rstc() {
 	say restic -r "$REPO" "$@"
+	set +e
 	sudo -E restic -r "$REPO" "$@" 2>&1 | cat
+	ret=$?
+	set -e
+
+	if [[ $ret -eq 0 ]]; then return 0; fi
+	# https://github.com/restic/restic/issues/3098
+	if [[ $ret -eq 3 ]]; then return 0; fi
+	exit $ret
 }
 
 docker_update() {
