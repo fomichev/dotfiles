@@ -71,7 +71,7 @@
 	fixes = Fixes: %h (\"%s\")
 
 [rerere]
-	enabled = true
+	enabled = false
 
 [include]
 	path = ~/local/.gitconfig
