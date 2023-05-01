@@ -89,7 +89,7 @@ host() {
 	console+=" -serial mon:stdio"
 
 	if [[ "${ARCH}" != "arm64" ]]; then
-		cmdline+=" earlyprintk=serial,$TTY,115200"
+		cmdline+=" console=$TTY,115200"
 	fi
 	cmdline+=" quiet oops=panic retbleed=off"
 
