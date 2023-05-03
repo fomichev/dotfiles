@@ -1,0 +1,13 @@
+#!/bin/bash
+
+src=(https://github.com/google/neper.git)
+skip_steps=(install)
+
+binaries=(psp_rr psp_crr psp_stream tcp_rr tcp_crr tcp_stream udp_rr udp_stream)
+
+post_build() {
+	for f in ${binaries[@]}; do
+		cp -f "$B/$f" "$R/bin/$f"
+		echo cp -f "$B/$f" "$R/bin/$f"
+	done
+}
