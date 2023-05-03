@@ -32,6 +32,7 @@ GUEST=${GUEST:-false}
 MODULES=${MODULES:-false}
 TTY=${TTY:-ttyS0}
 SSH=${SSH:-false}
+FWD_PORT=${FWD_PORT:-}
 # }}}
 
 usage() {
@@ -52,6 +53,7 @@ usage() {
 	echo "    d - start SSH server"
 	echo "    s - run script instead of interactive bash"
 	echo "    2 - disable cgroup v1, run only v2"
+	echo "    f - forward given localhost port (comma-separated list)"
 	exit 1
 }
 
@@ -98,6 +100,12 @@ host() {
 	if $SSH; then
 		net+=",hostfwd=tcp:127.0.0.1:$SSH_PORT-:22"
 	fi
+	if [[ ! -z "$FWD_PORT" ]]; then
+		for p in $(echo "$FWD_PORT" | tr ',' ' '); do
+			net+=",hostfwd=tcp::${p}-:$p"
+		done
+	fi
+
 	net+=" -device virtio-net-pci,netdev=virtual"
 
 	cmdline+=" $CMDLINE"
@@ -158,6 +166,7 @@ host() {
 	init+="DIR_KERNEL='$(pwd)' "
 	init+="MODULES='$MODULES' "
 	init+="SSH='$SSH' "
+	init+="FWD_PORT='$FWD_PORT' "
 	init+="SCRIPT='$SCRIPT' "
 	init+="$ENVIRON_ARG "
 	init+="/tmp/dir_q/q"
@@ -492,7 +501,7 @@ EOF
 	sleep 30
 }
 
-while getopts "2i:dhgms:c:" opt; do
+while getopts "2i:dhgms:c:f:" opt; do
 	case $opt in
 		h) usage ;;
 		2) CMDLINE+=" cgroup_no_v1=all" ;;
@@ -502,6 +511,7 @@ while getopts "2i:dhgms:c:" opt; do
 		c) CMDLINE="$OPTARG" ;;
 		d) SSH=true ;;
 		s) SCRIPT="$OPTARG" ;;
+		f) FWD_PORT="$OPTARG" ;;
 	esac
 done
 shift $((OPTIND -1))
