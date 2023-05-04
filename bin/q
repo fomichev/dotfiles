@@ -6,6 +6,8 @@ SSH_PORT=${SSH_PORT:-42222}
 
 NRCPU=${NRCPU:-4}
 MEMORY=${MEMORY:-15872}
+TAP_QUEUES=${TAP_QUEUES:-$NRCPU}
+TAP_MQ=${TAP_MQ:-true}
 
 V4_ADDR=${V4_ADDR:-} # dhcp by default
 V4_PREFIX=${V4_PREFIX:-} # dhcp by default
@@ -33,6 +35,9 @@ MODULES=${MODULES:-false}
 TTY=${TTY:-ttyS0}
 SSH=${SSH:-false}
 FWD_PORT=${FWD_PORT:-}
+NET_USER=${NET_USER:-true}
+NET_TAP=${NET_TAP:-false}
+NET_VHOST=${NET_VHOST:-false}
 # }}}
 
 usage() {
@@ -54,6 +59,7 @@ usage() {
 	echo "    s - run script instead of interactive bash"
 	echo "    2 - disable cgroup v1, run only v2"
 	echo "    f - forward given localhost port (comma-separated list)"
+	echo "    n - networking mode (user,tap,vhost)"
 	exit 1
 }
 
@@ -96,17 +102,44 @@ host() {
 	cmdline+=" quiet oops=panic retbleed=off"
 
 	local net
-	net+=" -netdev user,id=virtual"
-	if $SSH; then
-		net+=",hostfwd=tcp:127.0.0.1:$SSH_PORT-:22"
-	fi
-	if [[ ! -z "$FWD_PORT" ]]; then
-		for p in $(echo "$FWD_PORT" | tr ',' ' '); do
-			net+=",hostfwd=tcp::${p}-:$p"
-		done
+
+	if $NET_USER; then
+		net+=" -netdev user,id=virtual"
+
+		if $SSH; then
+			net+=",hostfwd=tcp:127.0.0.1:$SSH_PORT-:22"
+		fi
+		if [[ ! -z "$FWD_PORT" ]]; then
+			for p in $(echo "$FWD_PORT" | tr ',' ' '); do
+				net+=",hostfwd=tcp::${p}-:$p"
+			done
+		fi
+
+		net+=" -device virtio-net-pci,netdev=virtual"
 	fi
 
-	net+=" -device virtio-net-pci,netdev=virtual"
+	if $NET_TAP; then
+		local dev="qtap1"
+		if $TAP_MQ; then
+			dev="qtap0"
+		fi
+
+		local vhost=""
+
+		if $NET_VHOST; then
+			vhost=",vhost=on"
+		fi
+
+		net+=" -netdev tap,id=virtual,ifname=$dev,script=no$vhost"
+		if $TAP_MQ; then
+			net+=",queues=${TAP_QUEUES}"
+		fi
+
+		net+=" -device virtio-net-pci,netdev=virtual"
+		if $TAP_MQ; then
+			net+=",mq=on"
+		fi
+	fi
 
 	cmdline+=" $CMDLINE"
 	cmdline+=" rootfstype=9p"
@@ -167,6 +200,13 @@ host() {
 	init+="MODULES='$MODULES' "
 	init+="SSH='$SSH' "
 	init+="FWD_PORT='$FWD_PORT' "
+	init+="V4_ADDR='$V4_ADDR' "
+	init+="V4_PREFIX='$V4_PREFIX' "
+	init+="V6_ADDR='$V6_ADDR' "
+	init+="V6_PREFIX='$V6_PREFIX' "
+	init+="NET_USER='$NET_USER' "
+	init+="NET_TAP='$NET_TAP' "
+	init+="NET_VHOST='$NET_VHOST' "
 	init+="SCRIPT='$SCRIPT' "
 	init+="$ENVIRON_ARG "
 	init+="/tmp/dir_q/q"
@@ -324,26 +364,32 @@ guest() {
 
 	ip link set dev lo up
 
-	if [[ -n "$(command -v busybox)" ]]; then
-		if [[ -e "/etc/udhcpc/default.script" ]]; then
-			mask-dir /etc/resolvconf/run
-			mkdir -p /run/resolvconf
-			echo "nameserver 8.8.8.8" > /run/resolvconf/resolv.conf
+	if $NET_USER; then
+		if [[ -n "$(command -v busybox)" ]]; then
+			if [[ -e "/etc/udhcpc/default.script" ]]; then
+				mask-dir /etc/resolvconf/run
+				mkdir -p /run/resolvconf
+				echo "nameserver 8.8.8.8" > /run/resolvconf/resolv.conf
 
-			local dev=$(ls -d /sys/bus/virtio/drivers/virtio_net/virtio* |sort -g |head -n1)
-			local iface=$(ls $dev/net)
-			say dhcp on iface $iface
-			ip link set dev $iface up
-			busybox udhcpc -i $iface -p /run/udhcpc \
-				-s /etc/udhcpc/default.script -q -t 1 -n -f
+				local dev=$(ls -d /sys/bus/virtio/drivers/virtio_net/virtio* |sort -g |head -n1)
+				local iface=$(ls $dev/net)
+				say dhcp on iface $iface
+				ip link set dev $iface up
+				busybox udhcpc -i $iface -p /run/udhcpc \
+					-s /etc/udhcpc/default.script -q -t 1 -n -f
 
-			local v4_addr=$(ip -o -4 addr show dev eth0 | awk '{print $4}' | cut -d/ -f1)
-			append_to_hosts "$v4_addr"
+				local v4_addr=$(ip -o -4 addr show dev eth0 | awk '{print $4}' | cut -d/ -f1)
+				append_to_hosts "$v4_addr"
+			else
+				say "busybox is found, but no /etc/udhcpc/default.script, skipping udhcpc"
+			fi
 		else
-			say "busybox is found, but no /etc/udhcpc/default.script, skipping udhcpc"
+			say "busybox is not found, skipping udhcpc"
 		fi
-	else
-		say "busybox is not found, skipping udhcpc"
+	fi
+
+	if $NET_TAP; then
+		ip link set dev eth0 up
 	fi
 
 	if [[ ! -z "$V6_ADDR" ]]; then
@@ -501,7 +547,7 @@ EOF
 	sleep 30
 }
 
-while getopts "2i:dhgms:c:f:" opt; do
+while getopts "2i:dhgms:c:f:n:" opt; do
 	case $opt in
 		h) usage ;;
 		2) CMDLINE+=" cgroup_no_v1=all" ;;
@@ -512,6 +558,24 @@ while getopts "2i:dhgms:c:f:" opt; do
 		d) SSH=true ;;
 		s) SCRIPT="$OPTARG" ;;
 		f) FWD_PORT="$OPTARG" ;;
+		n)
+			case "$OPTARG" in
+				user) ;;
+				tap)
+					NET_USER=false
+					NET_TAP=true
+					;;
+				vhost)
+					NET_USER=false
+					NET_TAP=true
+					NET_VHOST=true
+					;;
+				*)
+					echo "Invalid net '$OPTARG'"
+					exit 1
+					;;
+			esac
+			;;
 	esac
 done
 shift $((OPTIND -1))
@@ -532,6 +596,27 @@ else
 	shift
 
 	export HOSTNAME="$HOST"
+
+	if $NET_TAP; then
+		if ! ip link show dev qtap0 &>/dev/null; then
+			echo "Couldn't find qtap0 tap device, do:"
+			echo "$ sudo ip tuntap add dev qtap0 mode tap multi_queue"
+			echo "$ sudo ip addr add 10.10.10.1/24 dev qtap0"
+			echo "$ sudo ip link set dev qtap0 up"
+			echo "$ sudo ip tuntap add dev qtap1 mode tap"
+			echo "$ sudo ip addr add 10.10.11.1/24 dev qtap1"
+			echo "$ sudo ip link set dev qtap1 up"
+			exit 1
+		fi
+
+		if $TAP_MQ; then
+			V4_ADDR=10.10.10.2
+			V4_PREFIX=24
+		else
+			V4_ADDR=10.10.11.2
+			V4_PREFIX=24
+		fi
+	fi
 
 	if [[ -z "$kernel" ]]; then
 		if [[ -e "arch/x86/boot/bzImage" ]]; then
