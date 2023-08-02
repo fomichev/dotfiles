@@ -24,13 +24,13 @@
 /home/sdf/.cargo
 /home/sdf/.xargo
 /home/sdf/.bundle
-/home/sdf/.local/share/containers/
 /home/sdf/src/dotfiles/.local/share/Trash
 /home/sdf/src/dotfiles/.config/chromium
 /home/sdf/src/dotfiles/.config/epiphany
 /home/sdf/src/dotfiles/.config/google-chrome
 /home/sdf/src/dotfiles/.config/signal
 /home/sdf/src/dotfiles/.config/BraveSoftware
+/home/sdf/src/dotfiles/.local/share/containers/
 /home/sdf/src/dotfiles/.local/share/keybase
 /home/sdf/src/dotfiles/.local/share/sonic-visualiser
 /home/sdf/src/dotfiles/.local/share/TelegramDesktop

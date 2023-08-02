@@ -50,6 +50,7 @@ docker_update() {
 
 system_upgrade() {
 	say 'update system'
+	sudo /usr/bin/pacman --noconfirm -Sy archlinux-keyring
 	sudo /usr/bin/pacman --noconfirm -Syu
 	local orphans="$(pacman -Qqtd)"
 	if [[ ! -z "$orphans" ]]; then
@@ -133,7 +134,6 @@ if [[ $# -eq 0 ]]; then
 	#google_photos
 
 	do_rstc \
-		--verbose \
 		--verbose \
 		$ARGS \
 		--exclude-file $HOME/src/dotfiles/.restic-exclude \
