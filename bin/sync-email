@@ -1,7 +1,6 @@
 #!/bin/bash
 
 set -x
-set -e
 
 [ -e ~/.imapfilter.lua ] && imapfilter -c ~/.imapfilter.lua
 [ -e ~/.mbsyncrc ] && mbsync -aV
