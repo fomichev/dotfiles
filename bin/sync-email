@@ -6,5 +6,8 @@ set -e
 [ -e ~/.imapfilter.lua ] && imapfilter -c ~/.imapfilter.lua
 [ -e ~/.mbsyncrc ] && mbsync -aV
 [ -e ~/.notmuch-config ] && notmuch new
-[ -d ~/src/public-inbox ] && exec ~/src/public-inbox/lei.sh up --all
-[ -e ~/.l2mdconfig ] && exec $HOME/opt/sysroot/bin/l2md --verbose
+[ -d ~/src/public-inbox ] && {
+	~/src/public-inbox/lei.sh up --all
+	~/src/public-inbox/lei.sh daemon-kill
+}
+[ -e ~/.l2mdconfig ] && $HOME/opt/sysroot/bin/l2md --verbose
