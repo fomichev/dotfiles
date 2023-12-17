@@ -6,9 +6,16 @@ usage() {
 	echo "ug [options]"
 	echo
 	echo "options:"
-	echo "    a - allow"
+	echo "    a - allow blocked once"
 	echo "    e - enable"
 	echo "    d - disable"
+	echo "    l - list blocked"
+	echo "    p - allow blocked permanently"
+	echo
+	echo "example:"
+	echo "    ug -l # list blocked"
+	echo "    ug -a # allow blocked"
+	echo "    ug -p # allow blocked permanently"
 	exit 1
 }
 
@@ -26,18 +33,24 @@ do_disable() {
 	exit 0
 }
 
+do_list() {
+	sudo usbguard list-devices | grep block
+}
+
 do_allow() {
-	sudo usbguard allow-device $(sudo usbguard list-devices | grep block | head -n1 | cut -d: -f1)
+	sudo usbguard allow-device "$@" $(sudo usbguard list-devices | grep block | head -n1 | cut -d: -f1)
 
 	exit 0
 }
 
-while getopts "aed" opt; do
+while getopts "aedpl" opt; do
 	case $opt in
 		h) usage ;;
 		a) do_allow ;;
+		p) do_allow -p ;;
 		e) do_enable ;;
 		d) do_disable ;;
+		l) do_list ;;
 		*) usage ;;
 	esac
 done
