@@ -21,7 +21,7 @@ if has("nvim")
 endif
 
 call plug#begin('~/.vim/bundle')
-Plug 'chriskempson/base16-vim'
+Plug 'tinted-theming/base16-vim', { 'branch': 'main' }
 Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': { -> fzf#install() } }
 Plug 'will133/vim-dirdiff'
 Plug 'fatih/vim-go'
