@@ -8,12 +8,12 @@ if [[ $PWD == /google/src/* ]]; then
 		pr) exec hg sync ;;
 		lp) exec hg log --patch ;;
 		au) exec hg amend ;;
-		ri) exec hg evolve --update ;;
-		he) exec hg histedit ;;
+		ri) exec hg histedit ;;
 		ra) exec hg resolve --mark --all ;;
 		rc) exec hg rebase --continue ;;
 		rl) exec hg resolve --list ;;
 		ec) exec hg evolve --continue ;;
+		push) hg upload chain || hg push ;;
 		remove)
 			hg prune "$@" || :
 			exec hg cls-setnumber --remove -c "$@"
