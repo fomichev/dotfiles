@@ -60,6 +60,7 @@ usage() {
 	echo "    2 - disable cgroup v1, run only v2"
 	echo "    f - forward given localhost port (comma-separated list)"
 	echo "    n - networking mode (user,tap,vhost)"
+	echo "    e - pass extra environment variable"
 	exit 1
 }
 
@@ -546,7 +547,7 @@ EOF
 	sleep 30
 }
 
-while getopts "2i:dhgms:c:f:n:" opt; do
+while getopts "2i:de:hgms:c:f:n:" opt; do
 	case $opt in
 		h) usage ;;
 		2) CMDLINE+=" cgroup_no_v1=all" ;;
@@ -557,6 +558,7 @@ while getopts "2i:dhgms:c:f:n:" opt; do
 		d) SSH=true ;;
 		s) SCRIPT="$OPTARG" ;;
 		f) FWD_PORT="$OPTARG" ;;
+		e) ENVIRON_ARG="$ENVIRON_ARG $OPTARG" ;;
 		n)
 			case "$OPTARG" in
 				user) ;;
