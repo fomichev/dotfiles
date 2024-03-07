@@ -8,7 +8,7 @@
 /tmp
 /var/lib/bitcoin
 /var/lib/bitcoind
-/home/sdf/bitcoind
+/home/sdf/data/bitcoind
 /var/log
 /var/run
 /var/cache
@@ -45,3 +45,4 @@
 /home/sdf/hass/www/mp4/
 /home/sdf/.BitwigStudio/cache/
 /home/sdf/.wine/
+/home/sdf/data/frigate/storage
