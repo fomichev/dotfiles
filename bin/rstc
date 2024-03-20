@@ -59,6 +59,14 @@ system_upgrade() {
 	fi
 }
 
+system_pacnew() {
+	local ret=$(find / -name '*.pacnew' 2>/dev/null)
+	if [ ! -z "$ret" ]; then
+		echo "$ret"
+		do_notify "pacnew"
+	fi
+}
+
 system_cleanup() {
 	say 'cleanup'
 	sudo /usr/bin/journalctl --vacuum-time=7d || :
@@ -148,6 +156,7 @@ if [[ $# -eq 0 ]]; then
 	docker_update
 	system_upgrade
 	system_cleanup
+	system_pacnew
 	do_notify "updated"
 	trap - EXIT
 	exit
