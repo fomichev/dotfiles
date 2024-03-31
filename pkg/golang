@@ -4,7 +4,14 @@ ver=1.22.1
 src=(https://go.dev/dl/go${ver}.linux-amd64.tar.gz)
 skip_steps=(build)
 
+pre_fetch() {
+	rm -rf $S
+	rm -rf $B/*
+}
+
 post_build() {
+	echo cp -a $S/* $B
+	echo ln -sf $B $R/go
 	cp -a $S/* $B
 	ln -sf $B $R/go
 }

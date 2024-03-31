@@ -48,6 +48,7 @@ src_subdir="" # cd into this sub-directory before trying to build
 skip_steps=() # skip "fetch", "build" or "install" step
 build_in_src=false
 
+pre_fetch() { :; }
 pre_build() { :; }
 post_build() { :; }
 # }}}
@@ -312,6 +313,8 @@ __mrproper() {
 __build() {
 	mkdir -p "$SRC" "$STAMP" "$B" "$R/bin"
 
+	say "pre fetch $B"
+	(cd $S && __with_clean_env pre_fetch)
 	if __invoke_step fetch; then
 		say "fetch $S"
 		(cd $SRC && fetch)
