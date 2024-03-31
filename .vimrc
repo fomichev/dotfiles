@@ -219,37 +219,6 @@ if filereadable(expand("~/.vimrc_background"))
 endif
 
 " 1}}}
-" Folding {{{1
-
-if !has("nvim")
-	function! MyFoldText()
-		let line = getline(v:foldstart)
-
-		let nucolwidth = &fdc + &number * &numberwidth
-		let windowwidth = winwidth(0) - nucolwidth - 2
-		let foldedlinecount = v:foldend - v:foldstart
-
-		" expand tabs into spaces
-		let onetab = strpart('          ', 0, &tabstop)
-		let line = substitute(line, '\t', onetab, 'g')
-
-		let line = strpart(line, 0, windowwidth - 2 -len(foldedlinecount))
-		let fillcharcount = windowwidth - len(line) - len(foldedlinecount)
-		return line . ' ' . repeat(" ",fillcharcount) . foldedlinecount . ' '
-	endfunction
-
-	set foldtext=MyFoldText()
-
-	" start with all folds closed
-	set foldlevelstart=0
-
-	" support only root fold for syntax
-	set foldnestmax=1
-endif
-
-set nofoldenable
-
-" 1}}}
 " Mappings {{{1
 " Quickfix {{{2
 
@@ -314,16 +283,6 @@ inoremap <C-h> <Esc><C-w>hi
 inoremap <C-j> <Esc><C-w>ji
 inoremap <C-k> <Esc><C-w>ki
 inoremap <C-l> <Esc><C-w>li
-
-" 2}}}
-" Folding {{{2
-
-" use space to open/close folds
-nnoremap <Space> za
-vnoremap <Space> za
-
-" make zO work no matter where the cursor is
-nnoremap zO zCzO
 
 " 2}}}
 " Ctags & Cscope {{{2

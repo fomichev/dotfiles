@@ -69,6 +69,7 @@ bin/monarch-policies
 .config/rclone/
 .config/software-center/
 .config/syllogi/
+.config/systemd/user/default.target.wants/
 .config/totem/
 .config/unity/
 .config/user-dirs.dirs

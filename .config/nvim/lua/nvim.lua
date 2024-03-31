@@ -3,6 +3,7 @@ require('packer').startup(function()
 	use 'wbthomason/packer.nvim'
 	use 'neovim/nvim-lspconfig'
 	use 'nvim-treesitter/nvim-treesitter'
+	use 'David-Kunz/gen.nvim'
 end)
 
 -- https://github.com/neovim/nvim-lspconfig
@@ -26,6 +27,12 @@ require'nvim-treesitter.configs'.setup {
 		enable = true,
 	},
 }
+
+require 'gen'.setup {
+	model = 'dolphin-mistral',
+}
+
+vim.keymap.set({ 'n', 'v' }, '<space>', ':Gen<CR>')
 
 -- Disable all diagnositcs
 vim.lsp.handlers["textDocument/publishDiagnostics"] = function() end
