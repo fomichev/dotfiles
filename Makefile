@@ -26,63 +26,14 @@ endef
 
 all: install init update
 
-GUIX_VERSION=1.3.0
-
-GUIX_PACKAGES+=go
-GUIX_PACKAGES+=vim-full
-GUIX_PACKAGES+=tmux
-GUIX_PACKAGES+=neomutt
-GUIX_PACKAGES+=l2md
-GUIX_PACKAGES+=pahole-git
-GUIX_PACKAGES+=iproute2-git
-GUIX_PACKAGES+=llvm-git
-
-guix_prepare:
-	sudo mkdir -p /var/guix /gnu /var/log/guix /etc/guix
-	sudo chown -R $(USER):$(shell id -gn) /var/guix/ /gnu /var/log/guix /etc/guix
-	cd ~/tmp && \
-	curl -LO https://ftp.gnu.org/gnu/guix/guix-binary-$(GUIX_VERSION).x86_64-linux.tar.xz
-	tar xf guix-binary-$(GUIX_VERSION).x86_64-linux.tar.xz && \
-	mv gnu/* /gnu/ && \
-	mv var/guix/* /var/guix/
-	mkdir -p ~/.config/guix
-	ln -sf /var/guix/profiles/per-user/root/current-guix ~/.config/guix/current
-
-guix_allow_prebuilt:
-	guix archive --authorize < ~/.config/guix/current/share/guix/ci.guix.gnu.org.pub
-	guix archive --authorize < ~/.config/guix/current/share/guix/ci.guix.info.pub
-
-guix_daemon:
-	TMPDIR=~/tmp ~/.config/guix/current/bin/guix-daemon --disable-chroot
-
-guix_install:
-	guix install $(GUIX_PACKAGES)
-
-nix_prepare:
-	sudo mkdir /nix
-	sudo chown sdf:sdf /nix
-	sh <(curl -L https://nixos.org/nix/install) --no-daemon
-
-nix_install:
-	nix-env --install go
-	nix-env --install vim
-	nix-env --install tmux
-	nix-env --install neomutt
-	nix-env --install l2md
-
-nix_install_latest:
-	for pkg in pahole llvm iproute2: do \
-		(cd $$pkg && nix-build --expr 'with import <nixpkgs> {}; callPackage ./default.nix {}'); \
-	done
-
 build:
 	pkg/mk pkg/golang
 	pkg/mk pkg/vim
 	pkg/mk pkg/llvm
 	pkg/mk pkg/pahole
 	pkg/mk pkg/sparse
+	pkg/mk pkg/nvim
 	#pkg/mk pkg/neomutt
-	#pkg/mk pkg/nvim
 	#pkg/mk pkg/tmux
 
 install:
@@ -91,7 +42,7 @@ install:
 	chmod -R 700 ~/.secret
 
 colors:
-	base16_ocean
+	./base16-shell/scripts/base16-eighties.sh
 
 init:
 	git submodule init && \

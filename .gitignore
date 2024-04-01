@@ -119,6 +119,7 @@ bin/monarch-policies
 .config/systemd/user/default.target.wants/
 .config/Thunar/
 .config/tilem2/
+.config/tinted-theming/
 .config/totem/
 .config/Tracktion/
 .config/transmission/
