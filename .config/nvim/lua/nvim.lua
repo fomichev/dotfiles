@@ -29,7 +29,7 @@ require'nvim-treesitter.configs'.setup {
 }
 
 require 'gen'.setup {
-	model = 'dolphin-mistral',
+	model = 'dolphin-mixtral',
 }
 
 require 'gen'.prompts = {
