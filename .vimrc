@@ -137,6 +137,8 @@ set complete-=i
 " and tags...
 set complete-=t
 
+nnoremap <c-\> :tab split<cr><c-]>
+
 " try to show last line (at least partially)
 set display+=lastline
 
@@ -283,25 +285,6 @@ inoremap <C-h> <Esc><C-w>hi
 inoremap <C-j> <Esc><C-w>ji
 inoremap <C-k> <Esc><C-w>ki
 inoremap <C-l> <Esc><C-w>li
-
-" 2}}}
-" Ctags & Cscope {{{2
-
-nnoremap <c-\> :tab split<cr><c-]>
-
-if !has("nvim")
-	" :tag and C-] always use cscope when available
-	set cscopetag
-	" search cstope database first
-	set cscopetagorder=0
-	" automatically pick up local cscope database
-	if filereadable("cscope.out")
-		cs add cscope.out
-	endif
-
-    " quick search for function callers
-    nnoremap <leader><c-]> :cs find c <C-R>=expand("<cword>")<cr><cr>
-endif
 
 " 2}}}
 " 1}}}
