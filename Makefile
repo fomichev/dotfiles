@@ -52,7 +52,7 @@ init:
 
 update:
 	git submodule foreach git fetch && \
-	git submodule foreach git reset --hard origin/master && \
+	git submodule foreach git pull && \
 	~/.tmux/plugins/tpm/bin/update_plugins all
 
 alias:
