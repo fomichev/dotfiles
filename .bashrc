@@ -99,8 +99,8 @@ export LESS_TERMCAP_md=$(tput setaf 4)
 
 if [ -z "$NO_BASE16" ]; then
 	# base16 colors
-	BASE16_SHELL="$HOME/src/dotfiles/base16-shell"
-	[ -s "$BASE16_SHELL/profile_helper.sh" ] && source "$BASE16_SHELL/profile_helper.sh"
+	BASE16_SHELL_PATH="$HOME/src/dotfiles/base16-shell"
+	[ -s "$BASE16_SHELL_PATH/profile_helper.sh" ] && source "$BASE16_SHELL_PATH/profile_helper.sh"
 fi
 
 # disable start/stop (Ctrl-S/Ctrl-Q) functionality

@@ -117,9 +117,9 @@ bin/monarch-policies
 .config/spotify/
 .config/syllogi/
 .config/systemd/user/default.target.wants/
+.config/systemd/user/sockets.target.wants/
 .config/Thunar/
 .config/tilem2/
-.config/tinted-theming/
 .config/totem/
 .config/Tracktion/
 .config/transmission/
