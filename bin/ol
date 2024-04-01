@@ -1,3 +1,22 @@
 #!/bin/bash
 
-$HOME/src/ollama/ollama run dolphin-mistral "$@"
+BIN=$HOME/src/ollama/ollama
+
+stop_ollama() {
+	systemctl --user stop ollama.service
+}
+
+wait_ollama() {
+	while ! $BIN list &>/dev/null; do
+		sleep .5
+	done
+}
+
+if ! systemctl --user is-active ollama.service &>/dev/null; then
+	echo ollama is not running, starting up...
+	systemctl --user start ollama.service
+	wait_ollama
+	trap stop_ollama EXIT
+fi
+
+$BIN run dolphin-mistral "$@"

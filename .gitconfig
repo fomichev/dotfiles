@@ -7,7 +7,7 @@
 	ai = add --interactive
 	au = add -u :/
 	b = branch
-	bl = blame -w -s
+	bl = blame -w -s -M -C -C -C
 	ca = commit --amend --allow-empty
 	ci = commit -s
 	co = checkout
