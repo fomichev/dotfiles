@@ -28,6 +28,7 @@ bin/kubeadm
 bin/monarch-policies
 
 .config/nvim/bundle
+.config/nvim/lazy-lock.json
 
 .config/.gsd-keyboard.settings-ported
 .config/anjuta/

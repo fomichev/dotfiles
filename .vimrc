@@ -2,32 +2,6 @@
 
 set nocompatible
 
-if empty(glob('~/.local/share/nvim/site/autoload/plug.vim'))
-  silent !curl -fLo ~/.local/share/nvim/site/autoload/plug.vim --create-dirs
-    \ https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
-  autocmd VimEnter * PlugInstall --sync | source ~/.vimrc
-endif
-
-if has("nvim")
-	if empty(glob('~/.local/share/nvim/site/pack/packer/start/packer.nvim'))
-		silent !git clone --depth 1 https://github.com/wbthomason/packer.nvim
-					\ ~/.local/share/nvim/site/pack/packer/start/packer.nvim
-		autocmd VimEnter * PlugInstall --sync | source ~/.vimrc
-	endif
-
-	syntax off
-	set mouse=
-	lua require('nvim')
-endif
-
-call plug#begin('~/.vim/bundle')
-Plug 'tinted-theming/base16-vim', { 'branch': 'main' }
-Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': { -> fzf#install() } }
-Plug 'will133/vim-dirdiff'
-Plug 'fatih/vim-go'
-Plug 'rust-lang/rust.vim'
-call plug#end()
-
 "1}}}
 " Essentials {{{1
 
