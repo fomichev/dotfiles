@@ -191,15 +191,12 @@ require("lazy").setup({
 			local configs = require("nvim-treesitter.configs")
 
 			configs.setup({
-				ensure_installed = { "c", "lua", "vim" },
+				ensure_installed = { "c", "lua", "vim", "rust", "go" },
 				sync_install = true,
 				auto_install = true,
-				ignore_install = { "javascript" },
 
 				highlight = {
 					enable = true,
-					disable = { "javascript" },
-					-- additional_vim_regex_highlighting = true,
 					additional_vim_regex_highlighting = false,
 				},
 
@@ -210,6 +207,8 @@ require("lazy").setup({
 		end
 	}
 })
+
+require'lspconfig'.clangd.setup{}
 
 -- Disable all diagnostics
 vim.lsp.handlers["textDocument/publishDiagnostics"] = function() end
