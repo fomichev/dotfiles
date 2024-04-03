@@ -86,7 +86,7 @@ for _, v in ipairs({ "help", "qf", "gitendemail", }) do
 	})
 end
 
-vim.o.grepprg = "g $*"
+vim.o.grepprg = "g --vimgrep --no-heading $*"
 vim.keymap.set("n", "<Leader>g", ":Grep<space>")
 
 vim.api.nvim_create_user_command(
@@ -214,7 +214,7 @@ require("lazy").setup({
 		config = function ()
 			local builtin = require("telescope.builtin")
 			vim.keymap.set("n", "<leader><leader>", builtin.find_files, {})
-			vim.keymap.set("n", "<leader>g", builtin.live_grep, {})
+			vim.keymap.set("n", "<leader>G", builtin.live_grep, {})
 			vim.keymap.set("n", "<leader>b", builtin.buffers, {})
 			vim.keymap.set("n", "<leader>h", builtin.help_tags, {})
 		end,
