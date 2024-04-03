@@ -79,20 +79,12 @@ vim.keymap.set("n", "<C-\\>", ":tab split <CR><C-]>")
 vim.o.spelllang = "en_us"
 vim.o.spell = true
 
-vim.api.nvim_create_autocmd("FileType", {
-	pattern = "help",
-	command = "setlocal nospell"
-})
-
-vim.api.nvim_create_autocmd("FileType", {
-	pattern = "qf",
-	command = "setlocal nospell"
-})
-
-vim.api.nvim_create_autocmd("FileType", {
-	pattern = "gitendemail",
-	command = "setlocal nospell"
-})
+for _, v in ipairs({ "help", "qf", "gitendemail", }) do
+	vim.api.nvim_create_autocmd("FileType", {
+		pattern = v,
+		command = "setlocal nospell"
+	})
+end
 
 vim.o.grepprg = "g $*"
 vim.keymap.set("n", "<Leader>g", ":Grep<space>")
@@ -170,7 +162,6 @@ vim.api.nvim_create_autocmd({ "BufRead", "BufNew" }, {
 require("lazy").setup({
 	-- "will133/vim-dirdiff"
 	-- "fatih/vim-go"
-	-- "rust-lang/rust.vim"
 	"tinted-theming/base16-vim",
 	"neovim/nvim-lspconfig",
 	{
@@ -241,6 +232,10 @@ cmp.setup({
 local capabilities = require('cmp_nvim_lsp').default_capabilities()
 
 require'lspconfig'.clangd.setup{
+	capabilities = capabilities
+}
+
+require'lspconfig'.rust_analyzer.setup{
 	capabilities = capabilities
 }
 
