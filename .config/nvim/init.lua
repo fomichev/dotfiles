@@ -211,10 +211,38 @@ require("lazy").setup({
 				},
 			})
 		end
-	}
+	},
+	'hrsh7th/cmp-nvim-lsp',
+	'hrsh7th/cmp-buffer',
+	'hrsh7th/cmp-path',
+	'hrsh7th/cmp-cmdline',
+	'hrsh7th/nvim-cmp',
 })
 
-require'lspconfig'.clangd.setup{}
+local cmp = require'cmp'
+
+cmp.setup({
+	snippet = {
+		expand = function(args)
+			vim.snippet.expand(args.body) -- For native neovim snippets (Neovim v0.10+)
+		end,
+	},
+	window = {},
+	mapping = cmp.mapping.preset.insert({
+		['<C-Space>'] = cmp.mapping.complete(),
+	}),
+	sources = cmp.config.sources({
+		{ name = 'nvim_lsp' },
+		}, {
+			{ name = 'buffer' },
+	})
+})
+
+local capabilities = require('cmp_nvim_lsp').default_capabilities()
+
+require'lspconfig'.clangd.setup{
+	capabilities = capabilities
+}
 
 vim.api.nvim_create_autocmd('LspAttach', {
 	group = vim.api.nvim_create_augroup('UserLspConfig', {}),
