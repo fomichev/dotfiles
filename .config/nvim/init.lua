@@ -181,7 +181,7 @@ require("lazy").setup({
 	{
 		"nvim-telescope/telescope-frecency.nvim",
 		config = function ()
-		require("telescope").load_extension "frecency"
+			require("telescope").load_extension "frecency"
 		end,
 	},
 	{
@@ -197,7 +197,7 @@ require("lazy").setup({
 			local configs = require("nvim-treesitter.configs")
 
 			configs.setup({
-				ensure_installed = { "c", "lua", "vim", "rust", "go" },
+				ensure_installed = { "c", "vim", "rust", "go" },
 				sync_install = true,
 				auto_install = true,
 
@@ -215,6 +215,26 @@ require("lazy").setup({
 })
 
 require'lspconfig'.clangd.setup{}
+
+vim.api.nvim_create_autocmd('LspAttach', {
+	group = vim.api.nvim_create_augroup('UserLspConfig', {}),
+	callback = function(ev)
+		-- Enable completion triggered by <c-x><c-o>
+		vim.bo[ev.buf].omnifunc = 'v:lua.vim.lsp.omnifunc'
+
+		local opts = { buffer = ev.buf }
+		vim.keymap.set('n', 'gD', vim.lsp.buf.declaration, opts)
+		vim.keymap.set('n', 'gd', vim.lsp.buf.definition, opts)
+		vim.keymap.set('n', 'gi', vim.lsp.buf.implementation, opts)
+		vim.keymap.set('n', 'gr', vim.lsp.buf.references, opts)
+		vim.keymap.set('n', 'K', vim.lsp.buf.hover, opts)
+		vim.keymap.set('n', '<C-k>', vim.lsp.buf.signature_help, opts)
+		vim.keymap.set({ 'n', 'v' }, '<leader>a', vim.lsp.buf.code_action, opts)
+		vim.keymap.set('n', '<leader>f', function()
+			vim.lsp.buf.format { async = true }
+		end, opts)
+	end,
+})
 
 -- Disable all diagnostics
 vim.lsp.handlers["textDocument/publishDiagnostics"] = function() end
