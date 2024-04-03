@@ -307,7 +307,7 @@ local cmp = require"cmp"
 cmp.setup({
 	snippet = {
 		expand = function(args)
-			vim.snippet.expand(args.body) -- For native neovim snippets (Neovim v0.10+)
+			vim.snippet.expand(args.body)
 		end,
 	},
 	window = {},
@@ -316,8 +316,8 @@ cmp.setup({
 	}),
 	sources = cmp.config.sources({
 		{ name = "nvim_lsp" },
-		}, {
-			{ name = "buffer" },
+	}, {
+		{ name = "buffer" },
 	})
 })
 
@@ -328,6 +328,12 @@ vim.cmd("source $HOME/.vimrc_background")
 -- Local local vimrc
 vim.cmd[[
 	if filereadable(expand($HOME) . "/local/.vimrc")
-	source $HOME/local/.vimrc
+		source $HOME/local/.vimrc
+	endif
+]]
+
+vim.cmd[[
+	if filereadable(expand($HOME) . "/local/nvim.lua")
+		luafile $HOME/local/nvim.lua
 	endif
 ]]
