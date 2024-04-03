@@ -1,13 +1,13 @@
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
 if not (vim.uv or vim.loop).fs_stat(lazypath) then
-  vim.fn.system({
-    "git",
-    "clone",
-    "--filter=blob:none",
-    "https://github.com/folke/lazy.nvim.git",
-    "--branch=stable",
-    lazypath,
-  })
+	vim.fn.system({
+		"git",
+		"clone",
+		"--filter=blob:none",
+		"https://github.com/folke/lazy.nvim.git",
+		"--branch=stable",
+		lazypath,
+	})
 end
 vim.opt.rtp:prepend(lazypath)
 
@@ -80,27 +80,27 @@ vim.o.spelllang = "en_us"
 vim.o.spell = true
 
 vim.api.nvim_create_autocmd("FileType", {
-  pattern = "help",
-  command = "setlocal nospell"
+	pattern = "help",
+	command = "setlocal nospell"
 })
 
 vim.api.nvim_create_autocmd("FileType", {
-  pattern = "qf",
-  command = "setlocal nospell"
+	pattern = "qf",
+	command = "setlocal nospell"
 })
 
 vim.api.nvim_create_autocmd("FileType", {
-  pattern = "gitendemail",
-  command = "setlocal nospell"
+	pattern = "gitendemail",
+	command = "setlocal nospell"
 })
 
 vim.o.grepprg = "g $*"
 vim.keymap.set("n", "<Leader>g", ":Grep<space>")
 
 vim.api.nvim_create_user_command(
-  "Grep",
-  "execute 'silent grep <args>' | botright copen | redraw",
-  {nargs = "+"}
+	"Grep",
+	"execute 'silent grep <args>' | botright copen | redraw",
+	{nargs = "+"}
 )
 
 -- Color 80 column
@@ -119,9 +119,9 @@ vim.o.termguicolors = false
 local quicfix = vim.api.nvim_create_augroup("quickfix", {clear = true})
 
 vim.api.nvim_create_autocmd("BufWinEnter", {
-  pattern = "quickfix",
-  group = quickfix,
-  command = "nnoremap <buffer> q :close<CR>"
+	pattern = "quickfix",
+	group = quickfix,
+	command = "nnoremap <buffer> q :close<CR>"
 })
 
 
@@ -148,23 +148,23 @@ vim.keymap.set("n", "<C-k>", "<C-w>k")
 vim.keymap.set("n", "<C-l>", "<C-w>l")
 
 vim.api.nvim_create_autocmd({ "BufRead", "BufNew" }, {
-  pattern = "*mutt-*",
-  command = "setlocal filetype=mail"
+	pattern = "*mutt-*",
+	command = "setlocal filetype=mail"
 })
 
 vim.api.nvim_create_autocmd({ "BufRead", "BufNew" }, {
-  pattern = "*.md",
-  command = "setlocal filetype=markdown"
+	pattern = "*.md",
+	command = "setlocal filetype=markdown"
 })
 
 vim.api.nvim_create_autocmd({ "BufRead", "BufNew" }, {
-  pattern = "*.cls",
-  command = "setlocal filetype=tex"
+	pattern = "*.cls",
+	command = "setlocal filetype=tex"
 })
 
 vim.api.nvim_create_autocmd({ "BufRead", "BufNew" }, {
-  pattern = "*.h",
-  command = "setlocal filetype=c"
+	pattern = "*.h",
+	command = "setlocal filetype=c"
 })
 
 require("lazy").setup({
@@ -173,11 +173,21 @@ require("lazy").setup({
 	-- "rust-lang/rust.vim"
 	"tinted-theming/base16-vim",
 	"neovim/nvim-lspconfig",
+	--	{
+	--		"junegunn/fzf",
+	--		dir = "$HOME/.fzf",
+	--		build = "./install --all",
+	--	},
 	{
 		"junegunn/fzf",
 		dir = "$HOME/.fzf",
-		build = "./install --all",
+		build = "./install --bin",
 	},
+
+	--{
+	--	"ibhagwan/fzf-lua",
+	--},
+
 	{
 		"David-Kunz/gen.nvim",
 		opts = {
@@ -257,6 +267,6 @@ vim.cmd("source $HOME/.vimrc_background")
 -- Local local vimrc
 vim.cmd[[
 	if filereadable(expand($HOME) . "/local/.vimrc")
-		source $HOME/local/.vimrc
+	source $HOME/local/.vimrc
 	endif
 ]]

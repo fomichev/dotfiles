@@ -4,7 +4,6 @@ function colorscheme_exists(scheme)
     return status_ok
 end
 
-print("X")
 if current_theme_name and current_theme_name ~= "" and vim.g.colors_name ~= 'base16-' .. current_theme_name and colorscheme_exists('base16-' .. current_theme_name) then
   vim.cmd('colorscheme base16-' .. current_theme_name)
 end
