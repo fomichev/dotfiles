@@ -161,18 +161,74 @@ vim.api.nvim_create_autocmd({ "BufRead", "BufNew" }, {
 
 require("lazy").setup({
 	-- "will133/vim-dirdiff"
-	-- "fatih/vim-go"
 	"tinted-theming/base16-vim",
-	"neovim/nvim-lspconfig",
+	{
+		"neovim/nvim-lspconfig",
+		config = function ()
+			local capabilities = require("cmp_nvim_lsp").default_capabilities()
+
+			require"lspconfig".clangd.setup{
+				capabilities = capabilities
+			}
+
+			require"lspconfig".rust_analyzer.setup{
+				capabilities = capabilities
+			}
+
+			--require"lspconfig".golps.setup{
+				--capabilities = capabilities
+			--}
+
+			require"lspconfig".pyright.setup{
+				capabilities = capabilities
+			}
+
+			vim.api.nvim_create_autocmd("LspAttach", {
+				group = vim.api.nvim_create_augroup("UserLspConfig", {}),
+				callback = function(ev)
+					-- Enable completion triggered by <c-x><c-o>
+					vim.bo[ev.buf].omnifunc = "v:lua.vim.lsp.omnifunc"
+
+					local opts = { buffer = ev.buf }
+					vim.keymap.set("n", "gD", vim.lsp.buf.declaration, opts)
+					vim.keymap.set("n", "gd", vim.lsp.buf.definition, opts)
+					vim.keymap.set("n", "gi", vim.lsp.buf.implementation, opts)
+					vim.keymap.set("n", "gr", vim.lsp.buf.references, opts)
+					vim.keymap.set("n", "K", vim.lsp.buf.hover, opts)
+					vim.keymap.set("n", "<C-k>", vim.lsp.buf.signature_help, opts)
+					vim.keymap.set({ "n", "v" }, "<leader>a", vim.lsp.buf.code_action, opts)
+					vim.keymap.set("n", "<leader>f", function()
+						vim.lsp.buf.format { async = true }
+					end, opts)
+				end,
+			})
+
+			-- Disable all diagnostics
+			vim.lsp.handlers["textDocument/publishDiagnostics"] = function() end
+		end,
+	},
 	{
 		"nvim-telescope/telescope.nvim",
 		branch = "0.1.x",
-		dependencies = { "nvim-lua/plenary.nvim" }
+		dependencies = { "nvim-lua/plenary.nvim" },
+		config = function ()
+			local builtin = require("telescope.builtin")
+			vim.keymap.set("n", "<leader><leader>", builtin.find_files, {})
+			vim.keymap.set("n", "<leader>g", builtin.live_grep, {})
+			vim.keymap.set("n", "<leader>b", builtin.buffers, {})
+			vim.keymap.set("n", "<leader>h", builtin.help_tags, {})
+		end,
 	},
 	{
 		"nvim-telescope/telescope-frecency.nvim",
 		config = function ()
 			require("telescope").load_extension "frecency"
+
+			vim.keymap.set("n", "<leader>r", function()
+				require("telescope").extensions.frecency.frecency {
+					workspace = "CWD",
+				}
+			end)
 		end,
 	},
 	{
@@ -180,6 +236,42 @@ require("lazy").setup({
 		opts = {
 			model = "dolphin-mixtral",
 		},
+		config = function ()
+			require "gen".prompts = {
+				Generate = {
+					prompt = "$input",
+					replace = true,
+				},
+				Comment = {
+					prompt = "Explain the following code snippet and write it as a comment, just output the final text without additional quotes around it:\n$text",
+					replace = true,
+				},
+				Ask = {
+					prompt = "Regarding the following text, $input:\n$text",
+				},
+				Summarize = {
+					prompt = "Summarize the following text:\n$text",
+				},
+				Rewrite = {
+					prompt = "Change the following text, $input, just output the final text without additional quotes around it:\n$text",
+					replace = true,
+				},
+				Review = {
+					prompt = "Review the following code and make concise suggestions:\n```$filetype\n$text\n```",
+				},
+				Fix_Grammar = {
+					prompt = "Modify the following text to improve grammar and spelling, just output the final text without additional quotes around it:\n$text",
+					replace = true,
+				},
+				Fix_Wording = {
+					prompt = "Modify the following text to use better wording, just output the final text without additional quotes around it:\n$text",
+					replace = true,
+				},
+			}
+
+			-- Map normal and visual mode SPACE to ollama
+			vim.keymap.set({ "n", "v" }, "<space>", ":Gen<CR>")
+		end,
 	},
 	{
 		"nvim-treesitter/nvim-treesitter",
@@ -201,7 +293,7 @@ require("lazy").setup({
 					enable = true,
 				},
 			})
-		end
+		end,
 	},
 	"hrsh7th/cmp-nvim-lsp",
 	"hrsh7th/cmp-buffer",
@@ -228,87 +320,6 @@ cmp.setup({
 			{ name = "buffer" },
 	})
 })
-
-local capabilities = require("cmp_nvim_lsp").default_capabilities()
-
-require"lspconfig".clangd.setup{
-	capabilities = capabilities
-}
-
-require"lspconfig".rust_analyzer.setup{
-	capabilities = capabilities
-}
-
-vim.api.nvim_create_autocmd("LspAttach", {
-	group = vim.api.nvim_create_augroup("UserLspConfig", {}),
-	callback = function(ev)
-		-- Enable completion triggered by <c-x><c-o>
-		vim.bo[ev.buf].omnifunc = "v:lua.vim.lsp.omnifunc"
-
-		local opts = { buffer = ev.buf }
-		vim.keymap.set("n", "gD", vim.lsp.buf.declaration, opts)
-		vim.keymap.set("n", "gd", vim.lsp.buf.definition, opts)
-		vim.keymap.set("n", "gi", vim.lsp.buf.implementation, opts)
-		vim.keymap.set("n", "gr", vim.lsp.buf.references, opts)
-		vim.keymap.set("n", "K", vim.lsp.buf.hover, opts)
-		vim.keymap.set("n", "<C-k>", vim.lsp.buf.signature_help, opts)
-		vim.keymap.set({ "n", "v" }, "<leader>a", vim.lsp.buf.code_action, opts)
-		vim.keymap.set("n", "<leader>f", function()
-			vim.lsp.buf.format { async = true }
-		end, opts)
-	end,
-})
-
--- Disable all diagnostics
-vim.lsp.handlers["textDocument/publishDiagnostics"] = function() end
-
--- Fuzzy finder
-local builtin = require("telescope.builtin")
-vim.keymap.set("n", "<leader><leader>", builtin.find_files, {})
-vim.keymap.set("n", "<leader>g", builtin.live_grep, {})
-vim.keymap.set("n", "<leader>b", builtin.buffers, {})
-vim.keymap.set("n", "<leader>h", builtin.help_tags, {})
-
-vim.keymap.set("n", "<leader>r", function()
-	require("telescope").extensions.frecency.frecency {
-		workspace = "CWD",
-	}
-end)
-
-require "gen".prompts = {
-	Generate = {
-		prompt = "$input",
-		replace = true,
-	},
-	Comment = {
-		prompt = "Explain the following code snippet and write it as a comment, just output the final text without additional quotes around it:\n$text",
-		replace = true,
-	},
-	Ask = {
-		prompt = "Regarding the following text, $input:\n$text",
-	},
-	Summarize = {
-		prompt = "Summarize the following text:\n$text",
-	},
-	Rewrite = {
-		prompt = "Change the following text, $input, just output the final text without additional quotes around it:\n$text",
-		replace = true,
-	},
-	Review = {
-		prompt = "Review the following code and make concise suggestions:\n```$filetype\n$text\n```",
-	},
-	Fix_Grammar = {
-		prompt = "Modify the following text to improve grammar and spelling, just output the final text without additional quotes around it:\n$text",
-		replace = true,
-	},
-	Fix_Wording = {
-		prompt = "Modify the following text to use better wording, just output the final text without additional quotes around it:\n$text",
-		replace = true,
-	},
-}
-
--- Map normal and visual mode SPACE to ollama
-vim.keymap.set({ "n", "v" }, "<space>", ":Gen<CR>")
 
 -- Load base16 color scheme
 vim.g.base16colorspace = 256
