@@ -41,6 +41,10 @@ install:
 	chmod 700 .gnupg
 	chmod -R 700 ~/.secret
 
+fzf:
+	git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf
+	~/.fzf/install
+
 colors:
 	./base16-shell/scripts/base16-eighties.sh
 
