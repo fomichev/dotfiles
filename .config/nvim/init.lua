@@ -173,21 +173,17 @@ require("lazy").setup({
 	-- "rust-lang/rust.vim"
 	"tinted-theming/base16-vim",
 	"neovim/nvim-lspconfig",
-	--	{
-	--		"junegunn/fzf",
-	--		dir = "$HOME/.fzf",
-	--		build = "./install --all",
-	--	},
 	{
-		"junegunn/fzf",
-		dir = "$HOME/.fzf",
-		build = "./install --bin",
+		'nvim-telescope/telescope.nvim',
+		branch = '0.1.x',
+		dependencies = { 'nvim-lua/plenary.nvim' }
 	},
-
-	--{
-	--	"ibhagwan/fzf-lua",
-	--},
-
+	{
+		"nvim-telescope/telescope-frecency.nvim",
+		config = function ()
+		require("telescope").load_extension "frecency"
+		end,
+	},
 	{
 		"David-Kunz/gen.nvim",
 		opts = {
@@ -223,7 +219,18 @@ require'lspconfig'.clangd.setup{}
 -- Disable all diagnostics
 vim.lsp.handlers["textDocument/publishDiagnostics"] = function() end
 
-vim.keymap.set("n", "<Leader>,", ":FZF<CR>")
+-- Fuzzy finder
+local builtin = require('telescope.builtin')
+vim.keymap.set('n', '<leader><leader>', builtin.find_files, {})
+vim.keymap.set('n', '<leader>g', builtin.live_grep, {})
+vim.keymap.set('n', '<leader>b', builtin.buffers, {})
+vim.keymap.set('n', '<leader>h', builtin.help_tags, {})
+
+vim.keymap.set("n", "<leader>r", function()
+	require("telescope").extensions.frecency.frecency {
+		workspace = "CWD",
+	}
+end)
 
 require "gen".prompts = {
 	Generate = {
