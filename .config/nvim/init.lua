@@ -96,7 +96,7 @@ vim.api.nvim_create_user_command(
 )
 
 -- Color 80 column
-vim.o.colorcolumn = 80
+vim.o.colorcolumn = "80"
 
 -- Use persistent undo
 vim.o.undofile = true
