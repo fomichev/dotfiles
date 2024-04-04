@@ -52,6 +52,9 @@ vim.o.cursorline = true
 -- Don't beep!
 vim.o.visualbell = true
 
+-- Disable folding
+vim.o.foldenable = false
+
 -- Messages tweaks
 vim.o.shortmess = "atToOI"
 
@@ -74,6 +77,9 @@ vim.o.swapfile = false
 vim.o.complete = ".,w,b,u"
 
 vim.keymap.set("n", "<C-\\>", ":tab split <CR><C-]>")
+
+-- Conflicts with treesitter
+vim.o.smartindent = false
 
 -- Enable spell check
 vim.o.spelllang = "en_us"
@@ -214,7 +220,13 @@ require("lazy").setup({
 			}
 
 			-- pacman -S lua-language-server
-			require"lspconfig".lua_ls.setup{
+			--require"lspconfig".lua_ls.setup{
+			--	capabilities = capabilities,
+			--	on_attach = lsp_on_attach,
+			--}
+
+
+			require"lspconfig".bashls.setup{
 				capabilities = capabilities,
 				on_attach = lsp_on_attach,
 			}
