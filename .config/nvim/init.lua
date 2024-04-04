@@ -188,7 +188,7 @@ local lsp_on_attach = function(client, bufnr)
 end
 
 require("lazy").setup({
-	-- "will133/vim-dirdiff"
+	"will133/vim-dirdiff",
 	"tinted-theming/base16-vim",
 	{
 		"neovim/nvim-lspconfig",
