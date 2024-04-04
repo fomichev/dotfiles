@@ -171,15 +171,24 @@ require("lazy").setup({
 				capabilities = capabilities
 			}
 
+			-- rustup component add rust-analyzer
 			require"lspconfig".rust_analyzer.setup{
+				capabilities = capabilities,
+				cmd = { "rustup", "run", "stable", "rust-analyzer" }
+			}
+
+			-- pacman -S gopls
+			--require"lspconfig".golps.setup{
+			--	capabilities = capabilities
+			--}
+
+			-- pacman -S pyright
+			require"lspconfig".pyright.setup{
 				capabilities = capabilities
 			}
 
-			--require"lspconfig".golps.setup{
-				--capabilities = capabilities
-			--}
-
-			require"lspconfig".pyright.setup{
+			-- pacman -S lua-language-server
+			require"lspconfig".lua_ls.setup{
 				capabilities = capabilities
 			}
 
@@ -196,8 +205,8 @@ require("lazy").setup({
 					vim.keymap.set("n", "gr", vim.lsp.buf.references, opts)
 					vim.keymap.set("n", "K", vim.lsp.buf.hover, opts)
 					vim.keymap.set("n", "<C-k>", vim.lsp.buf.signature_help, opts)
-					vim.keymap.set({ "n", "v" }, "<leader>a", vim.lsp.buf.code_action, opts)
-					vim.keymap.set("n", "<leader>f", function()
+					vim.keymap.set({ "n", "v" }, "<Leader>a", vim.lsp.buf.code_action, opts)
+					vim.keymap.set("n", "<Leader>f", function()
 						vim.lsp.buf.format { async = true }
 					end, opts)
 				end,
@@ -213,22 +222,11 @@ require("lazy").setup({
 		dependencies = { "nvim-lua/plenary.nvim" },
 		config = function ()
 			local builtin = require("telescope.builtin")
-			vim.keymap.set("n", "<leader><leader>", builtin.find_files, {})
-			vim.keymap.set("n", "<leader>G", builtin.live_grep, {})
-			vim.keymap.set("n", "<leader>b", builtin.buffers, {})
-			vim.keymap.set("n", "<leader>h", builtin.help_tags, {})
-		end,
-	},
-	{
-		"nvim-telescope/telescope-frecency.nvim",
-		config = function ()
-			require("telescope").load_extension "frecency"
-
-			vim.keymap.set("n", "<leader>r", function()
-				require("telescope").extensions.frecency.frecency {
-					workspace = "CWD",
-				}
-			end)
+			vim.keymap.set("n", "<Leader><Leader>", builtin.find_files, {})
+			vim.keymap.set("n", "<Leader>G", builtin.live_grep, {})
+			vim.keymap.set("n", "<Leader>b", builtin.buffers, {})
+			vim.keymap.set("n", "<Leader>h", builtin.help_tags, {})
+			vim.keymap.set("n", "<Leader>r", builtin.oldfiles, {})
 		end,
 	},
 	{
@@ -280,7 +278,7 @@ require("lazy").setup({
 			local configs = require("nvim-treesitter.configs")
 
 			configs.setup({
-				ensure_installed = { "c", "vim", "rust", "go" },
+				ensure_installed = { "c", "vim", "rust", "go", "lua" },
 				sync_install = true,
 				auto_install = true,
 
@@ -299,8 +297,15 @@ require("lazy").setup({
 	"hrsh7th/cmp-buffer",
 	"hrsh7th/cmp-path",
 	"hrsh7th/cmp-cmdline",
-	"hrsh7th/nvim-cmp",
+	{
+		"hrsh7th/nvim-cmp",
+		event = "InsertEnter",
+	},
 })
+
+vim.keymap.set('n', '<Leader>d', vim.diagnostic.setloclist)
+vim.keymap.set('n', '[d', vim.diagnostic.goto_prev)
+vim.keymap.set('n', ']d', vim.diagnostic.goto_next)
 
 local cmp = require"cmp"
 
