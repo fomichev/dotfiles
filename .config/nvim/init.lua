@@ -159,6 +159,21 @@ vim.api.nvim_create_autocmd({ "BufRead", "BufNew" }, {
 	command = "setlocal filetype=c"
 })
 
+local lsp_on_attach = function(client, bufnr)
+	local opts = { noremap = true, silent = true, buffer = bufnr }
+
+	vim.keymap.set("n", "gD", vim.lsp.buf.declaration, opts)
+	vim.keymap.set("n", "gd", vim.lsp.buf.definition, opts)
+	vim.keymap.set("n", "gi", vim.lsp.buf.implementation, opts)
+	vim.keymap.set("n", "gr", vim.lsp.buf.references, opts)
+	vim.keymap.set("n", "K", vim.lsp.buf.hover, opts)
+	vim.keymap.set("n", "<C-k>", vim.lsp.buf.signature_help, opts)
+	vim.keymap.set({ "n", "v" }, "<Leader>a", vim.lsp.buf.code_action, opts)
+	vim.keymap.set("n", "<Leader>f", function()
+		vim.lsp.buf.format { async = true }
+	end, opts)
+end
+
 require("lazy").setup({
 	-- "will133/vim-dirdiff"
 	"tinted-theming/base16-vim",
@@ -168,49 +183,34 @@ require("lazy").setup({
 			local capabilities = require("cmp_nvim_lsp").default_capabilities()
 
 			require"lspconfig".clangd.setup{
-				capabilities = capabilities
+				capabilities = capabilities,
+				on_attach = lsp_on_attach,
 			}
 
 			-- rustup component add rust-analyzer
 			require"lspconfig".rust_analyzer.setup{
 				capabilities = capabilities,
-				cmd = { "rustup", "run", "stable", "rust-analyzer" }
+				on_attach = lsp_on_attach,
+				cmd = { "rustup", "run", "stable", "rust-analyzer" },
 			}
 
 			-- pacman -S gopls
 			--require"lspconfig".golps.setup{
-			--	capabilities = capabilities
+			--	capabilities = capabilities,
+			--	on_attach = lsp_on_attach,
 			--}
 
 			-- pacman -S pyright
 			require"lspconfig".pyright.setup{
-				capabilities = capabilities
+				capabilities = capabilities,
+				on_attach = lsp_on_attach,
 			}
 
 			-- pacman -S lua-language-server
 			require"lspconfig".lua_ls.setup{
-				capabilities = capabilities
+				capabilities = capabilities,
+				on_attach = lsp_on_attach,
 			}
-
-			vim.api.nvim_create_autocmd("LspAttach", {
-				group = vim.api.nvim_create_augroup("UserLspConfig", {}),
-				callback = function(ev)
-					-- Enable completion triggered by <c-x><c-o>
-					vim.bo[ev.buf].omnifunc = "v:lua.vim.lsp.omnifunc"
-
-					local opts = { buffer = ev.buf }
-					vim.keymap.set("n", "gD", vim.lsp.buf.declaration, opts)
-					vim.keymap.set("n", "gd", vim.lsp.buf.definition, opts)
-					vim.keymap.set("n", "gi", vim.lsp.buf.implementation, opts)
-					vim.keymap.set("n", "gr", vim.lsp.buf.references, opts)
-					vim.keymap.set("n", "K", vim.lsp.buf.hover, opts)
-					vim.keymap.set("n", "<C-k>", vim.lsp.buf.signature_help, opts)
-					vim.keymap.set({ "n", "v" }, "<Leader>a", vim.lsp.buf.code_action, opts)
-					vim.keymap.set("n", "<Leader>f", function()
-						vim.lsp.buf.format { async = true }
-					end, opts)
-				end,
-			})
 
 			-- Disable all diagnostics
 			vim.lsp.handlers["textDocument/publishDiagnostics"] = function() end
