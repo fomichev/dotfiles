@@ -225,7 +225,7 @@ require("lazy").setup({
 			--	on_attach = lsp_on_attach,
 			--}
 
-
+			-- npm i -g bash-language-server
 			require"lspconfig".bashls.setup{
 				capabilities = capabilities,
 				on_attach = lsp_on_attach,
