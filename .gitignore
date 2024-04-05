@@ -30,6 +30,8 @@ bin/monarch-policies
 .config/nvim/bundle
 .config/nvim/lazy-lock.json
 
+.config/tinted-theming/base16_shell_theme
+
 .config/.gsd-keyboard.settings-ported
 .config/anjuta/
 .config/anytype/
