@@ -152,6 +152,10 @@ vim.keymap.set("n", "<C-j>", "<C-w>j")
 vim.keymap.set("n", "<C-k>", "<C-w>k")
 vim.keymap.set("n", "<C-l>", "<C-w>l")
 
+-- Cursor stays in the middle when searching
+vim.keymap.set("n", "n", "nzzzv")
+vim.keymap.set("n", "N", "Nzzzv")
+
 vim.api.nvim_create_autocmd({ "BufRead", "BufNew" }, {
 	pattern = "*mutt-*",
 	command = "setlocal filetype=mail"
