@@ -224,13 +224,14 @@ require("lazy").setup({
 			--}
 
 			-- npm i -g bash-language-server
+			-- pacman -S bash-language-server
 			require"lspconfig".bashls.setup{
 				capabilities = capabilities,
 				on_attach = lsp_on_attach,
 			}
 
 			-- Disable all diagnostics
-			vim.lsp.handlers["textDocument/publishDiagnostics"] = function() end
+			--vim.lsp.handlers["textDocument/publishDiagnostics"] = function() end
 		end,
 	},
 	{
