@@ -123,5 +123,6 @@ alias b="$BROWSER"
 alias serve="ruby -run -e httpd . -p 9090"
 alias ussh="ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o LogLevel=quiet"
 alias ip="ip -color=auto"
+alias rd="BROWSER=firefox rustup docs --std"
 
 # }}}
