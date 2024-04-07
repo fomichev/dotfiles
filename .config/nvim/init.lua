@@ -323,6 +323,47 @@ require("lazy").setup({
 		"hrsh7th/nvim-cmp",
 		event = "InsertEnter",
 	},
+	{
+		"epwalsh/obsidian.nvim",
+		version = "main",
+		lazy = false,
+		event = {
+			"BufReadPre ~/Documents/Obsidian/Main/**.md",
+			"BufNewFile ~/Documents/Obsidian/Main/**.md",
+			"BufReadPre ~/src/kernel-scripts/Kernel/**.md",
+			"BufNewFile ~/src/kernel-scripts/Kernel/**.md",
+		},
+		dependencies = {
+			"nvim-lua/plenary.nvim",
+		},
+		opts = {
+			workspaces = {
+				{
+					name = "Main",
+					path = "~/Documents/Obsidian/Main/",
+				},
+				{
+					name = "Kernel",
+					path = "~/src/kernel-scripts/Kernel/",
+				},
+			},
+			daily_notes = {
+				folder = "Journal/",
+				date_format = "%Y-%m-%d",
+				template = 'journal.md'
+			},
+			templates = {
+				subdir = ".templates",
+			},
+			ui = {
+				checkboxes = {
+					[" "] = { char = "☐", hl_group = "ObsidianTodo" },
+					["x"] = { char = "✔", hl_group = "ObsidianDone" },
+				},
+				external_link_icon = { char = "", hl_group = "ObsidianExtLinkIcon" },
+			},
+		},
+	}
 })
 
 vim.keymap.set('n', '<Leader>d', vim.diagnostic.setloclist)
