@@ -186,6 +186,9 @@ vim.api.nvim_create_autocmd({ "BufRead", "BufNew" }, {
 	command = "setlocal filetype=c"
 })
 
+-- CursorHold timeout
+vim.o.updatetime = 500
+
 local lsp_on_attach = function(client, bufnr)
 	local opts = { noremap = true, silent = true, buffer = bufnr }
 
