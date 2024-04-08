@@ -163,6 +163,9 @@ vim.keymap.set("n", "<C-l>", "<C-w>l")
 vim.keymap.set("n", "n", "nzzzv")
 vim.keymap.set("n", "N", "Nzzzv")
 
+-- E (Explore) clashes with something else
+vim.api.nvim_create_user_command("E", "Explore", { nargs = 0})
+
 vim.api.nvim_create_autocmd({ "BufRead", "BufNew" }, {
 	pattern = "*mutt-*",
 	command = "setlocal filetype=mail"
@@ -405,12 +408,6 @@ vim.g.base16colorspace = 256
 vim.cmd("source $HOME/.vimrc_background")
 
 -- Local local vimrc
-vim.cmd[[
-	if filereadable(expand($HOME) . "/local/.vimrc")
-		source $HOME/local/.vimrc
-	endif
-]]
-
 vim.cmd[[
 	if filereadable(expand($HOME) . "/local/nvim.lua")
 		luafile $HOME/local/nvim.lua
