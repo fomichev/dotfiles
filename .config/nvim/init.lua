@@ -12,7 +12,7 @@ end
 vim.opt.rtp:prepend(lazypath)
 
 -- Free leader keys:
--- qwe tyui p[]\
+-- qwe tyuiop[]\
 --       jk ;'
 -- zxcv_nm .
 
@@ -193,7 +193,7 @@ local lsp_on_attach = function(client, bufnr)
 	vim.keymap.set("n", "K", vim.lsp.buf.hover, opts)
 	vim.keymap.set("n", "<C-k>", vim.lsp.buf.signature_help, opts)
 	vim.keymap.set({ "n", "v" }, "<Leader>a", vim.lsp.buf.code_action, opts)
-	vim.keymap.set({ "n", "v" }, "<Leader>o", vim.lsp.buf.format, opts)
+	vim.keymap.set({ "n", "v" }, "<Leader>.", vim.lsp.buf.format, opts)
 end
 
 require("lazy").setup({
