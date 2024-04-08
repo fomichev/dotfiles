@@ -197,6 +197,18 @@ local lsp_on_attach = function(client, bufnr)
 	vim.keymap.set("n", "<C-k>", vim.lsp.buf.signature_help, opts)
 	vim.keymap.set({ "n", "v" }, "<Leader>a", vim.lsp.buf.code_action, opts)
 	vim.keymap.set({ "n", "v" }, "<Leader>.", vim.lsp.buf.format, opts)
+
+	-- Highlight symbol under cursor in other parts of the document.
+	if client.server_capabilities.documentHighlightProvider then
+		local lsp_buffer_augroup = vim.api.nvim_create_augroup("lsp-buffer", {})
+
+		local function aucmd(event, callback)
+			vim.api.nvim_create_autocmd(event, { group = lsp_buffer_augroup, buffer = bufnr, callback = callback })
+		end
+
+		aucmd("CursorHold", function() vim.lsp.buf.document_highlight() end)
+		aucmd("CursorMoved", function() vim.lsp.buf.clear_references() end)
+	end
 end
 
 require("lazy").setup({
