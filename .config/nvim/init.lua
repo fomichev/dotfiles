@@ -11,6 +11,11 @@ if not (vim.uv or vim.loop).fs_stat(lazypath) then
 end
 vim.opt.rtp:prepend(lazypath)
 
+-- Free leader keys:
+-- qwe tyui p[]\
+--       jk ;'
+-- zxcv_nm .
+
 vim.g.mapleader = ","
 vim.keymap.set("n", "\\", ",")
 
@@ -84,6 +89,8 @@ vim.o.smartindent = false
 -- Enable spell check
 vim.o.spelllang = "en_us"
 vim.o.spell = true
+
+vim.keymap.set("n", "<Leader>s", ":set nospell<CR>")
 
 for _, v in ipairs({ "help", "qf", "gitendemail", }) do
 	vim.api.nvim_create_autocmd("FileType", {
@@ -186,7 +193,7 @@ local lsp_on_attach = function(client, bufnr)
 	vim.keymap.set("n", "K", vim.lsp.buf.hover, opts)
 	vim.keymap.set("n", "<C-k>", vim.lsp.buf.signature_help, opts)
 	vim.keymap.set({ "n", "v" }, "<Leader>a", vim.lsp.buf.code_action, opts)
-	vim.keymap.set({ "n", "v" }, "<Leader>f", vim.lsp.buf.format, opts)
+	vim.keymap.set({ "n", "v" }, "<Leader>o", vim.lsp.buf.format, opts)
 end
 
 require("lazy").setup({
@@ -244,7 +251,7 @@ require("lazy").setup({
 		dependencies = { "nvim-lua/plenary.nvim" },
 		config = function ()
 			local builtin = require("telescope.builtin")
-			vim.keymap.set("n", "<Leader><Leader>", builtin.find_files, {})
+			vim.keymap.set("n", "<Leader>,", builtin.find_files, {})
 			vim.keymap.set("n", "<Leader>f", builtin.live_grep, {})
 			vim.keymap.set("n", "<Leader>b", builtin.buffers, {})
 			vim.keymap.set("n", "<Leader>h", builtin.help_tags, {})
