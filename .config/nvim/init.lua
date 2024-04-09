@@ -15,6 +15,34 @@ vim.opt.rtp:prepend(lazypath)
 -- qwe  yuiop[]\
 --        k ;'
 -- zxcv_nm .
+--
+-- ,1 Grapple #1
+-- ,2 Grapple #2
+-- ,3 Grapple #3
+-- ,4 Grapple #4
+-- ,4 Grapple #4
+--
+-- ,a LSP actions
+-- ,b Telescope buffers
+-- ,d LSP show diagnostics
+-- ,f Telescope grep
+-- ,g Grep
+-- ,h Telescope help
+-- ,j Grapple show
+-- ,l Toggle list
+-- ,r Telescope old files
+-- ,s Disable spell checker
+-- ,t Grapple tag
+-- ,/ Disable search
+-- ,, Telescope files
+-- ,. LSP format
+--
+-- gD Goto declaration
+-- gd Goto definition
+-- gi Goto implementation
+-- gr Goto references
+-- S-k LSP hover
+-- C-k LSP signature
 
 vim.g.mapleader = ","
 vim.keymap.set("n", "\\", ",")
@@ -90,7 +118,7 @@ vim.o.smartindent = false
 vim.o.spelllang = "en_us"
 vim.o.spell = true
 
-vim.keymap.set("n", "<Leader>s", ":set nospell<CR>")
+vim.keymap.set("n", "<Leader>s", ":set nospell!<CR>")
 
 for _, v in ipairs({ "help", "qf", "gitendemail", }) do
 	vim.api.nvim_create_autocmd("FileType", {
@@ -412,8 +440,6 @@ require("lazy").setup({
 })
 
 vim.keymap.set('n', '<Leader>d', vim.diagnostic.setloclist)
-vim.keymap.set('n', '[d', vim.diagnostic.goto_prev)
-vim.keymap.set('n', ']d', vim.diagnostic.goto_next)
 
 local cmp = require"cmp"
 
