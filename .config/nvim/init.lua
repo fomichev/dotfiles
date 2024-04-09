@@ -219,6 +219,8 @@ vim.api.nvim_create_autocmd({ "BufRead", "BufNew" }, {
 -- CursorHold timeout
 vim.o.updatetime = 500
 
+local lsp_buffer_augroup = vim.api.nvim_create_augroup("lsp-buffer", {})
+
 local lsp_on_attach = function(client, bufnr)
 	local opts = { noremap = true, silent = true, buffer = bufnr }
 
@@ -231,16 +233,20 @@ local lsp_on_attach = function(client, bufnr)
 	vim.keymap.set({ "n", "v" }, "<Leader>a", vim.lsp.buf.code_action, opts)
 	vim.keymap.set({ "n", "v" }, "<Leader>.", vim.lsp.buf.format, opts)
 
+	local function aucmd(event, callback)
+		vim.api.nvim_create_autocmd(event, { group = lsp_buffer_augroup, buffer = bufnr, callback = callback })
+	end
+
+	if client.server_capabilities.documentFormattingProvider then
+		if vim.bo[bufnr].filetype ~= "c" then
+			aucmd("BufWritePre", vim.lsp.buf.format)
+		end
+	end
+
 	-- Highlight symbol under cursor in other parts of the document.
 	if client.server_capabilities.documentHighlightProvider then
-		local lsp_buffer_augroup = vim.api.nvim_create_augroup("lsp-buffer", {})
-
-		local function aucmd(event, callback)
-			vim.api.nvim_create_autocmd(event, { group = lsp_buffer_augroup, buffer = bufnr, callback = callback })
-		end
-
-		aucmd("CursorHold", function() vim.lsp.buf.document_highlight() end)
-		aucmd("CursorMoved", function() vim.lsp.buf.clear_references() end)
+		aucmd("CursorHold", vim.lsp.buf.document_highlight)
+		aucmd("CursorMoved", vim.lsp.buf.clear_references)
 	end
 end
 
