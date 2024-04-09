@@ -12,8 +12,8 @@ end
 vim.opt.rtp:prepend(lazypath)
 
 -- Free leader keys:
--- qwe tyuiop[]\
---       jk ;'
+-- qwe  yuiop[]\
+--        k ;'
 -- zxcv_nm .
 
 vim.g.mapleader = ","
@@ -390,7 +390,25 @@ require("lazy").setup({
 				external_link_icon = { char = "", hl_group = "ObsidianExtLinkIcon" },
 			},
 		},
-	}
+	},
+	{
+		"cbochs/grapple.nvim",
+		opts = {
+			scope = "lsp",
+			icons = false,
+			status = false,
+		},
+		keys = {
+			{ "<leader>t", "<cmd>Grapple toggle<cr>"},
+			{ "<leader>j", "<cmd>Grapple toggle_tags<cr>"},
+
+			{ "<leader>1", "<cmd>silent Grapple select index=1<cr>"},
+			{ "<leader>2", "<cmd>silent Grapple select index=2<cr>"},
+			{ "<leader>3", "<cmd>silent Grapple select index=3<cr>"},
+			{ "<leader>4", "<cmd>silent Grapple select index=4<cr>"},
+			{ "<leader>5", "<cmd>silent Grapple select index=5<cr>"},
+		},
+	},
 })
 
 vim.keymap.set('n', '<Leader>d', vim.diagnostic.setloclist)
