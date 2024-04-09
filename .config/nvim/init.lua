@@ -14,7 +14,7 @@ vim.opt.rtp:prepend(lazypath)
 -- Free leader keys:
 -- qwe  yuiop[]\
 --        k ;'
--- zxcv_nm .
+-- zx   nm .
 --
 -- ,1 Grapple #1
 -- ,2 Grapple #2
@@ -24,6 +24,7 @@ vim.opt.rtp:prepend(lazypath)
 --
 -- ,a LSP actions
 -- ,b Telescope buffers
+-- ,c Grapple prev tag
 -- ,d LSP show diagnostics
 -- ,f Telescope grep
 -- ,g Grep
@@ -33,6 +34,7 @@ vim.opt.rtp:prepend(lazypath)
 -- ,r Telescope old files
 -- ,s Disable spell checker
 -- ,t Grapple tag
+-- ,v Grapple next tag
 -- ,/ Disable search
 -- ,, Telescope files
 -- ,. LSP format
@@ -427,14 +429,17 @@ require("lazy").setup({
 			status = false,
 		},
 		keys = {
-			{ "<leader>t", "<cmd>Grapple toggle<cr>"},
-			{ "<leader>j", "<cmd>Grapple toggle_tags<cr>"},
+			{ "<leader>t", "<cmd>Grapple toggle<cr>" },
+			{ "<leader>j", "<cmd>Grapple toggle_tags<cr>" },
 
-			{ "<leader>1", "<cmd>silent Grapple select index=1<cr>"},
-			{ "<leader>2", "<cmd>silent Grapple select index=2<cr>"},
-			{ "<leader>3", "<cmd>silent Grapple select index=3<cr>"},
-			{ "<leader>4", "<cmd>silent Grapple select index=4<cr>"},
-			{ "<leader>5", "<cmd>silent Grapple select index=5<cr>"},
+			{ "<leader>1", "<cmd>silent Grapple select index=1<cr>" },
+			{ "<leader>2", "<cmd>silent Grapple select index=2<cr>" },
+			{ "<leader>3", "<cmd>silent Grapple select index=3<cr>" },
+			{ "<leader>4", "<cmd>silent Grapple select index=4<cr>" },
+			{ "<leader>5", "<cmd>silent Grapple select index=5<cr>" },
+
+			{ "<leader>v", "<cmd>silent Grapple cycle_tags next<cr>" },
+			{ "<leader>c", "<cmd>silent Grapple cycle_tags prev<cr>" },
 		},
 	},
 })
