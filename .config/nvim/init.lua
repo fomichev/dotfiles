@@ -425,6 +425,10 @@ require("lazy").setup({
 				},
 				external_link_icon = { char = "", hl_group = "ObsidianExtLinkIcon" },
 			},
+			note_path_func = function(spec)
+				local path = spec.dir / tostring(spec.title)
+				return path:with_suffix(".md")
+			end,
 		},
 	},
 	{
