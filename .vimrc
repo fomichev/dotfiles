@@ -136,17 +136,8 @@ else
 	set backupdir=~/.vim/tmp
 endif
 
-" enable spell check
-set spelllang=en_us,ru
-set spellfile=$HOME/.vim/spell/all.add
-set spell
-
-autocmd FileType help setlocal nospell
-autocmd FileType qf setlocal nospell
-autocmd FileType gitsendemail setlocal nospell
-
 " use homegrown grep wrapper
-set grepprg=g\ $*
+set grepprg=g\ --vimgrep\ --no-heading\ $*
 noremap <Leader>g :Grep<space>
 command! -nargs=+ Grep execute 'silent grep <args>' | botright copen | redraw!
 
@@ -164,9 +155,6 @@ if version >= 703
 	" set undo directory
 	if has('win32')
 		set undodir=$HOME/.vim/tmp
-	elseif has("nvim")
-		set undodir=~/.config/vim/tmp
-	else
 		set undodir=~/.vim/tmp
 	endif
 endif
@@ -181,18 +169,13 @@ set termguicolors
 " https://github.com/mobile-shell/mosh/commit/ce7ba37ad4e493769a126db2b39b8a9aa9121278
 set notermguicolors
 
-if !has("nvim")
-    " :help xterm-true-color (for vim inside of tmux)
-    let &t_8f = "\<Esc>[38;2;%lu;%lu;%lum"
-    let &t_8b = "\<Esc>[48;2;%lu;%lu;%lum"
+" :help xterm-true-color (for vim inside of tmux)
+let &t_8f = "\<Esc>[38;2;%lu;%lu;%lum"
+let &t_8b = "\<Esc>[48;2;%lu;%lu;%lum"
 
-    syntax enable
-endif
+syntax enable
 
-if filereadable(expand("~/.vimrc_background"))
-  let base16colorspace=256
-  source ~/.vimrc_background
-endif
+colorscheme desert
 
 " 1}}}
 " Mappings {{{1
@@ -272,38 +255,4 @@ let g:netrw_special_syntax = 1
 let g:netrw_browse_split = 0
 
 " 2}}}
-" DirDiff {{{2
-
-let g:DirDiffExcludes = ".hg,.git,*.o,*.a"
-
-" 2}}}
-" Rust {{{2
-
-let g:rustfmt_autosave = 1
-
-" 2}}}
-" 1}}}
-" Associations {{{1
-
-" treat .h files as C files
-let g:c_syntax_for_h=1
-
-autocmd BufRead,BufNewFile *mutt-* setfiletype mail
-autocmd BufRead,BufNewFile *.md setlocal filetype=markdown
-autocmd BufRead,BufNewFile *.cls setlocal filetype=tex
-autocmd BufRead,BufNewFile *.taskpaper setlocal filetype=taskpaper
-
-" 1}}}
-" FZF {{{1
-
-noremap <Leader>, :FZF<CR>
-
-" 1}}}
-" Local configuration {{{1
-
-" execute local configuration
-if filereadable(expand($HOME) . '/local/.vimrc')
-	source $HOME/local/.vimrc
-endif
-
 " 1}}}
