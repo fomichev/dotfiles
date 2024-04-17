@@ -84,10 +84,10 @@ host() {
 	local cmdline
 
 	local fs
-	fs+=" -fsdev local,id=vfs1,path=$DIR_ROOT,security_model=none,readonly=on"
-	fs+=" -fsdev local,id=vfs2,path=$(pwd),security_model=none"
-	fs+=" -fsdev local,id=vfs3,path=$DIR_EXPORT,security_model=none"
-	fs+=" -fsdev local,id=vfs4,path=$DIR_Q,security_model=none,readonly=on"
+	fs+=" -fsdev local,id=vfs1,path=$DIR_ROOT,multidevs=remap,security_model=none,readonly=on"
+	fs+=" -fsdev local,id=vfs2,path=$(pwd),multidevs=remap,security_model=none"
+	fs+=" -fsdev local,id=vfs3,path=$DIR_EXPORT,multidevs=remap,security_model=none"
+	fs+=" -fsdev local,id=vfs4,path=$DIR_Q,multidevs=remap,security_model=none,readonly=on"
 	fs+=" -device virtio-9p-pci,fsdev=vfs1,mount_tag=/dev/root"
 	fs+=" -device virtio-9p-pci,fsdev=vfs2,mount_tag=/dev/kernel"
 	fs+=" -device virtio-9p-pci,fsdev=vfs3,mount_tag=$DIR_EXPORT"
