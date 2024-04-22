@@ -218,6 +218,8 @@ rows = [
 ]
 
 def header():
+    print("<!-- https://html-preview.github.io/?url=https://github.com/fomichev/dotfiles/blob/master/keyboard/layout.html -->")
+
     print("<html>")
 
     print("<head>")
