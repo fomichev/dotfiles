@@ -223,6 +223,9 @@ vim.o.updatetime = 500
 vim.keymap.set("n", "<C-p>", ":silent cprev<CR>")
 vim.keymap.set("n", "<C-n>", ":silent cnext<CR>")
 
+-- No LSP info on the side
+vim.o.signcolumn = "no"
+
 local lsp_buffer_augroup = vim.api.nvim_create_augroup("lsp-buffer", {})
 
 local lsp_on_attach = function(client, bufnr)
