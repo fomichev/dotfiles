@@ -244,11 +244,11 @@ local lsp_on_attach = function(client, bufnr)
 		vim.api.nvim_create_autocmd(event, { group = lsp_buffer_augroup, buffer = bufnr, callback = callback })
 	end
 
-	if client.server_capabilities.documentFormattingProvider then
-		if vim.bo[bufnr].filetype ~= "c" then
-			aucmd("BufWritePre", vim.lsp.buf.format)
-		end
-	end
+--	if client.server_capabilities.documentFormattingProvider then
+--		if vim.bo[bufnr].filetype ~= "c" then
+--			aucmd("BufWritePre", vim.lsp.buf.format)
+--		end
+--	end
 
 	-- Highlight symbol under cursor in other parts of the document.
 	if client.server_capabilities.documentHighlightProvider then
