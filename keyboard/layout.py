@@ -80,8 +80,8 @@ rows = [
         { NORMAL: "`", SHIFT: "~", },
         { NORMAL: "A", },
         { NORMAL: "S", },
-        { NORMAL: "D", LAYER_AUX: "ScrnPrv", },
-        { NORMAL: "F", LAYER_AUX: "ScrnNxt", },
+        { NORMAL: "D", },
+        { NORMAL: "F", },
         { NORMAL: "G", LAYER_AUX: "RU_EN", },
 
         None,
@@ -100,7 +100,7 @@ rows = [
     ],
 
     [
-        { NORMAL: "", },
+        { NORMAL: "Super", HOLD: "<div class=\"layer_aux\">Aux</div>", },
         { NORMAL: "Z", },
         { NORMAL: "X", },
         { NORMAL: "C", },
@@ -119,15 +119,15 @@ rows = [
         { NORMAL: ",", LAYER_AUX: "🛞 Up", SHIFT: "<", },
         { NORMAL: ".", LAYER_AUX: "🛞 Right", SHIFT: ">", },
         { NORMAL: "/", SHIFT: "?", },
-        { NORMAL: "", },
+        { NORMAL: "Super", HOLD: "<div class=\"layer_aux\">Aux</div>", },
     ],
 
     [
         None,
-        { NORMAL: "<", LAYER_AUX: "PRG", },
-        { NORMAL: "(", },
-        { NORMAL: "{", },
-        { NORMAL: "[", },
+        { NORMAL: "", LAYER_AUX: "PRG", },
+        { NORMAL: "ScrnPrv", },
+        { NORMAL: "[", SHIFT: "{", },
+        { NORMAL: "Shift", },
         None,
 
         None,
@@ -138,10 +138,10 @@ rows = [
         None,
 
         None,
-        { NORMAL: "]", },
-        { NORMAL: "}", },
-        { NORMAL: ")", },
-        { NORMAL: ">", LAYER_AUX: "DBG", },
+        { NORMAL: "Shift", },
+        { NORMAL: "]", SHIFT: "}", },
+        { NORMAL: "ScrnNxt", },
+        { NORMAL: "", LAYER_AUX: "DBG", },
         None,
     ],
 
@@ -153,12 +153,12 @@ rows = [
         None,
         None,
 
-        { NORMAL: "Esc", HOLD: "Ctrl", },
-        { NORMAL: "Super", HOLD: "<div class=\"layer_aux\">Aux</div>", },
+        { NORMAL: "Ctrl", },
+        { NORMAL: "Alt", },
         None,
         None,
-        { NORMAL: "Super", HOLD: "<div class=\"layer_aux\">Aux</div>", },
-        { NORMAL: "Esc", HOLD: "Ctrl", },
+        { NORMAL: "Alt", },
+        { NORMAL: "Ctrl", },
 
         None,
         None,
@@ -197,16 +197,16 @@ rows = [
         None,
         None,
         None,
-        { NORMAL: "Backpace", HOLD: "<div class=\"key_shift\">Shift</div>", },
+        { NORMAL: "Backpace", },
 
-        { NORMAL: "Delete", HOLD: "Alt", },
+        { NORMAL: "Esc", },
         { NORMAL: "Right", SHIFT: "End", },
         None,
         None,
         { NORMAL: "Down", SHIFT: "PgDn", LAYER_AUX: "🖱️ MB", },
-        { NORMAL: "Enter", HOLD: "Alt", LAYER_AUX: "🖱️ LB", },
+        { NORMAL: "Enter", LAYER_AUX: "🖱️ LB", },
 
-        { NORMAL: "Space", HOLD: "<div class=\"key_shift\">Shift</div>", LAYER_AUX: "🖱️ RB", },
+        { NORMAL: "Space", LAYER_AUX: "🖱️ RB", },
         None,
         None,
         None,
