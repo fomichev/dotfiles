@@ -31,12 +31,12 @@ rows = [
     ],
 
     [
-        { NORMAL: "=", SHIFT: "+", LAYER_AUX: "TapDelay+", },
-        { NORMAL: "1", SHIFT: "!", },
-        { NORMAL: "2", SHIFT: "@", },
-        { NORMAL: "3", SHIFT: "#", },
-        { NORMAL: "4", SHIFT: "$", },
-        { NORMAL: "5", SHIFT: "%", },
+        { NORMAL: "=", SHIFT: "+", LAYER_AUX: "F12", },
+        { NORMAL: "1", SHIFT: "!", LAYER_AUX: "F1", },
+        { NORMAL: "2", SHIFT: "@", LAYER_AUX: "F2", },
+        { NORMAL: "3", SHIFT: "#", LAYER_AUX: "F3", },
+        { NORMAL: "4", SHIFT: "$", LAYER_AUX: "F4", },
+        { NORMAL: "5", SHIFT: "%", LAYER_AUX: "F5", },
 
         None,
         None,
@@ -45,16 +45,16 @@ rows = [
         None,
         None,
 
-        { NORMAL: "6", SHIFT: "^", },
-        { NORMAL: "7", SHIFT: "&", },
-        { NORMAL: "8", SHIFT: "*", },
-        { NORMAL: "9", SHIFT: "(", },
-        { NORMAL: "0", SHIFT: ")", },
-        { NORMAL: "-", SHIFT: "_", LAYER_AUX: "TapDelay-", },
+        { NORMAL: "6", SHIFT: "^", LAYER_AUX: "F6", },
+        { NORMAL: "7", SHIFT: "&", LAYER_AUX: "F7", },
+        { NORMAL: "8", SHIFT: "*", LAYER_AUX: "F8", },
+        { NORMAL: "9", SHIFT: "(", LAYER_AUX: "F9", },
+        { NORMAL: "0", SHIFT: ")", LAYER_AUX: "F10", },
+        { NORMAL: "-", SHIFT: "_", LAYER_AUX: "F11", },
     ],
 
     [
-        { NORMAL: "Tab", LAYER_AUX: "TapDelay", },
+        { NORMAL: "Tab", },
         { NORMAL: "Q", },
         { NORMAL: "W", },
         { NORMAL: "E", },
@@ -100,7 +100,7 @@ rows = [
     ],
 
     [
-        { NORMAL: "Super", HOLD: "<div class=\"layer_aux\">Aux</div>", },
+        { NORMAL: "Super", },
         { NORMAL: "Z", },
         { NORMAL: "X", },
         { NORMAL: "C", },
@@ -119,15 +119,15 @@ rows = [
         { NORMAL: ",", LAYER_AUX: "🛞 Up", SHIFT: "<", },
         { NORMAL: ".", LAYER_AUX: "🛞 Right", SHIFT: ">", },
         { NORMAL: "/", SHIFT: "?", },
-        { NORMAL: "Super", HOLD: "<div class=\"layer_aux\">Aux</div>", },
+        { NORMAL: "Super", },
     ],
 
     [
         None,
-        { NORMAL: "", LAYER_AUX: "PRG", },
+        { NORMAL: "", HOLD: "<div class=\"layer_aux\">Aux</div>", },
         { NORMAL: "ScrnPrv", },
         { NORMAL: "[", SHIFT: "{", },
-        { NORMAL: "Shift", },
+        { NORMAL: "Shift", LAYER_AUX: "PRG", },
         None,
 
         None,
@@ -138,10 +138,10 @@ rows = [
         None,
 
         None,
-        { NORMAL: "Shift", },
+        { NORMAL: "Shift", LAYER_AUX: "DBG", },
         { NORMAL: "]", SHIFT: "}", },
         { NORMAL: "ScrnNxt", },
-        { NORMAL: "", LAYER_AUX: "DBG", },
+        { NORMAL: "", HOLD: "<div class=\"layer_aux\">Aux</div>", },
         None,
     ],
 
