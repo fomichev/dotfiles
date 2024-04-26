@@ -124,9 +124,9 @@ rows = [
 
     [
         None,
-        { NORMAL: "", HOLD: "<div class=\"layer_aux\">Aux</div>", },
-        { NORMAL: "ScrnPrv", },
+        { NORMAL: "<div class=\"layer_aux\">Aux</div>", },
         { NORMAL: "[", SHIFT: "{", },
+        { NORMAL: "Alt", },
         { NORMAL: "Shift", LAYER_AUX: "PRG", },
         None,
 
@@ -139,9 +139,9 @@ rows = [
 
         None,
         { NORMAL: "Shift", LAYER_AUX: "DBG", },
+        { NORMAL: "Alt", },
         { NORMAL: "]", SHIFT: "}", },
-        { NORMAL: "ScrnNxt", },
-        { NORMAL: "", HOLD: "<div class=\"layer_aux\">Aux</div>", },
+        { NORMAL: "<div class=\"layer_aux\">Aux</div>", },
         None,
     ],
 
@@ -154,10 +154,10 @@ rows = [
         None,
 
         { NORMAL: "Ctrl", },
-        { NORMAL: "Alt", },
+        { NORMAL: "ScrnPrv", },
         None,
         None,
-        { NORMAL: "Alt", },
+        { NORMAL: "ScrnNxt", },
         { NORMAL: "Ctrl", },
 
         None,
