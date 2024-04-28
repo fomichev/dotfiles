@@ -12,42 +12,44 @@ end
 vim.opt.rtp:prepend(lazypath)
 
 -- Free leader keys:
--- qwe  yuiop[]\
---        k ;'
+-- qwe  yui p[]\
+--        k  '
 -- zx   nm .
 --
--- ,1 Grapple #1
--- ,2 Grapple #2
--- ,3 Grapple #3
--- ,4 Grapple #4
--- ,4 Grapple #4
+-- <Leader>1 Grapple #1
+-- <Leader>2 Grapple #2
+-- <Leader>3 Grapple #3
+-- <Leader>4 Grapple #4
+-- <Leader>4 Grapple #4
 --
--- ,a LSP actions
--- ,b Telescope buffers
--- ,c Grapple prev tag
--- ,d LSP show diagnostics
--- ,f Telescope grep
--- ,g Grep
--- ,h Telescope help
--- ,j Grapple show
--- ,l Toggle list
--- ,r Telescope old files
--- ,s Disable spell checker
--- ,t Grapple tag
--- ,v Grapple next tag
--- ,/ Disable search
--- ,, Telescope files
--- ,. LSP format
+-- <Leader>a LSP actions
+-- <Leader>b Telescope buffers
+-- <Leader>c Grapple prev tag
+-- <Leader>d LSP show diagnostics
+--
+-- <Leader>f Telescope files
+-- <Leader>g Grep
+-- <Leader>h Telescope help
+-- <Leader>j Grapple show
+-- <Leader>k LSP docs
+-- <Leader>l Toggle list
+-- <Leader>o Ollama
+-- <Leader>r Telescope old files
+-- <Leader>s Disable spell checker
+-- <Leader>t Grapple tag
+-- <Leader>v Grapple next tag
+--
+-- <Leader>; Disable search
+-- <Leader>/ Telescope grep
+-- <Leader>. LSP format
 --
 -- gD Goto declaration
 -- gd Goto definition
 -- gi Goto implementation
 -- gr Goto references
--- S-k LSP hover
--- C-k LSP signature
 
-vim.g.mapleader = ","
-vim.keymap.set("n", "\\", ",")
+vim.g.mapleader = " "
+--vim.keymap.set("n", "\\", ",")
 
 -- Don't use mouse
 vim.o.mouse = ""
@@ -168,7 +170,7 @@ vim.keymap.set("n", "/", "/\\v")
 vim.keymap.set("n", "?", "?\\v")
 
 -- Disable search highlight
-vim.keymap.set("n", "<Leader>/", ":silent :nohlsearch<CR>")
+vim.keymap.set("n", "<Leader>;", ":silent :nohlsearch<CR>")
 
 -- Toggle list option
 vim.o.listchars = "tab:> ,trail:-,nbsp:+,eol:$"
@@ -235,8 +237,7 @@ local lsp_on_attach = function(client, bufnr)
 	vim.keymap.set("n", "gd", vim.lsp.buf.definition, opts)
 	vim.keymap.set("n", "gi", vim.lsp.buf.implementation, opts)
 	vim.keymap.set("n", "gr", vim.lsp.buf.references, opts)
-	vim.keymap.set("n", "K", vim.lsp.buf.hover, opts)
-	vim.keymap.set("n", "<C-k>", vim.lsp.buf.signature_help, opts)
+	vim.keymap.set("n", "<Leader>k", vim.lsp.buf.hover, opts)
 	vim.keymap.set({ "n", "v" }, "<Leader>a", vim.lsp.buf.code_action, opts)
 	vim.keymap.set({ "n", "v" }, "<Leader>.", vim.lsp.buf.format, opts)
 
@@ -314,8 +315,8 @@ require("lazy").setup({
 		dependencies = { "nvim-lua/plenary.nvim" },
 		config = function ()
 			local builtin = require("telescope.builtin")
-			vim.keymap.set("n", "<Leader>,", builtin.find_files, {})
-			vim.keymap.set("n", "<Leader>f", builtin.live_grep, {})
+			vim.keymap.set("n", "<Leader>f", builtin.find_files, {})
+			vim.keymap.set("n", "<Leader>/", builtin.live_grep, {})
 			vim.keymap.set("n", "<Leader>b", builtin.buffers, {})
 			vim.keymap.set("n", "<Leader>h", builtin.help_tags, {})
 			vim.keymap.set("n", "<Leader>r", builtin.oldfiles, {})
@@ -359,8 +360,7 @@ require("lazy").setup({
 				},
 			}
 
-			-- Map normal and visual mode SPACE to ollama
-			vim.keymap.set({ "n", "v" }, "<space>", ":Gen<CR>")
+			vim.keymap.set({ "n", "v" }, "<Leader>o", ":Gen<CR>")
 		end,
 	},
 	{
@@ -446,17 +446,17 @@ require("lazy").setup({
 			status = false,
 		},
 		keys = {
-			{ "<leader>t", "<cmd>Grapple toggle<cr>" },
-			{ "<leader>j", "<cmd>Grapple toggle_tags<cr>" },
+			{ "<Leader>t", "<cmd>Grapple toggle<cr>" },
+			{ "<Leader>j", "<cmd>Grapple toggle_tags<cr>" },
 
-			{ "<leader>1", "<cmd>silent Grapple select index=1<cr>" },
-			{ "<leader>2", "<cmd>silent Grapple select index=2<cr>" },
-			{ "<leader>3", "<cmd>silent Grapple select index=3<cr>" },
-			{ "<leader>4", "<cmd>silent Grapple select index=4<cr>" },
-			{ "<leader>5", "<cmd>silent Grapple select index=5<cr>" },
+			{ "<Leader>1", "<cmd>silent Grapple select index=1<cr>" },
+			{ "<Leader>2", "<cmd>silent Grapple select index=2<cr>" },
+			{ "<Leader>3", "<cmd>silent Grapple select index=3<cr>" },
+			{ "<Leader>4", "<cmd>silent Grapple select index=4<cr>" },
+			{ "<Leader>5", "<cmd>silent Grapple select index=5<cr>" },
 
-			{ "<leader>v", "<cmd>silent Grapple cycle_tags next<cr>" },
-			{ "<leader>c", "<cmd>silent Grapple cycle_tags prev<cr>" },
+			{ "<Leader>v", "<cmd>silent Grapple cycle_tags next<cr>" },
+			{ "<Leader>c", "<cmd>silent Grapple cycle_tags prev<cr>" },
 		},
 	},
 })
