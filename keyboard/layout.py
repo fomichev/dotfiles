@@ -3,7 +3,7 @@
 STYLE = 0
 NORMAL = 1
 SHIFT = 2
-HOLD = 3
+CTRL = 3
 LAYER_AUX = 4
 
 rows = [
@@ -138,7 +138,7 @@ rows = [
         None,
 
         None,
-        { NORMAL: "Shift", LAYER_AUX: "DBG", },
+        { NORMAL: "Shift", },
         { NORMAL: "Alt", },
         { NORMAL: "]", SHIFT: "}", },
         { NORMAL: "<div class=\"layer_aux\">Aux</div>", },
@@ -177,10 +177,10 @@ rows = [
         None,
 
         None,
-        { NORMAL: "Left", SHIFT: "Home", },
+        { NORMAL: "Left", CTRL: "Home", },
         None,
         None,
-        { NORMAL: "Up", SHIFT: "PgUp", },
+        { NORMAL: "Up", CTRL: "PgUp", },
         None,
 
         None,
@@ -200,10 +200,10 @@ rows = [
         { NORMAL: "Backpace", },
 
         { NORMAL: "Esc", },
-        { NORMAL: "Right", SHIFT: "End", },
+        { NORMAL: "Right", CTRL: "End", },
         None,
         None,
-        { NORMAL: "Down", SHIFT: "PgDn", LAYER_AUX: "🖱️ MB", },
+        { NORMAL: "Down", CTRL: "PgDn", LAYER_AUX: "🖱️ MB", },
         { NORMAL: "Enter", LAYER_AUX: "🖱️ LB", },
 
         { NORMAL: "Space", LAYER_AUX: "🖱️ RB", },
@@ -248,8 +248,9 @@ def header():
     print("    .key_norm {")
     print("      text-align: center;")
     print("    }")
-    print("    .key_hold {")
+    print("    .key_ctrl {")
     print("      text-align: left;")
+    print("      color: blue;")
     print("    }")
     print("  </style>")
     print("</head>")
@@ -268,7 +269,7 @@ def format_key(kd):
     norm = kd[NORMAL]
     style = kd.get(STYLE, "key")
     shift = kd.get(SHIFT, "&nbsp;")
-    hold = kd.get(HOLD, "&nbsp;")
+    ctrl = kd.get(CTRL, "&nbsp;")
     layer_aux = kd.get(LAYER_AUX, "&nbsp;")
 
     return """
@@ -290,7 +291,7 @@ def format_key(kd):
           </tr>
           <tr>
             <td>
-                <div class="key_hold">{hold}</div>
+                <div class="key_ctrl">{ctrl}</div>
             </td>
           </tr>
         </table>
@@ -298,7 +299,7 @@ def format_key(kd):
         style = style,
         norm = norm,
         shift = shift,
-        hold = hold,
+        ctrl = ctrl,
         layer_aux = layer_aux,
     )
 
