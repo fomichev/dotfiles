@@ -1,0 +1,7 @@
+#!/bin/bash
+
+src=(https://github.com/helix-editor/helix.git)
+
+post_build() {
+	ln -Ts "$S/runtime" ~/.config/helix/runtime
+}
