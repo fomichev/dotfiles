@@ -7,6 +7,7 @@ auto-pairs = false
 # TODO: flip this to false eventually?
 auto-info = true
 indent-heuristic = "hybrid"
+line-number = "relative"
 
 # https://github.com/LGUG2Z/helix-vim/blob/master/config.toml
 
