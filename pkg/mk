@@ -221,7 +221,7 @@ __invoke_step() {
 }
 
 __build_cmake() {
-	cmake -DCMAKE_INSTALL_PREFIX=$R ${cmake_flags[@]} "$1"
+	cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=$R ${cmake_flags[@]} "$1"
 	cmake --build .
 	cmake ${install_flags[@]} \
 		-DCMAKE_INSTALL_PREFIX=$R \
