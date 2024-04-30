@@ -228,6 +228,10 @@ __build_cmake() {
 		-P cmake_install.cmake
 }
 
+__build_cargo() {
+	(cd "$S" && cargo install --path helix-term --locked --root "$PREFIX")
+}
+
 __build_autoconf() {
 	[ -x "$S/autogen.sh" ] && (cd "$S" && ./autogen.sh) || :
 	[ -e "$S/configure.ac" -a ! -e "$S/configure" ] && (cd "$S" && autoreconf -fi) || :
@@ -254,6 +258,8 @@ build() {
 
 	if [ -f "$src/CMakeLists.txt" ]; then
 		__build_cmake "$src"
+	elif [ -f "$src/Cargo.toml" ]; then
+		__build_cargo "$src"
 	elif [ -f "$src/configure" -o -f "$src/configure.ac" ]; then
 		if $build_in_src; then
 			cd "$S"
@@ -314,7 +320,7 @@ __build() {
 	mkdir -p "$SRC" "$STAMP" "$B" "$R/bin"
 
 	say "pre fetch $B"
-	(cd $S && __with_clean_env pre_fetch)
+	(cd $B && __with_clean_env pre_fetch)
 	if __invoke_step fetch; then
 		say "fetch $S"
 		(cd $SRC && fetch)
