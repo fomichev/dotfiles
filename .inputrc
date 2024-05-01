@@ -23,4 +23,3 @@ set visible-stats on
 
 set keymap vi-insert
 "\C-l": clear-screen
-"jj": vi-movement-mode
