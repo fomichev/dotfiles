@@ -16,28 +16,32 @@ vim.opt.rtp:prepend(lazypath)
 --        k  '
 -- zx   nm .
 --
--- <Leader>1 Grapple #1
--- <Leader>2 Grapple #2
--- <Leader>3 Grapple #3
--- <Leader>4 Grapple #4
--- <Leader>4 Grapple #4
+-- <Leader>1 Harpoon #1
+-- <Leader>2 Harpoon #2
+-- <Leader>3 Harpoon #3
+-- <Leader>4 Harpoon #4
+-- <Leader>5 Harpoon #5
+-- <Leader>6 Harpoon #6
+-- <Leader>7 Harpoon #7
+-- <Leader>8 Harpoon #8
+-- <Leader>9 Harpoon #9
 --
 -- <Leader>a LSP actions
 -- <Leader>b Telescope buffers
--- <Leader>c Grapple prev tag
+-- <Leader>c Harpoon prev tag
 -- <Leader>d LSP show diagnostics
 --
 -- <Leader>f Telescope files
 -- <Leader>g Grep
 -- <Leader>h Telescope help
--- <Leader>j Grapple show
+-- <Leader>j Harpoon show
 -- <Leader>k LSP docs
 -- <Leader>l Toggle list
 -- <Leader>o Ollama
 -- <Leader>r Telescope old files
 -- <Leader>s Disable spell checker
--- <Leader>t Grapple tag
--- <Leader>v Grapple next tag
+-- <Leader>t Harpoon tag
+-- <Leader>v Harpoon next tag
 --
 -- <Leader>; Disable search
 -- <Leader>/ Telescope grep
@@ -439,29 +443,32 @@ require("lazy").setup({
 		},
 	},
 	{
-		"cbochs/grapple.nvim",
-		opts = {
-			scope = "lsp",
-			icons = false,
-			status = false,
-		},
-		keys = {
-			{ "<Leader>t", "<cmd>Grapple toggle<cr>" },
-			{ "<Leader>j", "<cmd>Grapple toggle_tags<cr>" },
-
-			{ "<Leader>1", "<cmd>silent Grapple select index=1<cr>" },
-			{ "<Leader>2", "<cmd>silent Grapple select index=2<cr>" },
-			{ "<Leader>3", "<cmd>silent Grapple select index=3<cr>" },
-			{ "<Leader>4", "<cmd>silent Grapple select index=4<cr>" },
-			{ "<Leader>5", "<cmd>silent Grapple select index=5<cr>" },
-
-			{ "<Leader>v", "<cmd>silent Grapple cycle_tags next<cr>" },
-			{ "<Leader>c", "<cmd>silent Grapple cycle_tags prev<cr>" },
+		"ThePrimeagen/harpoon",
+		branch = "harpoon2",
+		dependencies = {
+			"nvim-lua/plenary.nvim",
+			"nvim-telescope/telescope.nvim",
 		},
 	},
 })
 
 vim.keymap.set('n', '<Leader>d', vim.diagnostic.setloclist)
+
+-- Harpoon
+
+local harpoon = require('harpoon')
+harpoon:setup({})
+
+vim.keymap.set("n", "<Leader>t", function() harpoon:list():add() end)
+vim.keymap.set("n", "<Leader>j", function() harpoon.ui:toggle_quick_menu(harpoon:list()) end)
+
+vim.keymap.set("n", "<Leader>1", function() harpoon:list():select(1) end)
+vim.keymap.set("n", "<Leader>2", function() harpoon:list():select(2) end)
+vim.keymap.set("n", "<Leader>3", function() harpoon:list():select(3) end)
+vim.keymap.set("n", "<Leader>4", function() harpoon:list():select(4) end)
+
+vim.keymap.set("n", "<Leader>v", function() harpoon:list():prev() end)
+vim.keymap.set("n", "<Leader>c", function() harpoon:list():next() end)
 
 local cmp = require"cmp"
 
