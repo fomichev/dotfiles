@@ -12,19 +12,14 @@ end
 vim.opt.rtp:prepend(lazypath)
 
 -- Free leader keys:
--- qwe  yui p[]\
---        k  '
--- zx   nm .
+-- qwe__   yuiop[]\
+-- _____   __k__'
+-- zx___   nm_._
 --
--- <Leader>1 Harpoon #1
--- <Leader>2 Harpoon #2
--- <Leader>3 Harpoon #3
--- <Leader>4 Harpoon #4
--- <Leader>5 Harpoon #5
--- <Leader>6 Harpoon #6
--- <Leader>7 Harpoon #7
--- <Leader>8 Harpoon #8
--- <Leader>9 Harpoon #9
+-- <Leader>y Harpoon #1
+-- <Leader>u Harpoon #2
+-- <Leader>i Harpoon #3
+-- <Leader>o Harpoon #4
 --
 -- <Leader>a LSP actions
 -- <Leader>b Telescope buffers
@@ -37,7 +32,7 @@ vim.opt.rtp:prepend(lazypath)
 -- <Leader>j Harpoon show
 -- <Leader>k LSP docs
 -- <Leader>l Toggle list
--- <Leader>o Ollama
+-- <Leader>x Ollama
 -- <Leader>r Telescope old files
 -- <Leader>s Disable spell checker
 -- <Leader>t Harpoon tag
@@ -364,7 +359,7 @@ require("lazy").setup({
 				},
 			}
 
-			vim.keymap.set({ "n", "v" }, "<Leader>o", ":Gen<CR>")
+			vim.keymap.set({ "n", "v" }, "<Leader>x", ":Gen<CR>")
 		end,
 	},
 	{
@@ -462,10 +457,10 @@ harpoon:setup({})
 vim.keymap.set("n", "<Leader>t", function() harpoon:list():add() end)
 vim.keymap.set("n", "<Leader>j", function() harpoon.ui:toggle_quick_menu(harpoon:list()) end)
 
-vim.keymap.set("n", "<Leader>1", function() harpoon:list():select(1) end)
-vim.keymap.set("n", "<Leader>2", function() harpoon:list():select(2) end)
-vim.keymap.set("n", "<Leader>3", function() harpoon:list():select(3) end)
-vim.keymap.set("n", "<Leader>4", function() harpoon:list():select(4) end)
+vim.keymap.set("n", "<Leader>y", function() harpoon:list():select(1) end)
+vim.keymap.set("n", "<Leader>u", function() harpoon:list():select(2) end)
+vim.keymap.set("n", "<Leader>i", function() harpoon:list():select(3) end)
+vim.keymap.set("n", "<Leader>o", function() harpoon:list():select(4) end)
 
 vim.keymap.set("n", "<Leader>v", function() harpoon:list():prev() end)
 vim.keymap.set("n", "<Leader>c", function() harpoon:list():next() end)
