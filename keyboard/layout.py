@@ -5,6 +5,7 @@ NORMAL = 1
 SHIFT = 2
 CTRL = 3
 LAYER_AUX = 4
+HOLD = 5
 
 rows = [
     [
@@ -82,7 +83,7 @@ rows = [
         { NORMAL: "S", },
         { NORMAL: "D", },
         { NORMAL: "F", },
-        { NORMAL: "G", LAYER_AUX: "RU_EN", },
+        { NORMAL: "G", },
 
         None,
         None,
@@ -100,7 +101,7 @@ rows = [
     ],
 
     [
-        { NORMAL: "Super", },
+        { NORMAL: "<div class=\"layer_aux\">Aux</div>", },
         { NORMAL: "Z", },
         { NORMAL: "X", },
         { NORMAL: "C", },
@@ -119,15 +120,15 @@ rows = [
         { NORMAL: ",", LAYER_AUX: "🛞 Up", SHIFT: "<", },
         { NORMAL: ".", LAYER_AUX: "🛞 Right", SHIFT: ">", },
         { NORMAL: "/", SHIFT: "?", },
-        { NORMAL: "Super", },
+        { NORMAL: "<div class=\"layer_aux\">Aux</div>", },
     ],
 
     [
         None,
-        { NORMAL: "<div class=\"layer_aux\">Aux</div>", },
+        { NORMAL: "Super", },
+        { NORMAL: "", },
         { NORMAL: "[", SHIFT: "{", },
-        { NORMAL: "Alt", },
-        { NORMAL: "Shift", LAYER_AUX: "PRG", },
+        { NORMAL: "Esc", LAYER_AUX: "PRG", },
         None,
 
         None,
@@ -138,10 +139,10 @@ rows = [
         None,
 
         None,
-        { NORMAL: "Shift", },
-        { NORMAL: "Alt", },
+        { NORMAL: "Esc", },
         { NORMAL: "]", SHIFT: "}", },
-        { NORMAL: "<div class=\"layer_aux\">Aux</div>", },
+        { NORMAL: "", },
+        { NORMAL: "Super", },
         None,
     ],
 
@@ -158,7 +159,7 @@ rows = [
         None,
         None,
         { NORMAL: "ScrnNxt", },
-        { NORMAL: "Ctrl", },
+        { NORMAL: "Shift", },
 
         None,
         None,
@@ -199,7 +200,7 @@ rows = [
         None,
         { NORMAL: "Backpace", },
 
-        { NORMAL: "Esc", },
+        { NORMAL: "Alt", },
         { NORMAL: "Right", CTRL: "End", },
         None,
         None,
@@ -252,6 +253,10 @@ def header():
     print("      text-align: left;")
     print("      color: blue;")
     print("    }")
+    print("    .key_hold {")
+    print("      text-align: right;")
+    print("      color: green;")
+    print("    }")
     print("  </style>")
     print("</head>")
 
@@ -270,6 +275,7 @@ def format_key(kd):
     style = kd.get(STYLE, "key")
     shift = kd.get(SHIFT, "&nbsp;")
     ctrl = kd.get(CTRL, "&nbsp;")
+    hold = kd.get(HOLD, "&nbsp;")
     layer_aux = kd.get(LAYER_AUX, "&nbsp;")
 
     return """
@@ -291,7 +297,8 @@ def format_key(kd):
           </tr>
           <tr>
             <td>
-                <div class="key_ctrl">{ctrl}</div>
+                <span class="key_ctrl">{ctrl}</span>
+                <span class="key_hold">{hold}</span>
             </td>
           </tr>
         </table>
@@ -300,6 +307,7 @@ def format_key(kd):
         norm = norm,
         shift = shift,
         ctrl = ctrl,
+        hold = hold,
         layer_aux = layer_aux,
     )
 
