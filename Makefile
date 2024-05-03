@@ -66,21 +66,30 @@ gnome:
 	# https://wiki.archlinux.org/index.php/Logitech_Marble_Mouse#Gnome_3_and_Wayland
 	gsettings set org.gnome.desktop.peripherals.trackball scroll-wheel-emulation-button 3
 
+	gsettings set org.gnome.settings-daemon.plugins.media-keys screensaver "['<Super>q']"
 	gsettings set org.gnome.desktop.wm.keybindings move-to-workspace-left "[]"
 	gsettings set org.gnome.desktop.wm.keybindings move-to-workspace-right "[]"
-	gsettings set org.gnome.desktop.wm.keybindings switch-to-workspace-left "['<Primary><Alt>Up']"
-	gsettings set org.gnome.desktop.wm.keybindings switch-to-workspace-right "['<Primary><Alt>Down']"
+	gsettings set org.gnome.desktop.wm.keybindings switch-to-workspace-left "['<Super>h']"
+	gsettings set org.gnome.desktop.wm.keybindings switch-to-workspace-right "['<Super>l']"
 	gsettings set org.gnome.desktop.wm.keybindings switch-to-workspace-up "[]"
 	gsettings set org.gnome.desktop.wm.keybindings switch-to-workspace-down "[]"
+	gsettings set org.gnome.desktop.wm.keybindings switch-to-workspace-1 "['<Super>1']"
+	gsettings set org.gnome.desktop.wm.keybindings switch-to-workspace-2 "['<Super>2']"
+	gsettings set org.gnome.desktop.wm.keybindings switch-to-workspace-3 "['<Super>3']"
+	gsettings set org.gnome.desktop.wm.keybindings switch-to-workspace-4 "['<Super>4']"
 
+	gsettings get org.gnome.settings-daemon.plugins.media-keys screensaver
 	gsettings get org.gnome.desktop.wm.keybindings move-to-workspace-left
 	gsettings get org.gnome.desktop.wm.keybindings move-to-workspace-right
 	gsettings get org.gnome.desktop.wm.keybindings switch-to-workspace-left
 	gsettings get org.gnome.desktop.wm.keybindings switch-to-workspace-right
 	gsettings get org.gnome.desktop.wm.keybindings switch-to-workspace-up
 	gsettings get org.gnome.desktop.wm.keybindings switch-to-workspace-down
+	gsettings get org.gnome.desktop.wm.keybindings switch-to-workspace-1
+	gsettings get org.gnome.desktop.wm.keybindings switch-to-workspace-2
+	gsettings get org.gnome.desktop.wm.keybindings switch-to-workspace-3
+	gsettings get org.gnome.desktop.wm.keybindings switch-to-workspace-4
 
-	gsettings set org.gnome.desktop.wm.keybindings switch-to-workspace-1 "['<Super>1']"
-	gsettings set org.gnome.desktop.wm.keybindings switch-to-workspace-2 "['<Super>2']"
-	gsettings set org.gnome.desktop.wm.keybindings switch-to-workspace-3 "['<Super>3']"
-	gsettings set org.gnome.desktop.wm.keybindings switch-to-workspace-4 "['<Super>4']"
+layout:
+	keyboard/kinesis.py > keyboard/kinesis.html
+	keyboard/sofle.py > keyboard/sofle.html

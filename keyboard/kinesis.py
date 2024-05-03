@@ -9,26 +9,26 @@ HOLD = 5
 
 rows = [
     [
-        { STYLE: "key-small", NORMAL: "ESC", },
-        { STYLE: "key-small", NORMAL: "F1", },
-        { STYLE: "key-small", NORMAL: "F2", },
-        { STYLE: "key-small", NORMAL: "F3", },
-        { STYLE: "key-small", NORMAL: "F4", },
-        { STYLE: "key-small", NORMAL: "F5", },
+        { STYLE: "key-small", NORMAL: "", },
+        { STYLE: "key-small", NORMAL: "", },
+        { STYLE: "key-small", NORMAL: "", },
+        { STYLE: "key-small", NORMAL: "", },
+        { STYLE: "key-small", NORMAL: "", },
+        { STYLE: "key-small", NORMAL: "", },
 
-        { STYLE: "key-small", NORMAL: "F6", },
-        { STYLE: "key-small", NORMAL: "F7", },
-        { STYLE: "key-small", NORMAL: "F8", },
-        { STYLE: "key-small", NORMAL: "F9", },
-        { STYLE: "key-small", NORMAL: "F10", },
-        { STYLE: "key-small", NORMAL: "F11", },
+        { STYLE: "key-small", NORMAL: "", },
+        { STYLE: "key-small", NORMAL: "", },
+        { STYLE: "key-small", NORMAL: "", },
+        { STYLE: "key-small", NORMAL: "", },
+        { STYLE: "key-small", NORMAL: "", },
+        { STYLE: "key-small", NORMAL: "", },
 
-        { STYLE: "key-small", NORMAL: "F12", },
-        { STYLE: "key-small", NORMAL: "PrnScr", },
-        { STYLE: "key-small", NORMAL: "-Vol", },
-        { STYLE: "key-small", NORMAL: "Pause", },
-        { STYLE: "key-small", NORMAL: "+Vol", },
-        { STYLE: "key-small", NORMAL: "Mute", },
+        { STYLE: "key-small", NORMAL: "", },
+        { STYLE: "key-small", NORMAL: "", },
+        { STYLE: "key-small", NORMAL: "", },
+        { STYLE: "key-small", NORMAL: "", },
+        { STYLE: "key-small", NORMAL: "", },
+        { STYLE: "key-small", NORMAL: "", },
     ],
 
     [
@@ -69,12 +69,12 @@ rows = [
         None,
         None,
 
-        { NORMAL: "Y", },
-        { NORMAL: "U", },
-        { NORMAL: "I", },
-        { NORMAL: "O", },
+        { NORMAL: "Y", LAYER_AUX: "[", },
+        { NORMAL: "U", LAYER_AUX: "]", },
+        { NORMAL: "I", LAYER_AUX: "{", },
+        { NORMAL: "O", LAYER_AUX: "}", },
         { NORMAL: "P", },
-        { NORMAL: "\\", SHIFT: "|", },
+        { NORMAL: "\\", },
     ],
 
     [
@@ -92,16 +92,16 @@ rows = [
         None,
         None,
 
-        { NORMAL: "H", LAYER_AUX: "🖱️ Left", },
-        { NORMAL: "J", LAYER_AUX: "🖱️ Down",},
-        { NORMAL: "K", LAYER_AUX: "🖱️ Up",},
-        { NORMAL: "L", LAYER_AUX: "🖱️ Right",},
+        { NORMAL: "H", LAYER_AUX: "Left", },
+        { NORMAL: "J", LAYER_AUX: "Down",},
+        { NORMAL: "K", LAYER_AUX: "Up",},
+        { NORMAL: "L", LAYER_AUX: "Right",},
         { NORMAL: ";", SHIFT: ":", },
         { NORMAL: "'", SHIFT: "\"", },
     ],
 
     [
-        { NORMAL: "<div class=\"layer_aux\">Aux</div>", },
+        { NORMAL: "", },
         { NORMAL: "Z", },
         { NORMAL: "X", },
         { NORMAL: "C", },
@@ -115,20 +115,20 @@ rows = [
         None,
         None,
 
-        { NORMAL: "N", LAYER_AUX: "🛞 Left", },
-        { NORMAL: "M", LAYER_AUX: "🛞 Down", },
-        { NORMAL: ",", LAYER_AUX: "🛞 Up", SHIFT: "<", },
-        { NORMAL: ".", LAYER_AUX: "🛞 Right", SHIFT: ">", },
+        { NORMAL: "N", LAYER_AUX: "Home", },
+        { NORMAL: "M", LAYER_AUX: "PgDn", },
+        { NORMAL: ",", LAYER_AUX: "PgUp", SHIFT: "<", },
+        { NORMAL: ".", LAYER_AUX: "End", SHIFT: ">", },
         { NORMAL: "/", SHIFT: "?", },
-        { NORMAL: "<div class=\"layer_aux\">Aux</div>", },
-    ],
-
-    [
-        None,
-        { NORMAL: "Super", },
         { NORMAL: "", },
-        { NORMAL: "[", SHIFT: "{", },
-        { NORMAL: "Esc", LAYER_AUX: "PRG", },
+    ],
+
+    [
+        None,
+        { NORMAL: " ", },
+        { NORMAL: "◆ Super", },
+        { NORMAL: "<div class=\"layer_aux\">✦ Aux</div>", },
+        { NORMAL: "⎋ Esc", LAYER_AUX: "PRG", },
         None,
 
         None,
@@ -139,27 +139,27 @@ rows = [
         None,
 
         None,
-        { NORMAL: "Esc", },
-        { NORMAL: "]", SHIFT: "}", },
+        { NORMAL: "⏎ Enter", },
+        { NORMAL: "⎇ Alt", },
+        { NORMAL: "Ctrl+B", },
+        { NORMAL: "⎇ Alt", },
+        None,
+    ],
+
+    [
+        None,
+        None,
+        None,
+        None,
+        None,
+        None,
+
+        { NORMAL: "⎈ Ctrl", },
         { NORMAL: "", },
-        { NORMAL: "Super", },
-        None,
-    ],
-
-    [
         None,
         None,
-        None,
-        None,
-        None,
-        None,
-
-        { NORMAL: "Ctrl", },
-        { NORMAL: "ScrnPrv", },
-        None,
-        None,
-        { NORMAL: "ScrnNxt", },
-        { NORMAL: "Shift", },
+        { NORMAL: "", },
+        { NORMAL: "<div class=\"key_shift\">⇧ Shift</div>", },
 
         None,
         None,
@@ -178,10 +178,10 @@ rows = [
         None,
 
         None,
-        { NORMAL: "Left", CTRL: "Home", },
+        { NORMAL: "", },
         None,
         None,
-        { NORMAL: "Up", CTRL: "PgUp", },
+        { NORMAL: "", },
         None,
 
         None,
@@ -198,16 +198,16 @@ rows = [
         None,
         None,
         None,
-        { NORMAL: "Backpace", },
+        { NORMAL: "⌫ Backspace", },
 
-        { NORMAL: "Alt", },
-        { NORMAL: "Right", CTRL: "End", },
+        { NORMAL: "", },
+        { NORMAL: "", },
         None,
         None,
-        { NORMAL: "Down", CTRL: "PgDn", LAYER_AUX: "🖱️ MB", },
-        { NORMAL: "Enter", LAYER_AUX: "🖱️ LB", },
+        { NORMAL: "", },
+        { NORMAL: "", },
 
-        { NORMAL: "Space", LAYER_AUX: "🖱️ RB", },
+        { NORMAL: "␣ Space", },
         None,
         None,
         None,
@@ -238,23 +238,18 @@ def header():
     print("      height: 120px;")
     print("    }")
     print("    .layer_aux {")
-    print("      text-align: left;")
     print("      color: red;")
-    print("      font-weight: bold;")
     print("    }")
     print("    .key_shift {")
-    print("      text-align: right;")
     print("      color: green;")
     print("    }")
     print("    .key_norm {")
     print("      text-align: center;")
     print("    }")
     print("    .key_ctrl {")
-    print("      text-align: left;")
     print("      color: blue;")
     print("    }")
     print("    .key_hold {")
-    print("      text-align: right;")
     print("      color: green;")
     print("    }")
     print("  </style>")
@@ -282,7 +277,7 @@ def format_key(kd):
         <table class="{style}">
           <tr>
             <td>
-                <table>
+                <table width="100%">
                     <tr>
                         <td><div class="layer_aux">{layer_aux}</div></td>
                         <td><div class="key_shift">{shift}</div></td>
