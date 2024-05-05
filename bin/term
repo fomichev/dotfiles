@@ -1,0 +1,3 @@
+#!/bin/bash
+
+eval BASE16_THEME="" alacritty

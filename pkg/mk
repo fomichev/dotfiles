@@ -229,7 +229,7 @@ __build_cmake() {
 }
 
 __build_cargo() {
-	(cd "$S" && cargo install --path helix-term --locked --root "$PREFIX")
+	(cd "$S" && cargo install ${cargo_flags[@]} --locked --root "$PREFIX")
 }
 
 __build_autoconf() {

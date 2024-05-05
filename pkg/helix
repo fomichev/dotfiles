@@ -2,6 +2,11 @@
 
 src=(https://github.com/helix-editor/helix.git)
 
+cargo_flags=(
+	--path
+	helix-term
+)
+
 post_build() {
 	ln -Ts "$S/runtime" ~/.config/helix/runtime
 }

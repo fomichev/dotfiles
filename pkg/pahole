@@ -1,7 +1,7 @@
 #!/bin/bash
 
+src=(git://git.kernel.org/pub/scm/devel/pahole/pahole.git)
+
 cmake_flags=(
 	-D__LIB=lib
 )
-
-src=(git://git.kernel.org/pub/scm/devel/pahole/pahole.git)

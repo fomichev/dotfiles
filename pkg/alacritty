@@ -1,0 +1,8 @@
+#!/bin/bash
+
+src=(https://github.com/alacritty/alacritty.git)
+
+cargo_flags=(
+	--path
+	alacritty
+)

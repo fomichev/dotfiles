@@ -1,0 +1,23 @@
+[window]
+decorations = "None"
+startup_mode = "Maximized"
+
+[font]
+size = 18
+normal.family = "Source Code Pro"
+normal.style = "Regular"
+bold.family = "Source Code Pro"
+bold.style = "Bold"
+italic.family = "Source Code Pro"
+italic.style = "Italic"
+
+[bell]
+duration = 0
+
+[mouse]
+bindings = [
+	{ mouse = "Middle", action = "PasteSelection" },
+]
+
+[terminal]
+osc52 =  "CopyPaste"
