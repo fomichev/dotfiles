@@ -1,3 +1,6 @@
+[env]
+TERM = "xterm-256color"
+
 [window]
 decorations = "None"
 startup_mode = "Maximized"
@@ -13,6 +16,12 @@ italic.style = "Italic"
 
 [bell]
 duration = 0
+
+[keyboard]
+bindings = [
+   { key = "C", mods = "Control|Shift", action = "Copy" },
+   { key = "V", mods = "Control|Shift", action = "Paste" },
+]
 
 [mouse]
 bindings = [

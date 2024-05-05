@@ -490,6 +490,21 @@ cmp.setup({
 vim.g.base16colorspace = 256
 vim.cmd("source $HOME/.vimrc_background")
 
+-- Use OCS 52 for clipboard
+-- https://neovim.io/doc/user/provider.html#clipboard-osc52
+-- https://github.com/tmux/tmux/wiki/Clipboard#quick-summary
+--vim.g.clipboard = {
+--  name = 'OSC 52',
+--  copy = {
+--    ['+'] = require('vim.ui.clipboard.osc52').copy('+'),
+--    ['*'] = require('vim.ui.clipboard.osc52').copy('*'),
+--  },
+--  paste = {
+--    ['+'] = require('vim.ui.clipboard.osc52').paste('+'),
+--    ['*'] = require('vim.ui.clipboard.osc52').paste('*'),
+--  },
+--}
+
 -- Local local vimrc
 vim.cmd[[
 	if filereadable(expand($HOME) . "/local/nvim.lua")
