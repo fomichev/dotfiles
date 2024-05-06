@@ -13,7 +13,7 @@ if [[ $PWD == /google/src/* ]]; then
 		rc) exec hg rebase --continue ;;
 		rl) exec hg resolve --list ;;
 		ec) exec hg evolve --continue ;;
-		push) hg upload chain || hg push ;;
+		push) hg upload chain ;;
 		remove)
 			hg prune "$@" || :
 			exec hg cls-setnumber --remove -c "$@"
