@@ -85,6 +85,7 @@ bin/monarch-policies
 .config/jack/
 .config/Jamulus/
 .config/Jedimark/
+.config/kicad/
 .config/libaccounts-glib/
 .config/LibreCAD/
 .config/libreoffice/

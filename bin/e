@@ -1,0 +1,11 @@
+#!/bin/bash
+
+if [[ $# -eq 0 ]]; then
+	if [[ -e ./net/core/filter.c ]]; then
+		$EDITOR ./net/core/filter.c
+		return
+	fi
+	eval $EDITOR .
+else
+	eval $EDITOR "$@"
+fi

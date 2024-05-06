@@ -1,0 +1,7 @@
+#!/bin/bash
+
+a=$(echo "$1" | sed -e 's/ /\\ /g')
+b=$(echo "$2" | sed -e 's/ /\\ /g')
+
+[ -z "$1" -o -z "$2" ] && { return; }
+[ -d "$1" -o -d "$2" ] && { eval $EDITOR -c "DirDiff $a $b"; } || { eval $EDITOR -d "$1" "$2"; }

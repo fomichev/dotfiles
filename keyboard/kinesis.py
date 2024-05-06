@@ -74,7 +74,7 @@ rows = [
         { NORMAL: "I", LAYER_AUX: "{", },
         { NORMAL: "O", LAYER_AUX: "}", },
         { NORMAL: "P", },
-        { NORMAL: "\\", },
+        { NORMAL: "\\", SHIFT: "|", },
     ],
 
     [
