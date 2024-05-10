@@ -54,6 +54,7 @@ bin/monarch-policies
 .config/epiphany/
 .config/evolution/
 .config/falkTX/
+.config/FreeCAD/
 .config/fish/
 .config/fontforge/
 .config/Ganache/

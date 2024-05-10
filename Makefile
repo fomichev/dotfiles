@@ -90,3 +90,4 @@ gnome:
 layout:
 	keyboard/kinesis.py > keyboard/kinesis.html
 	keyboard/sofle.py > keyboard/sofle.html
+	keyboard/corne.py > keyboard/corne.html
