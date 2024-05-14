@@ -3,7 +3,7 @@
 .vim/pack/
 .vim/spell/all.add.spl
 
-.mutt/cache/
+.mutt/cache
 
 mail/.notmuch/
 
@@ -122,6 +122,7 @@ bin/monarch-policies
 .config/syllogi/
 .config/systemd/user/default.target.wants/
 .config/systemd/user/sockets.target.wants/
+.config/telegram-send.conf
 .config/Thunar/
 .config/tilem2/
 .config/totem/
