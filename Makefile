@@ -73,22 +73,19 @@ gnome:
 	gsettings set org.gnome.desktop.wm.keybindings switch-to-workspace-right "['<Super>l']"
 	gsettings set org.gnome.desktop.wm.keybindings switch-to-workspace-up "[]"
 	gsettings set org.gnome.desktop.wm.keybindings switch-to-workspace-down "[]"
+	gsettings set org.gnome.shell.keybindings switch-to-application-1 "[]"
+	gsettings set org.gnome.shell.keybindings switch-to-application-2 "[]"
+	gsettings set org.gnome.shell.keybindings switch-to-application-3 "[]"
+	gsettings set org.gnome.shell.keybindings switch-to-application-4 "[]"
+	gsettings set org.gnome.shell.keybindings switch-to-application-5 "[]"
+	gsettings set org.gnome.shell.keybindings switch-to-application-6 "[]"
+	gsettings set org.gnome.shell.keybindings switch-to-application-7 "[]"
+	gsettings set org.gnome.shell.keybindings switch-to-application-8 "[]"
+	gsettings set org.gnome.shell.keybindings switch-to-application-9 "[]"
 	gsettings set org.gnome.desktop.wm.keybindings switch-to-workspace-1 "['<Super>1']"
 	gsettings set org.gnome.desktop.wm.keybindings switch-to-workspace-2 "['<Super>2']"
 	gsettings set org.gnome.desktop.wm.keybindings switch-to-workspace-3 "['<Super>3']"
 	gsettings set org.gnome.desktop.wm.keybindings switch-to-workspace-4 "['<Super>4']"
-
-	gsettings get org.gnome.settings-daemon.plugins.media-keys screensaver
-	gsettings get org.gnome.desktop.wm.keybindings move-to-workspace-left
-	gsettings get org.gnome.desktop.wm.keybindings move-to-workspace-right
-	gsettings get org.gnome.desktop.wm.keybindings switch-to-workspace-left
-	gsettings get org.gnome.desktop.wm.keybindings switch-to-workspace-right
-	gsettings get org.gnome.desktop.wm.keybindings switch-to-workspace-up
-	gsettings get org.gnome.desktop.wm.keybindings switch-to-workspace-down
-	gsettings get org.gnome.desktop.wm.keybindings switch-to-workspace-1
-	gsettings get org.gnome.desktop.wm.keybindings switch-to-workspace-2
-	gsettings get org.gnome.desktop.wm.keybindings switch-to-workspace-3
-	gsettings get org.gnome.desktop.wm.keybindings switch-to-workspace-4
 
 layout:
 	keyboard/kinesis.py > keyboard/kinesis.html
