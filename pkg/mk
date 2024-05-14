@@ -40,7 +40,7 @@ PREFIX="$R"
 # {{{
 src=
 declare -A patch
-configure_flags=(--prefix "$PREFIX")
+configure_flags=(--prefix="$PREFIX")
 make_flags=()
 cmake_flags=()
 install_flags=()
@@ -257,10 +257,13 @@ build() {
 	local src="$(__src_path)"
 
 	if [ -f "$src/CMakeLists.txt" ]; then
+		say "cmake"
 		__build_cmake "$src"
 	elif [ -f "$src/Cargo.toml" ]; then
+		say "cargo"
 		__build_cargo "$src"
 	elif [ -f "$src/configure" -o -f "$src/configure.ac" ]; then
+		say "autotools"
 		if $build_in_src; then
 			cd "$S"
 		else
@@ -269,6 +272,7 @@ build() {
 
 		__build_autoconf
 	elif [ -f "$src/Makefile" ]; then
+		say "make"
 		# build in the source tree
 		B="$src"
 		cd "$B"

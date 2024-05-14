@@ -9,4 +9,3 @@ set -x
 	~/src/public-inbox/lei.sh up --all
 	~/src/public-inbox/lei.sh daemon-kill
 }
-[ -e ~/.l2mdconfig ] && $HOME/opt/sysroot/bin/l2md --verbose
