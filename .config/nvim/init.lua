@@ -244,6 +244,10 @@ local lsp_on_attach = function(client, bufnr)
 		vim.api.nvim_create_autocmd(event, { group = lsp_buffer_augroup, buffer = bufnr, callback = callback })
 	end
 
+	if client.server_capabilities.inlayHintProvider then
+		vim.lsp.inlay_hint.enable(true)
+	end
+
 --	if client.server_capabilities.documentFormattingProvider then
 --		if vim.bo[bufnr].filetype ~= "c" then
 --			aucmd("BufWritePre", vim.lsp.buf.format)
@@ -392,51 +396,50 @@ require("lazy").setup({
 		"hrsh7th/nvim-cmp",
 		event = "InsertEnter",
 	},
-	{
-		"epwalsh/obsidian.nvim",
-		version = "main",
-		lazy = false,
-		event = {
-			"BufReadPre ~/Documents/Obsidian/Main/**.md",
-			"BufNewFile ~/Documents/Obsidian/Main/**.md",
-			"BufReadPre ~/src/kernel-scripts/Kernel/**.md",
-			"BufNewFile ~/src/kernel-scripts/Kernel/**.md",
-		},
-		dependencies = {
-			"nvim-lua/plenary.nvim",
-		},
-		opts = {
-			workspaces = {
-				{
-					name = "Main",
-					path = "~/Documents/Obsidian/Main/",
-				},
-				{
-					name = "Kernel",
-					path = "~/src/kernel-scripts/Kernel/",
-				},
-			},
-			daily_notes = {
-				folder = "Journal/",
-				date_format = "%Y-%m-%d",
-				template = 'journal.md'
-			},
-			templates = {
-				subdir = ".templates",
-			},
-			ui = {
-				checkboxes = {
-					[" "] = { char = "☐", hl_group = "ObsidianTodo" },
-					["x"] = { char = "✔", hl_group = "ObsidianDone" },
-				},
-				external_link_icon = { char = "", hl_group = "ObsidianExtLinkIcon" },
-			},
-			note_path_func = function(spec)
-				local path = spec.dir / tostring(spec.title)
-				return path:with_suffix(".md")
-			end,
-		},
-	},
+	-- {
+	-- 	"epwalsh/obsidian.nvim",
+	-- 	lazy = false,
+	-- 	event = {
+	-- 		"BufReadPre ~/Documents/Obsidian/Main/**.md",
+	-- 		"BufNewFile ~/Documents/Obsidian/Main/**.md",
+	-- 		"BufReadPre ~/src/kernel-scripts/Kernel/**.md",
+	-- 		"BufNewFile ~/src/kernel-scripts/Kernel/**.md",
+	-- 	},
+	-- 	dependencies = {
+	-- 		"nvim-lua/plenary.nvim",
+	-- 	},
+	-- 	opts = {
+	-- 		workspaces = {
+	-- 			{
+	-- 				name = "Main",
+	-- 				path = "~/Documents/Obsidian/Main/",
+	-- 			},
+	-- 			{
+	-- 				name = "Kernel",
+	-- 				path = "~/src/kernel-scripts/Kernel/",
+	-- 			},
+	-- 		},
+	-- 		daily_notes = {
+	-- 			folder = "Journal/",
+	-- 			date_format = "%Y-%m-%d",
+	-- 			template = 'journal.md'
+	-- 		},
+	-- 		templates = {
+	-- 			subdir = ".templates",
+	-- 		},
+	-- 		ui = {
+	-- 			checkboxes = {
+	-- 				[" "] = { char = "☐", hl_group = "ObsidianTodo" },
+	-- 				["x"] = { char = "✔", hl_group = "ObsidianDone" },
+	-- 			},
+	-- 			external_link_icon = { char = "", hl_group = "ObsidianExtLinkIcon" },
+	-- 		},
+	-- 		note_path_func = function(spec)
+	-- 			local path = spec.dir / tostring(spec.title)
+	-- 			return path:with_suffix(".md")
+	-- 		end,
+	-- 	},
+	-- },
 	{
 		"ThePrimeagen/harpoon",
 		branch = "harpoon2",
