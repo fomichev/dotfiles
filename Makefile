@@ -10,6 +10,9 @@ files := $(shell find $(CURDIR) \
 
 dbg := #echo
 
+QMK=$(HOME)/src/keyboard/qmk_firmware
+KEYMAP=~/tmp/keymap-drawer/bin/keymap
+
 define Ignored
 $(shell [ -r $(CURDIR)/ignore ] && grep -q $(shell echo "$1" | sed -e 's@$(CURDIR)/@@') $(CURDIR)/ignore && echo 1 || echo 0)
 endef
@@ -22,6 +25,10 @@ define InstallFile
 		$(dbg) rm -f "$2"; \
 		$(dbg) ln -s "$1" "$2"; \
 	};
+endef
+
+define Layout
+	(cd $(QMK) && qmk c2json -kb $1 -km $2 | $(KEYMAP) parse -q - | $(KEYMAP) draw - ) > $3
 endef
 
 all: install init update
@@ -88,6 +95,11 @@ gnome:
 	gsettings set org.gnome.desktop.wm.keybindings switch-to-workspace-4 "['<Super>4']"
 
 layout:
-	keyboard/kinesis.py > keyboard/kinesis.html
-	keyboard/sofle.py > keyboard/sofle.html
-	keyboard/corne.py > keyboard/corne.html
+	$(call Layout,sofle,sdf,keyboard/sofle.svg)
+	$(call Layout,kinesis/kint2pp,sdf,keyboard/kinesis.svg)
+
+flash_kinesis:
+	(cd $(QMK) && qmk flash -kb handwired/kinesis -km sdf)
+
+flash_sofle:
+	(cd $(QMK) && qmk flash -kb sofle -km sdf)
