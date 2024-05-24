@@ -5,9 +5,9 @@ set sendmail = gsendmail
 set mbox_type = Maildir
 
 set folder = "~/Mail"
-set mbox = "+sdf_google_com/bpf"
-set spoolfile = "+sdf_google_com/bpf"
-set record = "+sdf_google_com/bpf"
+set mbox = "+sdf_google_com/all"
+set spoolfile = "+sdf_google_com/all"
+set record = "+sdf_google_com/all"
 set postponed = "+sdf_google_com/drafts"
 mailboxes `find ~/Mail/ -type d -name cur -printf "%h\n" | sort | awk '{ print "\""$0"\""}' | tr "\n" " "`
 

@@ -101,7 +101,7 @@ set date_format = "%m/%d"
 set index_format = "%D  %-10.10F  %s"
 
 # sidebar
-set sidebar_visible
+#set sidebar_visible
 set sidebar_format = "%B%?F? [%F]?%* %?N?%N?"
 set mail_check_stats
 set sidebar_short_path
