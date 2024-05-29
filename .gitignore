@@ -101,6 +101,7 @@ bin/monarch-policies
 .config/nautilus/
 .config/nemo/
 .config/obsidian/
+.config/org.gnome.Dictionary/
 .config/OpenSCAD/
 .config/pipewire/
 .config/pipewire-media-session/
@@ -135,6 +136,7 @@ bin/monarch-policies
 .config/user-dirs.locale
 .config/user-share/
 .config/VESC/
+.config/via-nativia/
 .config/vim/
 .config/vlc/
 .config/wireshark/

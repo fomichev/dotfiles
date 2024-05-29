@@ -1,7 +1,0 @@
-#!/bin/bash
-
-if [[ $PWD == /google/src/* ]]; then
-	exec $EDITOR -p $(hg resolve --list | grep '^U ' | awk '{ print $2 }')
-fi
-
-exec $EDITOR -p $(git status -s | grep '^UU ' | awk '{ print $2 }')

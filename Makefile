@@ -103,3 +103,8 @@ flash_kinesis:
 
 flash_sofle:
 	(cd $(QMK) && qmk flash -kb sofle -km sdf)
+
+flash_sofle_choc:
+	(cd $(QMK) && qmk flash -kb sofle_choc -km default)
+	#(cd $(QMK) && qmk flash -kb sofle_choc -km via)
+	#(cd $(QMK) && qmk flash -kb sofle_choc -km sdf)
