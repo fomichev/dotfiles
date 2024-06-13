@@ -2,6 +2,36 @@
 
 BIN=$HOME/src/ollama/ollama
 
+if [ ! -e $BIN ]; then
+	BIN=/usr/bin/ollama
+fi
+
+#MODEL=dolphin-mixtral
+MODEL=llama3
+
+set -- `getopt s $*`
+[ ! $? -eq 0 ] && { exit 1; }
+
+OP=run
+
+while [ ! "$1" = "--" ]; do
+	case "$1" in
+	-s)
+		OP=serve
+		;;
+	*)
+		echo "Unknown argument $1"
+		exit 1
+		;;
+	esac
+	shift
+done
+shift
+
+if [ "$OP" = "serve" ]; then
+	exec $BIN serve "$@"
+fi
+
 stop_ollama() {
 	systemctl --user stop ollama.service
 }
@@ -19,4 +49,4 @@ if ! systemctl --user is-active ollama.service &>/dev/null; then
 	trap stop_ollama EXIT
 fi
 
-$BIN run dolphin-mixtral "$@"
+$BIN run $MODEL "$@"

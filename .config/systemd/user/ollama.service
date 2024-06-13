@@ -2,7 +2,7 @@
 Description=Ollama Service
 
 [Service]
-ExecStart=%h/src/ollama/ollama serve
+ExecStart=%h/bin/ol -s
 Restart=always
 RestartSec=3
 

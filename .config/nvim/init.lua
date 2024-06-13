@@ -328,7 +328,7 @@ require("lazy").setup({
 	{
 		"David-Kunz/gen.nvim",
 		opts = {
-			model = "dolphin-mixtral",
+			model = "llama3",
 		},
 		config = function ()
 			require "gen".prompts = {

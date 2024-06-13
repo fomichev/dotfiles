@@ -115,7 +115,7 @@ do_notify() {
 		telegram-send "$@"
 	fi
 
-	$HOME/bin/systemd-email s@fomichev.me $SERVICE "$(hostname) backup $@"
+	$HOME/bin/systemd-email sdf@fomichev.me $SERVICE "$(hostname) backup $@"
 }
 
 # Started without arguments.
