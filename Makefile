@@ -93,6 +93,7 @@ gnome:
 	gsettings set org.gnome.desktop.wm.keybindings switch-to-workspace-2 "['<Super>2']"
 	gsettings set org.gnome.desktop.wm.keybindings switch-to-workspace-3 "['<Super>3']"
 	gsettings set org.gnome.desktop.wm.keybindings switch-to-workspace-4 "['<Super>4']"
+	gsettings set org.gnome.desktop.wm.keybindings activate-window-menu "[]"
 
 layout:
 	$(call Layout,sofle,sdf,keyboard/sofle.svg)
@@ -105,6 +106,4 @@ flash_sofle:
 	(cd $(QMK) && qmk flash -kb sofle -km sdf)
 
 flash_sofle_choc:
-	(cd $(QMK) && qmk flash -kb sofle_choc -km default)
-	#(cd $(QMK) && qmk flash -kb sofle_choc -km via)
-	#(cd $(QMK) && qmk flash -kb sofle_choc -km sdf)
+	(cd $(QMK) && qmk flash -kb sofle_choc -km sdf)
