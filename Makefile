@@ -89,10 +89,10 @@ gnome:
 	gsettings set org.gnome.shell.keybindings switch-to-application-7 "[]"
 	gsettings set org.gnome.shell.keybindings switch-to-application-8 "[]"
 	gsettings set org.gnome.shell.keybindings switch-to-application-9 "[]"
-	gsettings set org.gnome.desktop.wm.keybindings switch-to-workspace-1 "['<Super>1']"
-	gsettings set org.gnome.desktop.wm.keybindings switch-to-workspace-2 "['<Super>2']"
-	gsettings set org.gnome.desktop.wm.keybindings switch-to-workspace-3 "['<Super>3']"
-	gsettings set org.gnome.desktop.wm.keybindings switch-to-workspace-4 "['<Super>4']"
+	gsettings set org.gnome.desktop.wm.keybindings switch-to-workspace-1 "['<Super>s']"
+	gsettings set org.gnome.desktop.wm.keybindings switch-to-workspace-2 "['<Super>d']"
+	gsettings set org.gnome.desktop.wm.keybindings switch-to-workspace-3 "['<Super>f']"
+	gsettings set org.gnome.desktop.wm.keybindings switch-to-workspace-4 "['<Super>g']"
 	gsettings set org.gnome.desktop.wm.keybindings activate-window-menu "[]"
 
 layout:
