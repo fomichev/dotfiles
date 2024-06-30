@@ -1,6 +1,3 @@
-[submodule "fonts"]
-	path = .fonts
-	url = https://github.com/powerline/fonts.git
 [submodule "base16-shell"]
 	path = base16-shell
 	url = https://github.com/tinted-theming/base16-shell.git

@@ -27,3 +27,5 @@ Beware the crocodiles
 $ echo $HOME/opt/sysroot/lib | sudo tee /etc/ld.so.conf.d/$USER.conf
 $ sudo ldconfig
 ```
+
+Fonts: adobe-source-code-pro-fonts

@@ -489,7 +489,7 @@ path.combo {
 </g>
 <g transform="translate(378, 364)" class="key keypos-75">
 <rect rx="6" ry="6" x="-26" y="-26" width="52" height="52" class="key"/>
-<text x="0" y="0" class="key tap">GUI</text>
+<text x="0" y="0" class="key tap">ALT</text>
 </g>
 <g transform="translate(490, 364)" class="key keypos-76">
 <rect rx="6" ry="6" x="-26" y="-26" width="52" height="52" class="key"/>
