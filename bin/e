@@ -2,8 +2,8 @@
 
 if [[ $# -eq 0 ]]; then
 	if [[ -e ./net/core/filter.c ]]; then
-		$EDITOR ./net/core/filter.c
-		return
+		eval $EDITOR ./net/core/filter.c
+		exit 0
 	fi
 	eval $EDITOR .
 else

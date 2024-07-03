@@ -1,4 +1,4 @@
-local current_theme_name = "eighties"
+local current_theme_name = "precious-dark-fifteen"
 function colorscheme_exists(scheme)
     local status_ok, _ = pcall(vim.cmd, "colorscheme " .. scheme)
     return status_ok

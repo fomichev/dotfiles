@@ -7,6 +7,6 @@ function! ColorschemeExists(theme)
     endtry
 endfunction
 
-if strlen('eighties') > 0 && (!exists('g:colors_name') || g:colors_name != 'base16-eighties') && ColorschemeExists('base16-eighties')
-  colorscheme base16-eighties
+if strlen('precious-dark-fifteen') > 0 && (!exists('g:colors_name') || g:colors_name != 'base16-precious-dark-fifteen') && ColorschemeExists('base16-precious-dark-fifteen')
+  colorscheme base16-precious-dark-fifteen
 endif
