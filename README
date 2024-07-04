@@ -1,26 +1,5 @@
 Beware the crocodiles
 
-# Aliases and tools
-* _ - sudo
-* a - ls -l
-* b - start browser
-* c - calculator
-* d - change directory and print its contents
-* e - run editor
-* ediff - run diff in vim
-* f - find by name
-* g - smart grep replacement
-* j - list jobs
-* l - ls
-* m - make
-* o - open file in associated application
-* p - print current directory and version control information
-* q - quilt
-* v - git
-* w - sorted w
-* x - extract archive
-* y - yank
-
 # ld.so.conf
 
 ```
@@ -28,4 +7,6 @@ $ echo $HOME/opt/sysroot/lib | sudo tee /etc/ld.so.conf.d/$USER.conf
 $ sudo ldconfig
 ```
 
-Fonts: adobe-source-code-pro-fonts
+# fonts
+
+adobe-source-code-pro-fonts

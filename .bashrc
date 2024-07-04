@@ -96,7 +96,6 @@ try_source /etc/profile.d/bash_completion.sh
 # add some color to man
 export LESS_TERMCAP_md=$(tput setaf 4)
 
-
 if [ -z "$NO_BASE16" ]; then
 	# base16 colors
 	BASE16_SHELL_PATH="$HOME/src/dotfiles/base16-shell"

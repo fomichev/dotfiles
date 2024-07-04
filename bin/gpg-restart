@@ -1,0 +1,4 @@
+#!/bin/sh
+
+gpgconf --reload scdaemon
+gpgconf --reload gpg-agent
