@@ -59,6 +59,13 @@ system_upgrade() {
 	fi
 }
 
+adblock_upgrade() {
+	if [ -e /usr/local/bin/update_unblock ]; then
+		say 'update adblock'
+		sudo /usr/local/bin/update_unblock
+	fi
+}
+
 system_pacnew() {
 	local ret=$(find / -name '*.pacnew' 2>/dev/null)
 	if [ ! -z "$ret" ]; then
@@ -155,6 +162,7 @@ if [[ $# -eq 0 ]]; then
 	do_notify "finished"
 	docker_update
 	system_upgrade
+	adblock_upgrade
 	system_cleanup
 	system_pacnew
 	do_notify "updated"
