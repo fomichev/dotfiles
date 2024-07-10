@@ -7,11 +7,11 @@ startup_mode = "Maximized"
 
 [font]
 size = 18
-normal.family = "Source Code Pro"
+normal.family = "CommitMono"
 normal.style = "Regular"
-bold.family = "Source Code Pro"
+normal.family = "CommitMono"
 bold.style = "Bold"
-italic.family = "Source Code Pro"
+normal.family = "CommitMono"
 italic.style = "Italic"
 
 [bell]
