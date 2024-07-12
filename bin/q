@@ -4,8 +4,10 @@
 # {{{
 SSH_PORT=${SSH_PORT:-42222}
 
-NRCPU=${NRCPU:-4}
-MEMORY=${MEMORY:-15872}
+#NRCPU=${NRCPU:-4}
+#MEMORY=${MEMORY:-15872}
+NRCPU=${NRCPU:-1}
+MEMORY=${MEMORY:-1024}
 TAP_QUEUES=${TAP_QUEUES:-$NRCPU}
 TAP_MQ=${TAP_MQ:-true}
 
@@ -20,7 +22,6 @@ HOST=${HOST:-q}
 # Internal variables:
 # {{{
 DIR_Q="$(dirname $0)"
-DIR_EXPORT=/export/hda3/tmp
 DIR_ROOT=${DIR_ROOT:-/}
 DIR_KERNEL=${DIR_KERNEL:-}
 IMAGE=${IMAGE:-}
@@ -28,6 +29,7 @@ IMAGE_PART="sda1"
 IMAGE_INIT="/sbin/init.real"
 SCRIPT=${SCRIPT:-}
 ENVIRON_ARG=${ENVIRON_ARG:-}
+MY_ARCH=$(uname -m)
 
 GDB=${GDB:-false}
 GUEST=${GUEST:-false}
@@ -86,11 +88,9 @@ host() {
 	local fs
 	fs+=" -fsdev local,id=vfs1,path=$DIR_ROOT,multidevs=remap,security_model=none,readonly=on"
 	fs+=" -fsdev local,id=vfs2,path=$(pwd),multidevs=remap,security_model=none"
-	fs+=" -fsdev local,id=vfs3,path=$DIR_EXPORT,multidevs=remap,security_model=none"
 	fs+=" -fsdev local,id=vfs4,path=$DIR_Q,multidevs=remap,security_model=none,readonly=on"
 	fs+=" -device virtio-9p-pci,fsdev=vfs1,mount_tag=/dev/root"
 	fs+=" -device virtio-9p-pci,fsdev=vfs2,mount_tag=/dev/kernel"
-	fs+=" -device virtio-9p-pci,fsdev=vfs3,mount_tag=$DIR_EXPORT"
 	fs+=" -device virtio-9p-pci,fsdev=vfs4,mount_tag=/tmp/dir_q"
 
 	local console
@@ -156,7 +156,7 @@ host() {
 	fi
 
 	local accel
-	if [[ "$(arch)" = "${ARCH}" ]]; then
+	if [[ "${MY_ARCH}" = "${ARCH}" ]]; then
 		accel+=" -machine accel=kvm:tcg"
 		accel+=" -enable-kvm"
 	fi
@@ -167,12 +167,12 @@ host() {
 	local qemu_flavor=$ARCH
 	case "${ARCH}" in
 		x86_64)
-			if [[ "$(arch)" = "${ARCH}" ]]; then
+			if [[ "${MY_ARCH}" = "${ARCH}" ]]; then
 				cpu="host"
 			fi
 			;;
 		arm64)
-			if [[ "$(arch)" = "${ARCH}" ]]; then
+			if [[ "${MY_ARCH}" = "${ARCH}" ]]; then
 				cpu="host"
 			else
 				accel+=" -machine virt"
@@ -300,14 +300,6 @@ guest() {
 	mount -n -t tmpfs tmpfs /tmp
 	mount -n -t tmpfs tmpfs /var/log
 	mount -n -t tmpfs tmpfs /run
-
-	if [[ -d /export ]]; then
-		mount -n -t tmpfs tmpfs /export
-		mkdir -p $DIR_EXPORT
-		mount -n -t 9p -o trans=virtio $DIR_EXPORT $DIR_EXPORT
-	else
-		say "$/expor mount point doesn't exist, not mounting $DIR_EXPORT"
-	fi
 
 	> /etc/fstab
 
@@ -635,10 +627,10 @@ else
 		fi
 	fi
 
-	if [[ ! "$ARCH" = "$(arch)" ]]; then
+	if [[ ! "$ARCH" = "${MY_ARCH}" ]]; then
 		if [[ "$DIR_ROOT" = "/" ]]; then
-			DIR_ROOT="$HOME/src/$(arch)"
-			say "$ARCH on $(arch), using $DIR_ROOT rootfs"
+			DIR_ROOT="$HOME/src/${MY_ARCH}"
+			say "$ARCH on ${MY_ARCH}, using $DIR_ROOT rootfs"
 		fi
 	fi
 
