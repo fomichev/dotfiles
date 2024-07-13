@@ -2,10 +2,10 @@
 
 if [[ $# -eq 0 ]]; then
 	if [[ -e ./net/core/filter.c ]]; then
-		eval $EDITOR ./net/core/filter.c
+		$EDITOR ./net/core/filter.c
 		exit 0
 	fi
-	eval $EDITOR .
+	$EDITOR .
 else
-	eval $EDITOR "$@"
+	$EDITOR "$@"
 fi
