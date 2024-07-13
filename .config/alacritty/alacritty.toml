@@ -9,9 +9,9 @@ startup_mode = "Maximized"
 size = 18
 normal.family = "CommitMono"
 normal.style = "Regular"
-normal.family = "CommitMono"
+bold.family = "CommitMono"
 bold.style = "Bold"
-normal.family = "CommitMono"
+italic.family = "CommitMono"
 italic.style = "Italic"
 
 [bell]

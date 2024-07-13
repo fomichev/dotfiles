@@ -76,6 +76,9 @@ export HISTIGNORE="$_ignore"
 # don't waste space in history file with timestamps
 unset HISTTIMEFORMAT
 
+# reload history after every prompt
+export PROMPT_COMMAND="history -n; history -a"
+
 history_defrag() {
 	mv ~/.bash_history ~/.bash_history.bak
 	cat ~/.bash_history.bak | egrep -v '^#' | sort | uniq > ~/.bash_history

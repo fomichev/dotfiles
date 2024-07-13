@@ -3,10 +3,29 @@ Beware the crocodiles
 # ld.so.conf
 
 ```
-$ echo $HOME/opt/sysroot/lib | sudo tee /etc/ld.so.conf.d/$USER.conf
-$ sudo ldconfig
+echo $HOME/opt/sysroot/lib | sudo tee /etc/ld.so.conf.d/$USER.conf
+sudo ldconfig
 ```
 
 # fonts
 
 https://commitmono.com/
+
+# bootstrap
+
+```
+sudo systemctl enable pcscd.service
+sudo systemctl start pcscd.service
+gpg --card-status
+gpg --import public.asc
+gpg --edit-key s@fomichev.me trust # 5 -> y
+
+curl -LO https://raw.githubusercontent.com/fomichev/dotfiles/master/.gnupg/gpg-agent.conf > ~/.gnupg/gpg-agent.conf
+curl -LO https://raw.githubusercontent.com/fomichev/dotfiles/master/.gnupg/gpg.conf > ~/.gnupg/gpg.conf
+sed -i -e 's/^use-keyboxd$/#use-keyboxd/' ~/.gnupg/common.conf
+
+export SSH_AUTH_SOCK="$(gpgconf --list-dirs agent-ssh-socket)"
+gpg-connect-agent updatestartuptty /bye
+
+ssh-add -l # 4096 SHA256:... (RSA)
+```

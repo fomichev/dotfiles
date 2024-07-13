@@ -46,6 +46,7 @@ build:
 install:
 	@$(foreach file,$(files),$(call InstallFile,$(file),$(HOME)/$(notdir $(file))))
 	chmod 700 .gnupg
+	mkdir -p ~/.secret
 	chmod -R 700 ~/.secret
 
 fzf:
@@ -53,7 +54,7 @@ fzf:
 	~/.fzf/install
 
 colors:
-	./base16-shell/scripts/base16-eighties.sh
+	base16_precious-dark-fifteen
 
 init:
 	git submodule init && \
