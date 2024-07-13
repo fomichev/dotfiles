@@ -44,11 +44,10 @@
 	interactive = auto
 
 [sendemail]
+	sendmailcmd = /usr/bin/msmtp
 	chainreplyto = false
-	#smtpserver = smtp.gmail.com:587
-	#smtpuser = s@fomichev.me
-	smtpencryption = tls
 	confirm = always
+	suppresscc = self
 
 [format]
 	coverletter = auto
