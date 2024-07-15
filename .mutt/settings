@@ -112,3 +112,6 @@ bind index,pager K sidebar-prev
 bind index,pager J sidebar-next
 bind index,pager O sidebar-open
 bind index,pager B sidebar-toggle-visible
+
+# show date in local time
+set display_filter="exec sed -r \"s/^Date:\\s*(([F-Wa-u]{3},\\s*)?[[:digit:]]{1,2}\\s+[A-Sa-y]{3}\\s+[[:digit:]]{4}\\s+[[:digit:]]{1,2}:[[:digit:]]{1,2}(:[[:digit:]]{1,2})?\\s+[+-][[:digit:]]{4})/date +'Date: %a, %d %b %Y %H:%M:%S %z' -d '\\1'/e\""

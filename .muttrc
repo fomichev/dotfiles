@@ -1,0 +1,14 @@
+set realname = "Stanislav Fomichev"
+set from = "Stanislav Fomichev <sdf@fomichev.me>"
+set sendmail = msmtp
+
+set mbox_type = Maildir
+
+set folder = "~/Mail"
+set mbox = "+all"
+set spoolfile = "+all"
+set record = "+all"
+set postponed = "+drafts"
+mailboxes `find ~/Mail/ -type d -name cur -printf "%h\n" | sort | awk '{ print "\""$0"\""}' | tr "\n" " "`
+
+source ~/.mutt/settings
