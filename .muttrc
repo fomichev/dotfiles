@@ -9,6 +9,7 @@ set mbox = "+all"
 set spoolfile = "+all"
 set record = "+all"
 set postponed = "+drafts"
+set trash=+trash
 mailboxes `find ~/Mail/ -type d -name cur -printf "%h\n" | sort | awk '{ print "\""$0"\""}' | tr "\n" " "`
 
 source ~/.mutt/settings

@@ -4,6 +4,7 @@ bind index \Cu half-up
 bind index G last-entry
 bind index g noop
 bind index gg first-entry
+bind index d delete-thread
 
 bind pager j next-line
 bind pager k previous-line
@@ -19,8 +20,20 @@ bind pager gT previous-undeleted
 bind pager a group-reply
 bind index a group-reply
 
-bind index "^" imap-fetch-mail
-bind pager "^" imap-fetch-mail
-
 macro index c "<change-folder>?<toggle-mailboxes>" "open a different folder"
 macro pager c "<change-folder>?<toggle-mailboxes>" "open a different folder"
+
+# toggle threads collapsing
+bind index <space> collapse-thread
+
+# sidebar
+bind index,pager K sidebar-prev
+bind index,pager J sidebar-next
+bind index,pager O sidebar-open
+bind index,pager B sidebar-toggle-visible
+
+# save attachments into home dir
+macro attach s <save-entry><bol>~/
+
+# mark all messages as read
+macro index A "T~U<enter><tag-prefix><clear-flag>N<untag-pattern>.<enter>" "mark all messages as read"

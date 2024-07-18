@@ -1,7 +1,0 @@
-set pgp_autosign = yes
-set pgp_autoencrypt = yes
-set pgp_replysignencrypted = yes
-set pgp_verify_sig = yes
-message-hook '!(~g|~G) ~b"^-----BEGIN\ PGP\ (SIGNED\ )?MESSAGE"' "exec check-traditional-pgp"
-set pgp_timeout = 32765
-set thorough_search = yes

@@ -9,7 +9,7 @@ configure_flags+=(
 		--gss
 		--disable-idn
 		--idn2
-		--mixmaster
 		--sasl
 		--ssl
+		--gdbm
 		)

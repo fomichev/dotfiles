@@ -1,0 +1,75 @@
+#!/bin/bash
+
+MBOX=~/Mail
+
+INBOX=$MBOX/all
+TRASH=$MBOX/trash
+
+is_child() {
+	grep -E -q "^In-Reply-To:" "$1"
+}
+
+in_reply_to() {
+	echo $(grep -E "^In-Reply-To:" "$1" | sed -e "s/In-Reply-To: <\([^>]*\)>/\1/")
+}
+
+message_id() {
+	echo $(grep -E "^Message-Id:" "$1" | sed -e "s/Message-Id: <\([^>]*\)>/\1/")
+}
+
+find_by_id() {
+	grep -Eril "^Message-Id: <$1>" $INBOX | head -n1
+}
+
+thread_message_id() {
+	local message_id="$1"
+
+	while :; do
+		local file=$(find_by_id $message_id)
+
+		if [ -z "$file" ]; then
+			message_id=""
+			break
+		fi
+
+		if ! is_child "$file"; then
+			break
+		fi
+
+		message_id=$(in_reply_to "$file")
+	done
+
+	echo "$message_id"
+}
+
+move_to_trash() {
+	# TODO: switch to cur once it's clear that it's working as intended
+	#mv $1 $TRASH/cur/
+	mv $1 $TRASH/new/
+}
+
+subject() {
+	echo $(grep -E "^Subject: " "$1" | sed -e "s/^Subject: //")
+}
+
+for f in $INBOX/*/*; do
+	if ! is_child "$f"; then
+		echo S $f $(subject $f)
+		continue
+	fi
+
+	reply_id=$(in_reply_to "$f")
+	thread_id=$(thread_message_id "$reply_id")
+
+	if [ ! -z "$thread_id" ]; then
+		echo S $f $(subject $f)
+		continue
+	fi
+
+	echo M $f $(subject $f)
+
+	if [ ! "$1" = "-d" ]; then
+		move_to_trash $f
+	fi
+done
+

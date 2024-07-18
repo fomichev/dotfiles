@@ -35,18 +35,6 @@ set help = yes
 # don't make new messages old upon mutt exit
 set mark_old = no
 
-# save attachments into home dir
-macro attach s <save-entry><bol>~/
-
-# receive new mail
-macro index S "<shell-escape>mbsync all<enter>"
-
-# mark all messages as read
-macro index A "T~U<enter><tag-prefix><clear-flag>N<untag-pattern>.<enter>" "mark all messages as read"
-
-# toggle threads collapsing
-bind index <space> collapse-thread
-
 # don't bother me with prompting for deletion and moving
 set move = no
 set delete = yes
@@ -60,6 +48,9 @@ set print_split = yes
 # sort messages by last received in thread
 set sort=threads
 set sort_aux=last-date-received
+set strict_threads=yes
+set sort_browser=reverse-date
+unset collapse_unread
 
 # pager: don't go to next message automatically
 set pager_stop
@@ -107,11 +98,6 @@ set mail_check_stats
 set sidebar_short_path
 set sidebar_delim_chars = "/"
 set sidebar_width = 20
-
-bind index,pager K sidebar-prev
-bind index,pager J sidebar-next
-bind index,pager O sidebar-open
-bind index,pager B sidebar-toggle-visible
 
 # show date in local time
 set display_filter="exec sed -r \"s/^Date:\\s*(([F-Wa-u]{3},\\s*)?[[:digit:]]{1,2}\\s+[A-Sa-y]{3}\\s+[[:digit:]]{4}\\s+[[:digit:]]{1,2}:[[:digit:]]{1,2}(:[[:digit:]]{1,2})?\\s+[+-][[:digit:]]{4})/date +'Date: %a, %d %b %Y %H:%M:%S %z' -d '\\1'/e\""

@@ -8,4 +8,5 @@ set -x
 [ -d ~/src/public-inbox ] && {
 	~/src/public-inbox/lei.sh up --all
 	~/src/public-inbox/lei.sh daemon-kill
+	~/bin/shuffle-email
 }
