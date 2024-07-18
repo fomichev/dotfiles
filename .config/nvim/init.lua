@@ -269,12 +269,10 @@ require("lazy").setup({
 		config = function ()
 			local capabilities = require("cmp_nvim_lsp").default_capabilities()
 
-			if not vim.startswith(vim.fn.getcwd(), "/google/src/cloud") then
-				require"lspconfig".clangd.setup{
-					capabilities = capabilities,
-					on_attach = lsp_on_attach,
-				}
-			end
+			require"lspconfig".clangd.setup{
+				capabilities = capabilities,
+				on_attach = lsp_on_attach,
+			}
 
 			-- rustup component add rust-analyzer
 			require"lspconfig".rust_analyzer.setup{
@@ -283,17 +281,17 @@ require("lazy").setup({
 				cmd = { "rustup", "run", "stable", "rust-analyzer" },
 			}
 
-			-- pacman -S gopls
-			--require"lspconfig".golps.setup{
-			--	capabilities = capabilities,
-			--	on_attach = lsp_on_attach,
-			--}
-
 			-- pacman -S pyright
 			require"lspconfig".pyright.setup{
 				capabilities = capabilities,
 				on_attach = lsp_on_attach,
 			}
+
+			-- pacman -S gopls
+			--require"lspconfig".golps.setup{
+			--	capabilities = capabilities,
+			--	on_attach = lsp_on_attach,
+			--}
 
 			-- pacman -S lua-language-server
 			--require"lspconfig".lua_ls.setup{
@@ -303,13 +301,13 @@ require("lazy").setup({
 
 			-- npm i -g bash-language-server
 			-- pacman -S bash-language-server
-			require"lspconfig".bashls.setup{
-				capabilities = capabilities,
-				on_attach = lsp_on_attach,
-			}
+			--require"lspconfig".bashls.setup{
+			--	capabilities = capabilities,
+			--	on_attach = lsp_on_attach,
+			--}
 
 			-- Disable all diagnostics
-			--vim.lsp.handlers["textDocument/publishDiagnostics"] = function() end
+			vim.lsp.handlers["textDocument/publishDiagnostics"] = function() end
 		end,
 	},
 	{
