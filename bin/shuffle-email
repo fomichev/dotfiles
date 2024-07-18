@@ -3,22 +3,23 @@
 MBOX=~/Mail
 
 INBOX=$MBOX/all
-TRASH=$MBOX/trash
+TRASH=$MBOX/archive
+SUBDIR=new # TODO: switch to "cur" eventually
 
 is_child() {
-	grep -E -q "^In-Reply-To:" "$1"
+	grep -Ei -q "^In-Reply-To:" "$1"
 }
 
 in_reply_to() {
-	echo $(grep -E "^In-Reply-To:" "$1" | sed -e "s/In-Reply-To: <\([^>]*\)>/\1/")
+	echo $(grep -Ei "^In-Reply-To:" "$1" | sed -e "s/In-Reply-To: <\([^>]*\)>/\1/I")
 }
 
 message_id() {
-	echo $(grep -E "^Message-Id:" "$1" | sed -e "s/Message-Id: <\([^>]*\)>/\1/")
+	echo $(grep -Ei "^Message-Id:" "$1" | sed -e "s/Message-Id: <\([^>]*\)>/\1/I")
 }
 
 find_by_id() {
-	grep -Eril "^Message-Id: <$1>" $INBOX | head -n1
+	grep -Eirl "^Message-Id: <$1>" $INBOX | head -n1
 }
 
 thread_message_id() {
@@ -43,18 +44,16 @@ thread_message_id() {
 }
 
 move_to_trash() {
-	# TODO: switch to cur once it's clear that it's working as intended
-	#mv $1 $TRASH/cur/
-	mv $1 $TRASH/new/
+	mv $1 $TRASH/$SUBDIR/
 }
 
 subject() {
-	echo $(grep -E "^Subject: " "$1" | sed -e "s/^Subject: //")
+	echo $(grep -Ei "^Subject: " "$1" | sed -e "s/^Subject: //I")
 }
 
 for f in $INBOX/*/*; do
 	if ! is_child "$f"; then
-		echo S $f $(subject $f)
+		echo T $f $(subject $f)
 		continue
 	fi
 
