@@ -51,7 +51,11 @@ docker_update() {
 system_upgrade() {
 	say 'update system'
 	sudo /usr/bin/pacman --noconfirm -Sy archlinux-keyring
-	sudo /usr/bin/pacman --noconfirm -Syu
+	if [ -e /usr/bin/yay ]; then
+		sudo /usr/bin/pacman --noconfirm -Syu
+	else
+		sudo /usr/bin/yay --noconfirm -Syu
+	fi
 	local orphans="$(pacman -Qqtd)"
 	if [[ ! -z "$orphans" ]]; then
 		say 'remove orphans'

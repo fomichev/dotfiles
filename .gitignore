@@ -79,6 +79,7 @@ bin/monarch-policies
 .config/gtk-3.0/
 .config/guitarix/
 .config/guix/
+.config/helix/runtime/
 .config/hexchat/
 .config/ibus/
 .config/inkscape/
@@ -143,6 +144,7 @@ bin/monarch-policies
 .config/xbuild/
 .config/xdg-terminals.list
 .config/xfce4/
+.config/yay/
 .config/yabridgectl/
 .config/Yubico/
 .config/zoomus.conf
