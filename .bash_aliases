@@ -19,6 +19,10 @@ d() { builtin cd "$@" &>/dev/null && echo "$(pwd):" | colorify && l; }
 complete -o filenames -o nospace -F _cd d
 
 gpg-export-ssh-agent() {
+	if ! systemctl is-active -q pcscd.service; then
+		sudo systemctl start pcscd.service
+	fi
+
 	export SSH_AUTH_SOCK="$(gpgconf --list-dirs agent-ssh-socket)"
 	gpg-connect-agent updatestartuptty /bye
 }
