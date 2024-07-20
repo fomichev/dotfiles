@@ -72,9 +72,11 @@
 [rerere]
 	enabled = false
 
-[include]
-	path = ~/local/.gitconfig
 [init]
 	defaultBranch = main
+
 [maintenance]
 	repo = /home/sdf/src/linux
+
+[include]
+	path = ~/local/.gitconfig
