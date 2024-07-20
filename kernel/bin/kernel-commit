@@ -1,0 +1,6 @@
+#!/bin/bash
+
+desc=$(git log -1 --oneline "$@" | cut -d' ' -f2-)
+sha1=$(echo "$@" | awk '{ print substr($0, 1, 12) }')
+
+echo "$sha1 (\"$desc\")"

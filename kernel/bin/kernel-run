@@ -1,0 +1,9 @@
+#!/bin/bash
+#
+# Start interactive QEMU with the freshly built kernel.
+
+MYDIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}" )" &>/dev/null && pwd)
+
+HOST=oqq187.prod.google.com \
+ENVIRON_ARG="MYDIR='$MYDIR' HOME='$HOME'" \
+	~/bin/q "$@" -s ""

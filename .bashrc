@@ -20,7 +20,7 @@ path_prepend ~/go/bin
 path_prepend /usr/local/bin
 path_prepend /usr/local/share/python
 
-path_append ~/src/kernel-scripts/bin
+path_append ~/src/dotfiles/kernel/bin
 
 export LD_LIBRARY_PATH=/usr/local/google/home/sdf/opt/sysroot/lib
 

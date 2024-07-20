@@ -1,0 +1,29 @@
+#!/bin/bash
+
+git describe \
+	--exclude 'core-urgent-*' \
+	--exclude 'core-mm-*' \
+	--exclude 'irq-urgent-*' \
+	--exclude 'irq_urgent_*' \
+	--exclude 'x86-urgent-*' \
+	--exclude 'x86-entry-*' \
+	--exclude 'x86_urgent_for_*' \
+	--exclude 'timers-urgent-*' \
+	--exclude 'sched-core-*' \
+	--exclude 'sched-urgent-*' \
+	--exclude 'sched_urgent_for_*' \
+	--exclude 'sched-psi-*' \
+	--exclude 'perf-urgent-*' \
+	--exclude 'perf_urgent_*' \
+	--exclude 'locking-urgent-*' \
+	--exclude 'locking-kcsan-*' \
+	--exclude 'smp-urgent-*' \
+	--exclude 'net-next-*' \
+	--exclude 'net-*' \
+	--exclude 'DONT-USE-next-*' \
+	--exclude 'next-*' \
+	--exclude 'archived/*' \
+	--contains "$@"
+
+	#--exclude 'icebreaker/*' \
+	#--exclude 'rapid/*' \

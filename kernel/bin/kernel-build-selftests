@@ -1,0 +1,24 @@
+#!/bin/bash
+#
+# Build BPF upstream selftests.
+
+MYDIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}" )" &>/dev/null && pwd)
+source $MYDIR/../host_lib.sh
+
+fixup_build_qemu
+
+set -x
+
+LLVM=${LLVM:-1}
+
+#if [ ! "$(basename $KDIR)" = "linux" ]; then
+	#rm -f $KDIR/tools/testing/selftests/bpf/prog_tests/tests.h
+#fi
+
+cflags+=" -Wno-error=unused-function"
+cflags+=" -Wno-error=unused-variable"
+
+make -s -j$(nproc) -C tools/bpf/bpftool LLVM=1 "$@"
+
+SAN_CFLAGS="$cflags" \
+make -s -j$(nproc) -C tools/testing/selftests/bpf LLVM=1 "$@"

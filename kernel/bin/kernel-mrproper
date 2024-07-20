@@ -1,0 +1,12 @@
+#!/bin/bash
+#
+# Remove _everything_ that's not traced.
+
+MYDIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}" )" &>/dev/null && pwd)
+source $MYDIR/../host_lib.sh
+
+set -x
+
+make -s mrproper
+git clean -fd
+git clean -dxf tools/bpf

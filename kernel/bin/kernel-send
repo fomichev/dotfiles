@@ -1,0 +1,132 @@
+#!/bin/bash
+#
+# Send patches (matching *.patch) upstream via git-send-email.
+
+MYDIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}" )" &>/dev/null && pwd)
+source $MYDIR/../host_lib.sh
+
+to() { ARGS+=" --to=$@"; }
+cc() { ARGS+=" --cc=$@"; }
+ignore_all() {
+	ARGS+=" --suppress-cc=all"
+}
+
+to_net() {
+	to netdev@vger.kernel.org
+	cc davem@davemloft.net
+	cc edumazet@google.com
+	cc kuba@kernel.org
+	cc pabeni@redhat.com
+}
+
+to_bpf() {
+	# https://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf.git/tree/MAINTAINERS#n3617
+
+	# L
+	to bpf@vger.kernel.org
+	to netdev@vger.kernel.org
+
+	# M
+	cc ast@kernel.org
+	cc daniel@iogearbox.net
+	cc andrii@kernel.org
+
+	# R
+	cc martin.lau@linux.dev
+	cc song@kernel.org
+	cc yhs@fb.com
+	cc john.fastabend@gmail.com
+	cc kpsingh@kernel.org
+	cc haoluo@google.com
+	cc jolsa@kernel.org
+}
+
+to_lkml() {
+	to linux-kernel@vger.kernel.org
+}
+
+git_send() {
+	echo git send-email $ARGS "$@" $KDIR/*.patch
+	git send-email $ARGS "$@" $KDIR/*.patch
+}
+
+try_to_send_to() {
+	case $target in
+		net|net-next)
+			to_net
+			;;
+		bpf|bpf-next)
+			to_bpf
+			;;
+		xdp_tx_metadata)
+			to_bpf
+
+			cc kuba@kernel.org
+			cc toke@kernel.org
+			cc willemb@google.com
+			cc dsahern@kernel.org
+			cc john.fastabend@gmail.com
+			cc magnus.karlsson@intel.com
+			cc bjorn@kernel.org
+			cc maciej.fijalkowski@intel.com
+			cc hawk@kernel.org
+			cc yoong.siang.song@intel.com # intel drivers folks
+			cc netdev@vger.kernel.org
+			cc xdp-hints@xdp-project.net
+			;;
+		perf)
+			to_lkml
+			cc peterz@infradead.org
+			cc acme@kernel.org
+			cc jolsa@redhat.com
+			cc namhyung@kernel.org
+			;;
+		kuba)
+			to kuba@kernel.org
+			;;
+		flow_dissector)
+			to_bpf
+			#cc simon.horman@netronome.com
+			cc willemb@google.com
+			cc ppenkov@google.com
+			;;
+		tun)
+			to_net
+			cc jasowang@redhat.com
+			cc brouer@redhat.com
+			cc mst@redhat.com
+			cc edumazet@google.com
+			;;
+		stable)
+			to stable@vger.kernel.org
+			;;
+		*)
+			return
+			;;
+	esac
+
+	git_send --validate --dry-run
+
+	echo "Sending to $target! Continue? [y/n]: "
+	read -n 1 cont
+
+	case $cont in
+		[yY])
+			git_send --confirm=never --quiet
+			rm *.patch
+			exit 0
+			;;
+		*)
+			exit 1
+			;;
+	esac
+}
+
+targets="$@ $(get_branch_name) $(get_branch_remote)"
+
+for target in $targets; do
+	try_to_send_to $target
+done
+
+echo "Could find suitable target in $targets"
+exit 1

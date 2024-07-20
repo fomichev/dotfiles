@@ -1,0 +1,9 @@
+#!/bin/bash
+
+MYDIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}" )" &>/dev/null && pwd)
+source $MYDIR/../host_lib.sh
+
+set -e
+
+make -C $KDIR -j SPHINXDIRS="networking" htmldocs
+make -C $KDIR -j SPHINXDIRS="bpf" htmldocs

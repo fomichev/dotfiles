@@ -1,0 +1,116 @@
+#!/bin/bash
+#
+# Start QEMU with the freshly built kernel and run the test script.
+
+set -e
+
+MYDIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}" )" &>/dev/null && pwd)
+source $MYDIR/../host_lib.sh
+
+compile_and_run() {
+	echo > $KDIR/bisect_status
+	echo "building (see bisect_build if fails)..." 1>&2
+	#touch $KDIR/tools/lib/bpf/libbpf_util.h # hack for some build
+	rm $KDIR/.config
+	touch $KDIR/tools/include/uapi/linux/netdev.h
+	kernel-build-qemu &> $KDIR/bisect_build || {
+		echo skip
+		return
+	}
+	#rm -f $KDIR/tools/lib/bpf/libbpf_util.h # hack for some build
+	#v co $KDIR/tools/lib/bpf/libbpf_util.h || : # hack for some build
+	echo "running the script (see bisect_script)..." 1>&2
+	kernel-run-script -e BISECT=y &> $KDIR/bisect_script || :
+	echo "$(cat $KDIR/bisect_status)"
+}
+
+verify() {
+	echo git checkout $GOOD
+	git reset --hard
+	git clean -xdf
+	git checkout $GOOD
+	got=$(compile_and_run)
+	echo got $got for GOOD
+	if [ ! "$got" = ok ]; then
+		echo "good revision unexpectedly got '$got'"
+		exit 1
+	fi
+
+	echo git checkout $BAD
+	git reset --hard
+	git clean -xdf
+	git checkout $BAD
+	got=$(compile_and_run)
+	echo got $got for BAD
+	if [ ! "$got" = fail ]; then
+		echo "bad revision unexpectedly got '$got'"
+		exit 1
+	fi
+
+	git reset --hard
+	git clean -xdf
+}
+
+setup() {
+	if [ $# -ne 2 ]; then
+		echo "usage: kernel-bisect <good> <bad>"
+		exit 1
+	fi
+
+	GOOD="$1"
+	BAD="$2"
+}
+
+setup_bisect() {
+	git bisect start --term-good mybad --term-bad mygood
+	git bisect mybad $BAD
+	git bisect mygood $GOOD
+}
+
+need_to_stop() {
+	local commits_left=$(git bisect visualize --oneline | wc -l)
+
+	echo "$commits_left commits left to bisect"
+
+	test $commits_left -eq 1
+}
+
+step() {
+	if need_to_stop; then
+		echo "nothing else to do!"
+		exit 0
+	fi
+
+	echo trying $(git show | head -n1)
+
+	got=$(compile_and_run)
+
+	echo "last log line: $(tail -n1 $KDIR/bisect_log)"
+
+	if [ "$got" = fail ]; then
+		echo git bisect bad
+		git bisect mybad
+	elif [ "$got" = skip ]; then
+		echo git bisect skip
+		git bisect skip
+	elif [ "$got" = ok ]; then
+		echo git bisect good
+		git bisect mygood
+	else
+		echo "bisect script failed! got: $got"
+		exit 2
+	fi
+}
+
+setup "$@"
+
+echo "verifying script output..."
+verify
+
+echo "starting bisect..."
+setup_bisect
+
+echo "starting bisect..."
+while :; do
+	step
+done

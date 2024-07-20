@@ -1,0 +1,16 @@
+#!/bin/bash
+#
+# Set proper upstream branch based on current branch name:
+# * 9xx<...> -> 9xx/staging/net/next
+# * upstream/<remote>/[RFC-]<hame>[/revision] -> <remote>
+# * wip/<remote>/<hame> -> <remote>
+
+MYDIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}" )" &>/dev/null && pwd)
+source $MYDIR/../host_lib.sh
+
+branch="$(get_branch)"
+remote="$(get_remote)"
+echo a
+
+echo "$branch -> $remote:"
+git branch --set-upstream-to=$remote $branch

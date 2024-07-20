@@ -1,0 +1,94 @@
+#!/bin/bash
+#
+# Prepare patches that are not in remote branch for git-send-email.
+
+MYDIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}" )" &>/dev/null && pwd)
+source $MYDIR/../host_lib.sh
+
+if [ "$1" = "-h" ]; then
+	echo "usage: $(basename $0) [till sha1]"
+	echo
+	echo "branch format: <type>/<remote>/[RFC-]<name>"
+	echo "where type is: postponed/rm/upstream/wip"
+	echo "    remote is: bpf/bpf-next"
+	exit 1
+fi
+
+check_patch=true
+if [ "$1" = "-n" ]; then
+	check_patch=false
+	shift
+fi
+
+reroll="$(get_reroll_count)"
+if [ ! -z "$reroll" ]; then
+	FLAGS+=" -v$reroll"
+fi
+
+remote="$(get_branch_remote)"
+prefix="PATCH"
+
+if [ ! -z "$SUFFIX" ]; then
+	prefix="$prefix $SUFFIX"
+fi
+
+since=$(remote_main_branch "$remote")
+till="HEAD"
+if [ ! -z "$1" ]; then
+	till="$1"
+	shift
+fi
+
+if [ "$(get_branch_tag)" = "rfc" ]; then
+	prefix="RFC"
+fi
+
+first_outgoing_sha="$(git log --format=format:%H "$since".."$till" | tail -n 1)"
+cover_letter="$(git show $first_outgoing_sha | awk -f $MYDIR/../parse_cover_letter.awk)"
+
+if [ -z "$cover_letter" ]; then
+	FLAGS+=" --no-cover-letter"
+fi
+
+#rm -f *.patch
+git format-patch \
+	--subject-prefix="$prefix $remote" \
+	$FLAGS \
+	"$@" \
+	"$since".."$till"
+
+for f in *.patch; do
+	cat "$f" | awk -f "$MYDIR/../remove_cover_letter.awk" > "${f}.bak"
+	mv "${f}.bak" "$f"
+done
+
+p_path=""
+for f in *0000-cover-letter.patch; do
+	if [ ! -z "$p_path" ]; then
+		echo "Multiple cover letter patches found: *0000-cover-letter.patch"
+		exit 1
+	fi
+	if [ -e "$f" ]; then
+		p_path="$f"
+	fi
+done
+
+if [ ! -z "$cover_letter" ]; then
+	cover_subj="$(echo "$cover_letter" | get_line 1 -)"
+	cover_space="$(echo "$cover_letter" | get_line 2 -)"
+	cover_msg="$(echo "$cover_letter" | tail -n +3 -)"
+
+	if [ ! -z "$cover_space" ]; then
+		echo "Second line of the cover letter is not empty!"
+		exit 1
+	fi
+
+	sed -i -e "s/\*\*\* SUBJECT HERE \*\*\*/$cover_subj/" $p_path
+
+	echo "$cover_msg" | sed -i -e "/\*\*\* BLURB HERE \*\*\*/ r /dev/stdin" $p_path
+	sed -i -e "/\*\*\* BLURB HERE \*\*\*/ d" $p_path
+fi
+
+if $check_patch; then
+	kernel-checkpatch
+fi

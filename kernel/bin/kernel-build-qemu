@@ -1,0 +1,163 @@
+#!/bin/bash
+#
+# Build kernel suitable for QEMU.
+
+MYDIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}" )" &>/dev/null && pwd)
+source $MYDIR/../host_lib.sh
+
+CONFIG=${CONFIG:-dbx}
+ASAN=${ASAN:-0}
+GTESTS=${GTESTS:-1}
+ARCH=${ARCH:-x86_64}
+RELEASE=${RELEASE:-$(kernel_release)}
+LLVM=${LLVM:-1}
+
+if [ $ASAN -eq 1 ]; then
+	if [ ! "$CONFIG" -eq "smp" ]; then
+		echo "ASAN=1 works only with CONFIG=smp"
+		exit 1
+	fi
+fi
+
+set -x
+
+TARGETS="all $(clangd_target)" # "$@"
+
+set_config() {
+	local key="$1"
+	local val="$2"
+
+	if [[ -z "$val" ]]; then val="y"; fi
+
+	echo "${key}=${val}" >> $KDIR/.config
+}
+
+case "$CONFIG" in
+	smp)
+		y_dbx=n
+		;;
+	dbx)
+		y_dbx=y
+		;;
+	*)
+		echo "Invalid CONFIG=$CONFIG"
+		exit 1
+		;;
+esac
+
+if [[ ! -e $KDIR/.config ]]; then
+	make -s -j$(nproc) LLVM=$LLVM ARCH=$ARCH ${ARCH}_defconfig
+
+	set +x
+
+	set_config CONFIG_KERNEL_GZIP n
+	set_config CONFIG_KERNEL_LZMA
+
+	set_config CONFIG_PARAVIRT n
+	set_config CONFIG_SECURITY_SELINUX n
+	set_config CONFIG_RETPOLINE n
+
+	set_config CONFIG_SLAB y # match prodkernel
+	set_config CONFIG_SLUB n # match prodkernel
+
+	set_config CONFIG_NR_CPUS 512
+	set_config CONFIG_MODULES
+	set_config CONFIG_FRAME_POINTER
+	set_config CONFIG_STACK_VALIDATION
+	set_config CONFIG_DEBUG_INFO
+	set_config CONFIG_DEBUG_INFO_DWARF4
+	set_config CONFIG_DEBUG_INFO_BTF
+	set_config CONFIG_MODULE_ALLOW_BTF_MISMATCH
+	set_config CONFIG_USER_NS
+	set_config CONFIG_MEMCG
+	set_config CONFIG_CONFIGFS_FS
+	set_config CONFIG_HARDENED_USERCOPY
+	set_config CONFIG_HARDLOCKUP_DETECTOR
+	set_config CONFIG_OVERLAY_FS
+	#set_config CONFIG_VFIO
+	#set_config CONFIG_DAX
+	#set_config CONFIG_FB
+	#set_config CONFIG_FRAMEBUFFER_CONSOLE
+	#set_config CONFIG_MTD
+
+	set_config CONFIG_TLS $y_dbx
+	set_config CONFIG_BONDING
+	set_config CONFIG_TCP_CONG_DCTCP
+	set_config CONFIG_NETFILTER_ADVANCED
+	set_config CONFIG_NET_ACT_GACT
+	set_config CONFIG_DUMMY
+	set_config CONFIG_NF_TABLES
+	set_config CONFIG_NETFILTER_XT_TARGET_MARK
+	set_config CONFIG_NETFILTER_XT_MATCH_MARK
+
+	#set_config CONFIG_IP_SCTP
+	#set_config CONFIG_NETFILTER_XT_MATCH_SCTP
+	#set_config CONFIG_NETFILTER_XT_TARGET_LOG
+
+	set_config CONFIG_NET_PKTGEN $y_dbx
+	set_config CONFIG_IPV6_SEG6_BPF
+	set_config CONFIG_IPV6_SEG6_LWTUNNEL
+	set_config CONFIG_VETH
+	set_config CONFIG_TUN
+	set_config CONFIG_IPVLAN
+	set_config CONFIG_BRIDGE
+	set_config CONFIG_MACVLAN
+	set_config CONFIG_MACVTAP
+	set_config CONFIG_VSOCKETS
+	set_config CONFIG_BPF_JIT_ALWAYS_ON
+	set_config CONFIG_BPF_UNPRIV_DEFAULT_OFF
+	set_config CONFIG_PSI
+	set_config CONFIG_NUMA_BALANCING
+
+	set_config CONFIG_VLAN_8021Q
+	set_config CONFIG_NET_ACT_VLAN
+	set_config CONFIG_NET_SCH_FQ
+	set_config CONFIG_VIRTIO_VSOCKETS
+	set_config CONFIG_NET_VRF
+
+	set_config CONFIG_DEBUG_KERNEL $y_dbx
+	set_config CONFIG_DEBUG_MISC $y_dbx
+	set_config CONFIG_CGROUP_DEBUG $y_dbx
+	#set_config CONFIG_PREEMPT $y_dbx
+	#set_config CONFIG_RETPOLINE $y_dbx
+	set_config CONFIG_STACK_TRACER $y_dbx
+	set_config CONFIG_DEBUG_SPINLOCK $y_dbx
+	set_config CONFIG_PROVE_LOCKING $y_dbx
+	set_config CONFIG_LOCKDEP $y_dbx
+	set_config CONFIG_DEBUG_ATOMIC_SLEEP $y_dbx
+	set_config CONFIG_DYNAMIC_DEBUG $y_dbx
+	set_config CONFIG_PROVE_RCU $y_dbx
+	set_config CONFIG_DEBUG_NET $y_dbx
+	set_config CONFIG_DEBUG_PAGEALLOC $y_dbx
+	set_config CONFIG_GDB_SCRIPTS $y_dbx
+
+	set_config CONFIG_MLX4_EN
+	set_config CONFIG_MLX5_CORE
+	set_config CONFIG_MLX5_CORE_EN
+
+	set_config CONFIG_CMDLINE_BOOL
+	set_config CONFIG_CMDLINE "oops=panic panic=10 io_delay=0xed libata.allow_tpm=1 nmi_watchdog=panic tco_start=1 quiet slab_nomerge fb_tunnels=none firmware_class.path=/var/google/session msr.allow_writes=on acpi_enforce_resources=lax video=efifb:off hest_disable=1 erst_disable=1 bert_disable=1 retbleed=off eagerfpu=on kvm_amd.nested=0 debug_pagealloc=on intel_iommu=optin pcie_port_pm=off scsi_mod.force_queue_depth=1,512:0 scsi_mod.scan=async libata.ata_probe_timeout=30 pm80xx.spinup_group=5 pm80xx.spinup_interval_ms=10000 pm80xx.spinup_group_decrease=1"
+
+	#set_config CONFIG_KASAN $y_dbx
+	#set_config CONFIG_KASAN_GENERIC $y_dbx
+	#set_config CONFIG_KASAN_INLINE $y_dbx
+	#set_config CONFIG_KASAN_STACK $y_dbx
+	#set_config CONFIG_KASAN_VMALLOC $y_dbx
+
+	# test_test_bpffs: maps.debug & progs.debug
+	# cb80ddc67152 break console!
+	#set_config CONFIG_BPF_PRELOAD $y_dbx
+	#set_config CONFIG_BPF_PRELOAD_UMD $y_dbx
+
+	set_config CONFIG_FBNIC
+
+	set -x
+
+	cat $KDIR/tools/testing/selftests/bpf/config >> $KDIR/.config
+	make -s -j$(nproc) LLVM=$LLVM ARCH=$ARCH olddefconfig
+	make -s -j$(nproc) headers
+fi
+KCFLAGS="-Wno-error=format -Wno-error=array-bounds" \
+	make -s -j$(nproc) LLVM=$LLVM ARCH=$ARCH $TARGETS
+
+clangd_generate

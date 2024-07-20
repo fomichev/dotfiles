@@ -1,0 +1,13 @@
+#!/bin/bash
+#
+# Run checkpatch over all *.patch files in the current directory.
+
+MYDIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}" )" &>/dev/null && pwd)
+source $MYDIR/../host_lib.sh
+
+if grep -q "Change-Id:" ./*.patch; then
+	echo Change-Id!
+	exit
+fi
+
+./scripts/checkpatch.pl --codespell "$@" ./*.patch

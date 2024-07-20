@@ -1,0 +1,8 @@
+#!/bin/bash
+#
+# Start QEMU with the freshly built kernel and run the test script.
+
+MYDIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}" )" &>/dev/null && pwd)
+
+ENVIRON_ARG="MYDIR='$MYDIR' HOME='$HOME'" \
+	~/bin/q "$@" -s "$MYDIR/../guest_script.sh"
