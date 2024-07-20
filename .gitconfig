@@ -61,7 +61,7 @@
 
 [core]
 	abbrev = 12
-	pager = "less -FXS"
+	pager = "LESS=FRXK less"
 
 [diff "default"]
 	xfuncname = "^[[:alpha:]$_].*[^:]$"
