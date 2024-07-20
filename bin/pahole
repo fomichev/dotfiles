@@ -1,3 +1,7 @@
 #!/bin/bash
 
-LD_LIBRARY_PATH=$HOME/opt/sysroot/lib $HOME/opt/sysroot/bin/pahole "$@"
+if [ -e $HOME/opt/sysroot/bin/pahole ]; then
+	LD_LIBRARY_PATH=$HOME/opt/sysroot/lib $HOME/opt/sysroot/bin/pahole "$@"
+else
+	/usr/bin/pahole "$@"
+fi
