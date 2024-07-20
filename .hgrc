@@ -1,5 +1,5 @@
 [ui]
-username = Stanislav Fomichev <s@fomichev.me>
+username = Stanislav Fomichev <sdf@fomichev.me>
 merge = internal:merge
 #commitsubrepos = True
 

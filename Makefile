@@ -96,6 +96,9 @@ gnome:
 	gsettings set org.gnome.desktop.wm.keybindings switch-to-workspace-4 "['<Super>4']"
 	gsettings set org.gnome.desktop.wm.keybindings activate-window-menu "[]"
 
+scp:
+	git ls-tree -r --name-only HEAD | tar -cz -T - | ssh $(DEVSERVER) tar xzf -
+
 layout:
 	$(call Layout,sofle,sdf,keyboard/sofle.svg)
 	$(call Layout,kinesis/kint2pp,sdf,keyboard/kinesis.svg)
