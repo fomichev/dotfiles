@@ -17,14 +17,13 @@ bind pager gg top
 bind pager gt next-undeleted
 bind pager gT previous-undeleted
 
-bind pager a group-reply
-bind index a group-reply
-
 macro index c "<change-folder>?<toggle-mailboxes>" "open a different folder"
 macro pager c "<change-folder>?<toggle-mailboxes>" "open a different folder"
 
-# toggle threads collapsing
-bind index <space> collapse-thread
+bind pager r group-reply
+bind index r group-reply
+bind index <space> read-thread
+bind pager <tab> skip-quoted
 
 # sidebar
 bind index,pager K sidebar-prev
@@ -34,6 +33,3 @@ bind index,pager B sidebar-toggle-visible
 
 # save attachments into home dir
 macro attach s <save-entry><bol>~/
-
-# mark all messages as read
-macro index A "T~U<enter><tag-prefix><clear-flag>N<untag-pattern>.<enter>" "mark all messages as read"

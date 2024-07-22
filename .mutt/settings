@@ -87,6 +87,9 @@ color  body  cyan         default  ^(Tested-by:).*
 color  body  cyan         default  ^(Reviewed-by:).*
 color  body  green        default  "LGTM"
 
+# always apply commands to tagged messages
+set auto_tag = yes
+
 # change date format a bit
 set date_format = "%m/%d"
 set index_format = "%D  %-10.10F  %s"
