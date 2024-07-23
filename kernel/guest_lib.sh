@@ -7,6 +7,34 @@ if [ -z "$HOME" ]; then
 	exit 1
 fi
 
+TP_EXCLUDE=()
+TP_INCLUDE=()
+SELFTEST=()
+CUSTOM=()
+
+SELFTEST_SUBDIR=bpf
+
+UNDER_GDB=false
+FTRACE_SYMBOL=
+#FTRACE_SYMBOL=$(ftrace_syscall bpf)
+#FTRACE_SYMBOL=$(ftrace_syscall bind)
+#FTRACE_SYMBOL=__sys_bind
+#FTRACE_SYMBOL=bpf_raw_tp_link_attach
+
+BISECT_ERR=
+#BISECT_ERR="failed to load object"
+#BISECT_ERR="name ct_sockops"
+
+TP_BINARY=test_progs
+#TP_BINARY=test_progs-no_alu32
+TP_RUNS=1
+TP_FLAGS=""
+#TP_FLAGS="-v -v"
+#TP_FLAGS="-j"
+TP_NUM=""
+#TP_NUM=62,98
+#TEST_PROGS_RUNS=100
+
 say() {
 	tput setaf 2
 	echo "$@"
@@ -242,11 +270,6 @@ run_selftest() {
 		(cd "$ST_DIR/$target" && maybe_ftrace maybe_gdb ./$script "$@")
 	fi
 }
-
-TP_BINARY=test_progs
-TP_RUNS=1
-TP_FLAGS=""
-TP_NUM=""
 
 run_test_progs() {
 	if [ $# -lt 2 ]; then
@@ -527,4 +550,34 @@ testsuite_bpftool_prog() {
 	bpftool prog loadall ./tools/testing/selftests/bpf/test_sk_lookup.bpf.o /sys/fs/bpf/x
 	bpftool prog attach pinned /sys/fs/bpf/x/lookup_pass sk_lookup
 	bpftool prog attach pinned /sys/fs/bpf/x/lookup_pass sk_lookup
+}
+
+__run_all_tests() {
+	for custom in ${CUSTOM[@]}; do
+		eval $custom
+	done
+
+	testsuite_syzkaller_c $KDIR/rep.c || :
+	testsuite_syzkaller $KDIR/rep.syz || :
+
+	for bin in ${SELFTEST[@]}; do
+		run_selftest $SELFTEST_SUBDIR $bin || :
+	done
+
+	#rm -f $ST_DIR/bpf/bpf_testmod.ko
+	run_test_progs -t "$(echo ${TP_INCLUDE[@]} | tr ' ' ',')" || :
+	run_test_progs -b "$(echo ${TP_EXCLUDE[@]} | tr ' ' ',')" || :
+	run_test_progs -n "$TP_NUM" || :
+}
+
+testsuite_run() {
+	testsuite_begin "$@"
+
+	if [ "$BISECT" = "y" ]; then
+		bisect_run __run_all_tests
+	else
+		__run_all_tests
+	fi
+
+	testsuite_end
 }
