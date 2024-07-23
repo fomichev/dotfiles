@@ -4,8 +4,13 @@
 # {{{
 SSH_PORT=${SSH_PORT:-42222}
 
+QEMU_PATH=
+QEMU_PREFIX=
+QEMU_SUFFIX=
+QEMU_MACH="accel=kvm:tcg" # q35 for pass-through
+
 #NRCPU=${NRCPU:-4}
-#MEMORY=${MEMORY:-15872}
+#MEMORY=${MEMORY:-8192}
 NRCPU=${NRCPU:-1}
 MEMORY=${MEMORY:-1024}
 TAP_QUEUES=${TAP_QUEUES:-$NRCPU}
@@ -17,6 +22,10 @@ V6_ADDR=${V6_ADDR:-"2002:ad6:c2c4::1"}
 V6_PREFIX=${V6_PREFIX:-128}
 
 HOST=${HOST:-q}
+
+if [ -e ".qrc" ]; then
+	source .qrc
+fi
 # }}}
 
 # Internal variables:
@@ -157,7 +166,7 @@ host() {
 
 	local accel
 	if [[ "${MY_ARCH}" = "${ARCH}" ]]; then
-		accel+=" -machine accel=kvm:tcg"
+		accel+=" -machine $QEMU_MACH"
 		accel+=" -enable-kvm"
 	fi
 
@@ -219,7 +228,7 @@ host() {
 		exit 1
 	fi
 
-	qemu-system-${qemu_flavor} \
+	$QEMU_PREFIX ${QEMU_PATH}qemu-system-${qemu_flavor} \
 		-nographic \
 		-no-reboot \
 		$accel \
@@ -234,7 +243,7 @@ host() {
 		$net \
 		$gdb \
 		-kernel "$kernel" \
-		-append "$cmdline"
+		-append "$cmdline" $QEMU_SUFFIX
 }
 
 say() {
