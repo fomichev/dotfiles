@@ -78,5 +78,8 @@
 [maintenance]
 	repo = /home/sdf/src/linux
 
+[advice]
+	detachedHead = false
+
 [include]
 	path = ~/local/.gitconfig
