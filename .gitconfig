@@ -48,6 +48,7 @@
 	chainreplyto = false
 	confirm = always
 	suppresscc = self
+	signedoffcc = false
 
 [format]
 	coverletter = auto
@@ -62,6 +63,9 @@
 [core]
 	abbrev = 12
 	pager = "LESS=FRXK less"
+
+[diff]
+	tool = nvimdiff
 
 [diff "default"]
 	xfuncname = "^[[:alpha:]$_].*[^:]$"
