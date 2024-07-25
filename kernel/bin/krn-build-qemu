@@ -150,7 +150,7 @@ if [[ ! -e $KDIR/.config ]]; then
 	#set_config CONFIG_BPF_PRELOAD_UMD $y_dbx
 
 	set_config CONFIG_FBNIC n
-	set_config CONFIG_PHYLINK
+	set_config CONFIG_STMMAC_ETH # for CONFIG_PHYLINK
 
 	set -x
 
