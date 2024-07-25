@@ -1,0 +1,8 @@
+#!/bin/bash
+#
+# Run sparse.
+
+make olddefconfig
+make C=2 2>&1 | tee sparse.txt
+
+echo "cat sparse.txt" | colorify

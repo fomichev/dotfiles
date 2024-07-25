@@ -1,0 +1,160 @@
+#!/bin/bash
+#
+# Build kernel using several different configs.
+
+MYDIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}" )" &>/dev/null && pwd)
+source $MYDIR/../host_lib.sh
+
+set -e
+
+#TESTS=(check_tools check_custom_configs check_kernel_configs check_sparse check_smatch)
+TESTS=(check_custom_configs check_kernel_configs)
+
+while getopts "htcksS" arg; do
+	case $arg in
+		h)
+			echo -e "usage: $(basename $0) [flags]"
+			echo
+			echo -e "flags:"
+			echo -e "\t-t\tonly tools"
+			echo -e "\t-c\tcustom configs"
+			echo -e "\t-k\tkernel configs"
+			echo -e "\t-s\tsparse"
+			echo -e "\t-S\tsmatch"
+			exit 1
+			;;
+		t) TESTS=(check_tools) ;;
+		c) TESTS=(check_custom_configs) ;;
+		k) TESTS=(check_kernel_configs) ;;
+		s) TESTS=(check_sparse) ;;
+		S) TESTS=(check_smatch) ;;
+	esac
+done
+shift $((OPTIND-1))
+
+CONFIGS="$(ls -1 $MYDIR/../config/.config*)"
+
+if [ ! -z "$1" ]; then
+	CONFIGS="$(ls -1 $MYDIR/../config/$1)"
+	shift
+fi
+
+mk() { make -s -j$(nproc) "$@"; }
+
+verify_config() {
+	local cfg="$1"
+	local errors=0
+	local line
+	while read line; do
+		local kcfg
+		local want_yn
+		local got_yn
+		local ln
+
+		if [[ -z "$line" ]]; then
+			continue
+		fi
+
+
+		kcfg=$(echo "$line" | cut -d= -f1)
+		want_yn=$(echo "$line" | cut -d= -f2)
+
+		ln=$(cat .config | grep "${kcfg}=" || :)
+		if [[ -z "$ln" ]]; then
+			got_yn=n
+		else
+			got_yn=$(echo "$line" | cut -d= -f2)
+		fi
+
+		if [[ "$want_yn" != "$got_yn" ]]; then
+			echo "Unexpected: $line (want: $want_yn got: $got_yn)"
+			errors=$(( $errors + 1 ))
+			continue
+
+		fi
+	done < <(cat "$cfg")
+
+	if [[ $errors -gt 0 ]]; then
+		exit 1
+		#return 0
+	fi
+}
+
+build_custom_config() {
+	local cfg="$(basename $1)"
+
+	echo "make mrproper"
+	mk mrproper
+
+	echo "make olddefconfig"
+	cp "$1" .config
+	mk olddefconfig
+
+	#say "make: x86_64_defconfig"
+	#mk x86_64_defconfig
+	#scripts/kconfig/merge_config.sh -r -y -s "$1"
+
+	echo "verify config"
+	verify_config "$1"
+
+	echo "make"
+	time mk
+}
+
+build_config() {
+	say "make: clean old build"
+	mk mrproper
+	say "make: $1"
+	mk $1
+	say "make"
+	time mk
+}
+
+tools_tests() {
+	mk -C tools clean &>/dev/null
+	say "test bpftool & bpf selftests for CC=$1"
+
+	(mk CC="$1" -C tools/bpf/bpftool)
+	(mk CC="$1" -C tools/testing/selftests/bpf)
+}
+
+check_tools() {
+	tools_tests clang
+	tools_tests gcc
+}
+
+check_custom_configs() {
+	for c in $CONFIGS; do
+		say "test custom kernel config $(basename $c)"
+		build_custom_config $c
+	done
+}
+
+check_kernel_configs() {
+	build_config allnoconfig
+	build_config alldefconfig
+	build_config allmodconfig
+	build_config allyesconfig
+}
+
+check_sparse() {
+	say "sparse"
+	kernel-check
+}
+
+check_smatch() {
+	if [ ! -e smatch_db.sqlite ]; then
+		say "smatch database"
+		~/opt/src/smatch/smatch_scripts/build_kernel_data.sh
+	fi
+
+	say "smatch"
+	~/opt/src/smatch/smatch_scripts/test_kernel.sh
+
+	say "cat smatch_warns.txt"
+	say "f .c.smatch"
+}
+
+for t in $TESTS; do
+	eval $t
+done
