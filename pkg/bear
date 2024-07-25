@@ -1,0 +1,3 @@
+#!/bin/bash
+
+src=(https://github.com/rizsotto/Bear.git)
