@@ -12,8 +12,6 @@ TP_INCLUDE=()
 SELFTEST=()
 CUSTOM=()
 
-SELFTEST_SUBDIR=bpf
-
 UNDER_GDB=false
 FTRACE_SYMBOL=
 #FTRACE_SYMBOL=$(ftrace_syscall bpf)
@@ -258,17 +256,15 @@ maybe_ftrace() {
 	fi
 }
 
+
 run_selftest() {
-	local target="$1"
-	local script="$2"
-	if [ -z "$script" ]; then
-		(cd $ST_DIR && make TARGETS="$target" run_tests)
-	else
-		shift
-		shift
-		echo "(cd '$ST_DIR/$target' && ./$script '$@')"
-		(cd "$ST_DIR/$target" && maybe_ftrace maybe_gdb ./$script "$@")
-	fi
+	local bin=$(basename "$1")
+	local dir=$(dirname "$1")
+
+	shift
+
+	echo "(cd '$ST_DIR/$dir' && ./$bin '$@')"
+	(cd "$ST_DIR/$dir" && maybe_ftrace maybe_gdb ./$bin "$@")
 }
 
 run_test_progs() {
@@ -281,7 +277,7 @@ run_test_progs() {
 	fi
 
 	for x in $(seq $TP_RUNS); do
-		run_selftest bpf $TP_BINARY $TP_FLAGS "$@"
+		run_selftest bpf/$TP_BINARY $TP_FLAGS "$@"
 	done
 }
 
@@ -561,7 +557,7 @@ __run_all_tests() {
 	testsuite_syzkaller $KDIR/rep.syz || :
 
 	for bin in ${SELFTEST[@]}; do
-		run_selftest $SELFTEST_SUBDIR $bin || :
+		run_selftest $bin || :
 	done
 
 	#rm -f $ST_DIR/bpf/bpf_testmod.ko
