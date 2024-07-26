@@ -10,7 +10,6 @@ source $MYDIR/../host_lib.sh
 
 branch="$(get_branch)"
 remote="$(get_remote)"
-echo a
 
 echo "$branch -> $remote:"
 git branch --set-upstream-to=$remote $branch
