@@ -41,9 +41,7 @@ set delete = yes
 set confirmappend = no
 
 # printer setup
-set print = yes
-set print_command="muttprint -p - | ps2pdf - $HOME/tmp/muttprint.pdf"
-set print_split = yes
+set print = no
 
 # sort messages by last received in thread
 set sort=threads

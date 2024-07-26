@@ -1,0 +1,275 @@
+#!/usr/bin/python3
+
+# Apply and diff:
+# krn-review -a -m "/home/sdf/Mail/all/cur/d824c9d51d9ccdbf9e33f0f047d6a74b4a6032e2:2,S"
+# cd ~/src/linux
+# krn-review -d
+# git checkout upstream/bpf-next/master
+# git branch -D upstream/0/3/20240725-convert_dev_cgroup-v1-0-2c8cbd487c44@bootlin.com
+
+# Prepare reply email:
+# krn-review -p -m "/home/sdf/Mail/all/cur/d824c9d51d9ccdbf9e33f0f047d6a74b4a6032e2:2,S"
+#
+# $ cd ~/review/20240725-convert_dev_cgroup-v1-0-2c8cbd487c44\@bootlin.com/
+# krn-review -e
+# krn-review -r
+
+import argparse
+import email
+import email.policy
+import filecmp
+import re
+import os
+import os.path
+import pathlib
+import subprocess
+import shutil
+import sys
+
+def difftool():
+    git_log = subprocess.check_output(['git', 'log', '--oneline', '@{u}..']).decode("utf-8")
+    sha1s = [ x.split(' ')[0] for x in git_log.split('\n') ]
+    sha1s.reverse()
+    sha1s = list(filter(None, sha1s))
+
+    i = 1
+    for sha1 in sha1s:
+        subprocess.call('clear')
+        print(f'Patch {i} / {len(sha1s)}')
+        print()
+        subprocess.call(['git', 'show', '--stat', sha1])
+        subprocess.call(['git', 'difftool', sha1 + '~', sha1])
+        i += 1
+
+def apply(subj, message_id, linux, tmux):
+    match = re.search(r'\[PATCH (.*?)\]', subj)
+    if match:
+        subsys = match.group(1).split()[0]
+    else:
+        print(f'unknown subsystem, assuming bpf-next')
+        subsys = "bpf-next"
+
+    review_branch = f'upstream/{subsys}/{message_id}'
+
+    os.chdir(args.linux)
+
+    if subprocess.call(['git', 'rev-parse', '--verify', review_branch]) == 0:
+        print(f'branch {review_branch} exists, doing nothing...')
+        return
+
+    if subprocess.call(['git', 'diff-index', '--quiet', 'HEAD', '--']) != 0:
+        print(f'the tree is dirty, doing nothing...')
+        return
+
+    print(f'Subject: {subj}')
+    print(f'Subsystem: {subsys}')
+    print(f'New branch: {review_branch}')
+
+    if subsys == 'net':
+        subsys_branch='net/main'
+    elif subsys == 'net-next':
+        subsys_branch='net-next/main'
+    if subsys == 'bpf':
+        subsys_branch='bpf/master'
+    elif subsys == 'bpf-next':
+        subsys_branch='bpf-next/master'
+    else:
+        print(f'unknown subsystem {subsys}, assuming bpf-next')
+        subsys_branch='bpf-next/master'
+
+    print(f'Subsystem branch: {subsys_branch}')
+
+    subprocess.check_call(['git', 'checkout', 'upstream/' + subsys_branch])
+    subprocess.check_call(['git', 'pull', '--rebase'])
+    subprocess.check_call(['git', 'checkout', '-b', review_branch])
+    subprocess.check_call(['git', 'branch', '--set-upstream-to=' + subsys_branch])
+    subprocess.check_call(['b4', 'shazam', message_id])
+
+    if tmux:
+        pane = 'D' + message_id
+        subprocess.check_call(['tmux', 'new-window', '-n', pane, f'cd {linux} && krn-review -d; tmux wait -S {pane}'])
+        subprocess.check_call(['tmux', 'wait', pane])
+        subprocess.check_call(['git', 'checkout', 'upstream/' + subsys_branch])
+        subprocess.check_call(['git', 'branch', '-D', review_branch])
+
+def find_root_message_id(dir):
+    for name in os.listdir(dir):
+        path = os.path.join(dir, name)
+        if not os.path.isfile(path):
+            continue
+
+        with open(path) as file:
+            policy = email.policy.EmailPolicy(utf8=True)
+            msg = email.message_from_file(file, policy=policy)
+
+        if 'In-Reply-To' not in msg:
+            return re.sub(r'[<>]', '', msg['Message-Id'])
+
+    raise Exception(f'could not find root message id in {dir}')
+
+def sanitize_subj(subj):
+    name = subj
+    name = re.sub('\\[', '', name)
+    name = re.sub('\\]', '', name)
+    name = re.sub('[^0-9a-zA-Z]+', '_', name)
+    return name
+
+def create_reply(path):
+    with open(path) as f:
+        policy = email.policy.EmailPolicy(utf8=True)
+
+        msg = email.message_from_file(f, policy=policy)
+        rsp = email.message.EmailMessage(policy=policy)
+        rsp.add_header('To', msg['From'])
+        rsp.add_header('Cc', msg['Cc'])
+        rsp.add_header('In-Reply-To', msg['Message-Id'])
+
+        subj = msg['Subject']
+
+        name = sanitize_subj(subj)
+
+        if not subj.startswith('Re: '):
+            subj = 'Re: ' + subj
+
+        rsp.add_header('Subject', subj)
+        rsp.add_header('Content-Type', msg['Content-Type'])
+
+        body = msg.get_body(preferencelist=['plain']).get_payload()
+        lines = [ '> ' + x for x in body.splitlines() ]
+        body = "\n".join(lines)
+        rsp.set_payload(body)
+
+        return (name, rsp.as_string(policy=policy))
+
+def create_replies(new_dir, msg_dir, ref_dir):
+    for name in os.listdir(new_dir):
+        path = os.path.join(new_dir, name)
+
+        if not os.path.isfile(path):
+            continue
+
+        reply_name, contents = create_reply(path)
+
+        with open(os.path.join(ref_dir, reply_name), "w") as file:
+            file.write(contents)
+
+        with open(os.path.join(msg_dir, reply_name), "w") as file:
+            file.write(contents)
+
+def prepare(linux, message_id, dir, tmux):
+    tmp_dir = os.path.join(dir, 'tmp')
+
+    if os.path.exists(tmp_dir):
+        print(f'directory {tmp_dir} already exists, bailing out...')
+        return
+    subprocess.check_call(['b4', 'mbox', '-M', message_id, '-n', tmp_dir])
+
+    message_id = find_root_message_id(os.path.join(tmp_dir, 'new'))
+
+    msg_dir = os.path.join(dir, message_id)
+    if os.path.exists(msg_dir):
+        shutil.rmtree(tmp_dir)
+        print(f'continue review series in {msg_dir}')
+    else:
+        shutil.move(tmp_dir, msg_dir)
+
+        ref_dir = os.path.join(msg_dir, 'ref')
+        if not os.path.exists(ref_dir):
+            os.mkdir(ref_dir)
+
+        new_dir = os.path.join(msg_dir, 'new')
+        create_replies(new_dir, msg_dir, ref_dir)
+
+        print(f'created review series in {msg_dir}')
+
+    if tmux:
+        pane = 'R' + message_id
+        subprocess.check_call(['tmux', 'new-window', '-n', pane, f'cd {msg_dir} && krn-review -er; sleep 1; tmux wait -S {pane}'])
+        subprocess.check_call(['tmux', 'wait', pane])
+
+def edit():
+    cmd = ['nvim', '-p']
+
+    for name in os.listdir('.'):
+        path = os.path.join('.', name)
+        if not os.path.isfile(path):
+            continue
+
+        cmd.append(path)
+
+    subprocess.call(cmd)
+
+def reply():
+    if not os.path.exists('cur') or not os.path.exists('ref'):
+        print('should be called from the directory with replies...')
+        return
+
+    differ = []
+
+    for name in os.listdir('.'):
+        path = os.path.join('.', name)
+        if not os.path.isfile(path):
+            continue
+
+        ref_path = os.path.join('ref', name)
+        if not filecmp.cmp(path, ref_path):
+            differ.append(path)
+
+    if len(differ) == 0:
+        print('could not find any changes to send')
+        return
+
+    print('will send the following replies:')
+    for file in differ:
+        print(f'- {file}')
+
+        while True:
+            response = input('continue? (y/n): ')
+            if response.lower() == 'n':
+                return
+            elif response.lower() == 'y':
+                break
+
+    for file in differ:
+        with subprocess.Popen(['msmtp', '-t'], stdin=subprocess.PIPE) as p:
+            with open(file) as f:
+                p.communicate(f.read().encode("utf-8"))
+
+parser = argparse.ArgumentParser()
+parser.add_argument('--linux', type=str, default='/home/sdf/src/linux')
+parser.add_argument('--review', type=str, default='/home/sdf/review')
+parser.add_argument('-m', '--message', type=str, default='')
+parser.add_argument('-d', '--diff', action='store_true')
+parser.add_argument('-a', '--apply', action='store_true')
+parser.add_argument('-e', '--edit', action='store_true')
+parser.add_argument('-p', '--prepare', action='store_true')
+parser.add_argument('-r', '--reply', action='store_true')
+parser.add_argument('--tmux', action='store_true')
+args = parser.parse_args()
+
+if args.message:
+    policy = email.policy.EmailPolicy(utf8=True)
+
+    if args.message == '-':
+        msg = email.message_from_file(sys.stdin, policy=policy)
+    else:
+        with open(args.message) as file:
+            msg = email.message_from_file(file, policy=policy)
+
+if args.diff:
+    difftool()
+
+elif args.apply:
+    subj = msg['Subject']
+    message_id = re.sub(r'[<>]', '', msg['Message-Id'])
+    apply(subj, message_id, args.linux, args.tmux)
+
+if args.prepare:
+    message_id = re.sub(r'[<>]', '', msg['Message-Id'])
+    prepare(args.linux, message_id, args.review, args.tmux)
+
+if args.edit:
+    edit()
+
+if args.reply:
+    reply()
