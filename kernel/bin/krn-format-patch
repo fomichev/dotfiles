@@ -90,5 +90,5 @@ if [ ! -z "$cover_letter" ]; then
 fi
 
 if $check_patch; then
-	kernel-checkpatch
+	krn-checkpatch
 fi
