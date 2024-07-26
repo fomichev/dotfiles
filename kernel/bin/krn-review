@@ -15,6 +15,7 @@
 # krn-review -r
 
 import argparse
+import atexit
 import email
 import email.policy
 import filecmp
@@ -43,13 +44,16 @@ def difftool():
 
 def apply(subj, message_id, linux, tmux):
     match = re.search(r'\[PATCH (.*?)\]', subj)
+    subsys = ''
     if match:
         subsys = match.group(1).split()[0]
-    else:
+
+    if subsys not in ['bpf', 'bpf-next', 'net', 'net-next']:
         print(f'unknown subsystem, assuming bpf-next')
         subsys = "bpf-next"
 
     review_branch = f'upstream/{subsys}/{message_id}'
+    print(f'review {review_branch}')
 
     os.chdir(args.linux)
 
@@ -87,10 +91,7 @@ def apply(subj, message_id, linux, tmux):
 
     if tmux:
         pane = 'D' + message_id
-        subprocess.check_call(['tmux', 'new-window', '-n', pane, f'cd {linux} && krn-review -d; tmux wait -S {pane}'])
-        subprocess.check_call(['tmux', 'wait', pane])
-        subprocess.check_call(['git', 'checkout', 'upstream/' + subsys_branch])
-        subprocess.check_call(['git', 'branch', '-D', review_branch])
+        subprocess.check_call(['tmux', 'new-window', '-n', pane, f'cd {linux} && krn-review --cleanup -d; sleep 10'])
 
 def find_root_message_id(dir):
     for name in os.listdir(dir):
@@ -184,8 +185,7 @@ def prepare(linux, message_id, dir, tmux):
 
     if tmux:
         pane = 'R' + message_id
-        subprocess.check_call(['tmux', 'new-window', '-n', pane, f'cd {msg_dir} && krn-review -er; sleep 1; tmux wait -S {pane}'])
-        subprocess.check_call(['tmux', 'wait', pane])
+        subprocess.check_call(['tmux', 'new-window', '-n', pane, f'cd {msg_dir} && krn-review -er; sleep 1'])
 
 def edit():
     cmd = ['nvim', '-p']
@@ -235,9 +235,28 @@ def reply():
             with open(file) as f:
                 p.communicate(f.read().encode("utf-8"))
 
+def cleanup():
+    review_branch = subprocess.check_output(['git', 'rev-parse', '--abbrev-ref', 'HEAD']).decode("utf-8").strip()
+
+    cols = review_branch.split('/')
+    if cols[0] != 'upstream':
+        print(f'no idea how to cleanup {review_branch}')
+        return
+
+    if cols[2] == 'main' or cols[2] == 'master':
+        return
+
+    cols[2] = 'main'
+    if 'bpf' in cols[1]:
+        cols[2] = 'master'
+
+    subprocess.check_call(['git', 'checkout', '/'.join(cols)])
+    subprocess.check_call(['git', 'branch', '-D', review_branch])
+
 parser = argparse.ArgumentParser()
 parser.add_argument('--linux', type=str, default='/home/sdf/src/linux')
 parser.add_argument('--review', type=str, default='/home/sdf/review')
+parser.add_argument('--cleanup', action='store_true')
 parser.add_argument('-m', '--message', type=str, default='')
 parser.add_argument('-d', '--diff', action='store_true')
 parser.add_argument('-a', '--apply', action='store_true')
@@ -246,6 +265,9 @@ parser.add_argument('-p', '--prepare', action='store_true')
 parser.add_argument('-r', '--reply', action='store_true')
 parser.add_argument('--tmux', action='store_true')
 args = parser.parse_args()
+
+if args.cleanup:
+    atexit.register(cleanup)
 
 if args.message:
     policy = email.policy.EmailPolicy(utf8=True)
