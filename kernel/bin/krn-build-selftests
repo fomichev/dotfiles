@@ -18,9 +18,9 @@ cflags+=" -Wno-error=unused-variable"
 
 PREFIX=
 
-if command -v bear &> /dev/null; then
-	PREFIX="bear --append -- "
-fi
+#if command -v bear &> /dev/null; then
+#	PREFIX="bear --append -- "
+#fi
 
 $PREFIX make -s -j$(nproc) -C tools/bpf/bpftool LLVM=$LLVM "$@"
 
