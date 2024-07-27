@@ -1,74 +1,83 @@
-#!/bin/bash
+#!/usr/bin/python3
 
-MBOX=~/Mail
+import argparse
+import email
+import email.policy
+import re
+import os
+import os.path
+import subprocess
+import shutil
+import sys
 
-INBOX=$MBOX/all
-TRASH=$MBOX/archive
-SUBDIR=new # TODO: switch to "cur" eventually
+parser = argparse.ArgumentParser()
+parser.add_argument('--linux', type=str, default='/home/sdf/src/linux')
+parser.add_argument('--inbox', type=str, default='/home/sdf/Mail/all')
+# TODO: switch to "cur" eventually
+parser.add_argument('--archive', type=str, default='/home/sdf/Mail/archive/new')
+parser.add_argument('--dry', default=False, action='store_true')
 
-is_child() {
-	grep -Ei -q "^In-Reply-To:" "$1"
-}
+args = parser.parse_args()
 
-in_reply_to() {
-	echo $(grep -Ei "^In-Reply-To:" "$1" | sed -e "s/In-Reply-To: <\([^>]*\)>/\1/I")
-}
+def parse_dir(path):
+    ret = {}
 
-message_id() {
-	echo $(grep -Ei "^Message-Id:" "$1" | sed -e "s/Message-Id: <\([^>]*\)>/\1/I")
-}
+    for name in os.listdir(path):
+        mail = os.path.join(path, name)
+        if not os.path.isfile(mail):
+            continue
 
-find_by_id() {
-	grep -Eirl "^Message-Id: <$1>" $INBOX | head -n1
-}
+        with open(mail) as file:
+            policy = email.policy.EmailPolicy(utf8=True)
+            msg = email.message_from_file(file, policy=policy)
 
-thread_message_id() {
-	local message_id="$1"
+            d = {}
 
-	while :; do
-		local file=$(find_by_id $message_id)
+            d['Message-Id'] = re.sub(r'[<>]', '', msg['Message-Id'])
+            if 'In-Reply-To' in msg:
+                d['In-Reply-To'] = re.sub(r'[<>]', '', msg['In-Reply-To'])
+            d['Subject'] = msg['Subject']
 
-		if [ -z "$file" ]; then
-			message_id=""
-			break
-		fi
+            ret[mail] = d
 
-		if ! is_child "$file"; then
-			break
-		fi
+    return ret
 
-		message_id=$(in_reply_to "$file")
-	done
+def parse_mbox(path):
+    cur = parse_dir(os.path.join(path, 'cur'))
+    new = parse_dir(os.path.join(path, 'new'))
+    return cur | new
 
-	echo "$message_id"
-}
+def have_top_message(mbox, id2path, id):
+    while True:
+        if id not in id2path:
+            return False
 
-move_to_trash() {
-	mv $1 $TRASH/$SUBDIR/
-}
+        d = mbox[id2path[id]]
+        if 'In-Reply-To' not in d:
+            return True
 
-subject() {
-	echo $(grep -Ei "^Subject: " "$1" | sed -e "s/^Subject: //I")
-}
+        id = d['In-Reply-To']
 
-for f in $INBOX/*/*; do
-	if ! is_child "$f"; then
-		echo T $f $(subject $f)
-		continue
-	fi
+    return False
 
-	reply_id=$(in_reply_to "$f")
-	thread_id=$(thread_message_id "$reply_id")
+inbox = parse_mbox(args.inbox)
 
-	if [ ! -z "$thread_id" ]; then
-		echo S $f $(subject $f)
-		continue
-	fi
+id2path = {}
 
-	echo M $f $(subject $f)
+for path, d in inbox.items():
+    id2path[d['Message-Id']] = path
 
-	if [ ! "$1" = "-d" ]; then
-		move_to_trash $f
-	fi
-done
+move = []
 
+for path in inbox:
+    if not have_top_message(inbox, id2path, inbox[path]['Message-Id']):
+        move.append(path)
+
+for path in move:
+    print(f'{path}: {inbox[path]["Subject"]}')
+
+if not args.dry:
+    for src in move:
+        dst = os.path.join(args.archive, os.path.basename(src))
+        print(f'{src} -> {dst}')
+        shutil.move(src, dst)
