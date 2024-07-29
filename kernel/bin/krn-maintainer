@@ -1,0 +1,8 @@
+#!/bin/bash
+
+MYDIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}" )" &>/dev/null && pwd)
+source $MYDIR/../host_lib.sh
+
+set -x
+
+./scripts/get_maintainer.pl *.patch
