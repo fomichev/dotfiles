@@ -14,18 +14,21 @@ TP_INCLUDE=(
 	#sockop
 	#sockopt sockopt_inherit sockopt_multi sockopt_sk
 	#lsm_cgroup
-	xdp_metadata
+	#xdp_metadata
 )
 
 SELFTEST=(
-	#test_maps
-	#test_verifier
-	#test_flow_dissector.sh
-	#test_kmod.sh
-	#test_lwt_seg6local.sh
-	#test_xsk.sh
-	#test_offload.py
-	#test_sock_addr.sh
+	drivers/net/stats.py #:--skip-disruptive
+	#drivers/net/hw/pp_alloc_fail.py
+
+	#bpf/test_maps
+	#bpf/test_verifier
+	#bpf/test_flow_dissector.sh
+	#bpf/test_kmod.sh
+	#bpf/test_lwt_seg6local.sh
+	#bpf/test_xsk.sh
+	#bpf/test_offload.py
+	#bpf/test_sock_addr.sh
 )
 
 CUSTOM=(

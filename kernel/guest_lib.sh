@@ -557,7 +557,7 @@ __run_all_tests() {
 	testsuite_syzkaller $KDIR/rep.syz || :
 
 	for bin in ${SELFTEST[@]}; do
-		run_selftest $bin || :
+		run_selftest $(echo "$bin" | tr ':' ' ') || :
 	done
 
 	#rm -f $ST_DIR/bpf/bpf_testmod.ko
