@@ -27,18 +27,25 @@ def parse_dir(path):
         if not os.path.isfile(mail):
             continue
 
-        with open(mail) as file:
-            policy = email.policy.EmailPolicy(utf8=True)
-            msg = email.message_from_file(file, policy=policy)
+        for encoding in [ "utf-8", "ISO-8859-1" ]:
+            try:
+                with open(mail, "r", encoding=encoding) as file:
+                    policy = email.policy.EmailPolicy(utf8=True)
+                    msg = email.message_from_file(file, policy=policy)
+            except:
+                pass
 
-            d = {}
+        if not msg:
+            raise Exception(f'could not decode {file}')
 
-            d['Message-Id'] = re.sub(r'[<>]', '', msg['Message-Id'])
-            if 'In-Reply-To' in msg:
-                d['In-Reply-To'] = re.sub(r'[<>]', '', msg['In-Reply-To'])
-            d['Subject'] = msg['Subject']
+        d = {}
 
-            ret[mail] = d
+        d['Message-Id'] = re.sub(r'[<>]', '', msg['Message-Id'])
+        if 'In-Reply-To' in msg:
+            d['In-Reply-To'] = re.sub(r'[<>]', '', msg['In-Reply-To'])
+        d['Subject'] = msg['Subject']
+
+        ret[mail] = d
 
     return ret
 
