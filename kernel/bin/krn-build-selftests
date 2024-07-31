@@ -24,5 +24,11 @@ PREFIX=
 
 $PREFIX make -s -j$(nproc) -C tools/bpf/bpftool LLVM=$LLVM "$@"
 
+
+SUBSYS="$1"
+if [ -z "$SUBSYS" ]; then
+	SUBSYS=net
+fi
+
 SAN_CFLAGS="$cflags" \
-$PREFIX make -s -j$(nproc) -C tools/testing/selftests/bpf LLVM=$LLVM "$@"
+$PREFIX make -s -j$(nproc) -C tools/testing/selftests/$SUBSYS LLVM=$LLVM "$@"
