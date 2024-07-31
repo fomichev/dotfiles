@@ -4,5 +4,12 @@
 
 MYDIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}" )" &>/dev/null && pwd)
 
+SCRIPT="$MYDIR/../guest_script.sh"
+CURDIR=$(pwd)
+
+if [ -e "${CURDIR}/.qsh" ]; then
+	SCRIPT="${CURDIR}/.qsh"
+fi
+
 ENVIRON_ARG="MYDIR='$MYDIR' HOME='$HOME'" \
-	~/bin/q "$@" -s "$MYDIR/../guest_script.sh"
+	~/bin/q "$@" -s "$SCRIPT"
