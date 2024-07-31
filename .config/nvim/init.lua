@@ -130,7 +130,7 @@ for _, v in ipairs({ "help", "qf", "gitendemail", }) do
 	})
 end
 
-vim.o.grepprg = "g --vimgrep --no-heading '$*'"
+vim.o.grepprg = "g --vimgrep --no-heading"
 vim.keymap.set("n", "<Leader>g", ":Grep<space>")
 
 vim.api.nvim_create_user_command(
