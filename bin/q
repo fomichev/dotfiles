@@ -39,6 +39,7 @@ IMAGE_INIT="/sbin/init.real"
 SCRIPT=${SCRIPT:-}
 ENVIRON_ARG=${ENVIRON_ARG:-}
 MY_ARCH=$(uname -m)
+QUIET=false
 
 GDB=${GDB:-false}
 GUEST=${GUEST:-false}
@@ -72,6 +73,7 @@ usage() {
 	echo "    f - forward given localhost port (comma-separated list)"
 	echo "    n - networking mode (user,tap,vhost)"
 	echo "    e - pass extra environment variable"
+	echo "    q - don't fallback to interactive shell on failure"
 	exit 1
 }
 
@@ -218,6 +220,7 @@ host() {
 	init+="NET_TAP='$NET_TAP' "
 	init+="NET_VHOST='$NET_VHOST' "
 	init+="SCRIPT='$SCRIPT' "
+	init+="QUIET='$QUIET' "
 	init+="$ENVIRON_ARG "
 	init+="/tmp/dir_q/q"
 
@@ -534,8 +537,10 @@ EOF
 		say non-interactive bash script
 		setsid bash --rcfile $rcfile -c "$SCRIPT"
 		if [[ ! $? -eq 0 ]]; then
-			say script failed, starting interactive console
-			setsid bash --rcfile $rcfile 0<>"/dev/$TTY" 1>&0 2>&0
+			if ! $QUIET; then
+				say script failed, starting interactive console
+				setsid bash --rcfile $rcfile 0<>"/dev/$TTY" 1>&0 2>&0
+			fi
 		fi
 	else
 		say interactive bash $rcfile
@@ -560,6 +565,7 @@ while getopts "2i:de:hgms:c:f:n:" opt; do
 		s) SCRIPT="$OPTARG" ;;
 		f) FWD_PORT="$OPTARG" ;;
 		e) ENVIRON_ARG="$ENVIRON_ARG $OPTARG" ;;
+		q) QUIET=true ;;
 		n)
 			case "$OPTARG" in
 				user) ;;
