@@ -16,3 +16,4 @@ perf.svg
 .tmp_vmlinux.kallsyms2.syms
 .tmp_vmlinux.kallsyms1.syms
 .vmlinux.export.c
+buck-out/
