@@ -11,6 +11,7 @@ GTESTS=${GTESTS:-1}
 ARCH=${ARCH:-x86_64}
 RELEASE=${RELEASE:-$(kernel_release)}
 LLVM=${LLVM:-1}
+SILENT="-s"
 
 if [ $ASAN -eq 1 ]; then
 	if [ ! "$CONFIG" -eq "smp" ]; then
@@ -18,6 +19,13 @@ if [ $ASAN -eq 1 ]; then
 		exit 1
 	fi
 fi
+
+while getopts "S" opt; do
+	case $opt in
+		S) SILENT="" ;;
+	esac
+done
+shift $((OPTIND -1))
 
 set -x
 
@@ -46,7 +54,7 @@ case "$CONFIG" in
 esac
 
 if [[ ! -e $KDIR/.config ]]; then
-	make -s -j$(nproc) LLVM=$LLVM ARCH=$ARCH ${ARCH}_defconfig
+	make $SILENT -j$(nproc) LLVM=$LLVM ARCH=$ARCH ${ARCH}_defconfig
 
 	set +x
 
@@ -156,10 +164,10 @@ if [[ ! -e $KDIR/.config ]]; then
 	set -x
 
 	cat $KDIR/tools/testing/selftests/bpf/config >> $KDIR/.config
-	make -s -j$(nproc) LLVM=$LLVM ARCH=$ARCH olddefconfig
-	make -s -j$(nproc) headers
+	make $SILENT -j$(nproc) LLVM=$LLVM ARCH=$ARCH olddefconfig
+	make $SILENT -j$(nproc) headers
 fi
 KCFLAGS="-Wno-error=format -Wno-error=array-bounds" \
-	make -s -j$(nproc) LLVM=$LLVM ARCH=$ARCH $TARGETS
+	make $SILENT -j$(nproc) LLVM=$LLVM ARCH=$ARCH $TARGETS
 
 clangd_generate
