@@ -171,3 +171,7 @@ clangd_generate() {
 		$script -d "$KDIR" -o "$KDIR/compile_commands.json"
 	fi
 }
+
+kernel_vmlinux() {
+	find . -type f -name 'vmlinux' | xargs file | grep 'ELF 64-bit LSB executable' | awk -F: '{print $1}' | tail -n1
+}

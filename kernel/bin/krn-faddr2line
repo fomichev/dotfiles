@@ -3,4 +3,4 @@
 MYDIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}" )" &>/dev/null && pwd)
 source $MYDIR/../host_lib.sh
 
-$KDIR/scripts/faddr2line $KDIR/vmlinux "$@"
+$KDIR/scripts/faddr2line $(kernel_vmlinux) "$@"
