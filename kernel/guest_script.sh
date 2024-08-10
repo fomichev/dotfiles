@@ -18,7 +18,7 @@ TP_INCLUDE=(
 )
 
 SELFTEST=(
-	drivers/net/stats.py #:--skip-disruptive
+	drivers/net/stats.py
 	#drivers/net/hw/pp_alloc_fail.py
 
 	#bpf/test_maps
