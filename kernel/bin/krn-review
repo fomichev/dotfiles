@@ -103,57 +103,70 @@ def find_root_message_id(dir):
             msg = email.message_from_file(file, policy=policy)
 
         if 'In-Reply-To' not in msg:
-            return re.sub(r'[<>]', '', msg['Message-Id'])
+            return re.sub(r'[<>]', '', msg['Message-Id']), msg['From']
 
     raise Exception(f'could not find root message id in {dir}')
 
 def sanitize_subj(subj):
-    name = subj
+    cols = subj.replace(": ", " ").split("]")
+
+    name = cols[1].strip('. ')
+    match = re.search(r".*(\d+)/\d+", cols[0])
+    if match:
+        name = f"{match.group(1)} {name}"
+
     name = re.sub('\\[', '', name)
     name = re.sub('\\]', '', name)
     name = re.sub('[^0-9a-zA-Z]+', '_', name)
     return name
 
-def create_reply(path):
-    with open(path) as f:
-        policy = email.policy.EmailPolicy(utf8=True)
+def create_reply(msg):
+    rsp = email.message.EmailMessage(policy=policy)
+    rsp.add_header('To', msg['From'])
+    rsp.add_header('Cc', msg['Cc'])
+    rsp.add_header('In-Reply-To', msg['Message-Id'])
 
-        msg = email.message_from_file(f, policy=policy)
-        rsp = email.message.EmailMessage(policy=policy)
-        rsp.add_header('To', msg['From'])
-        rsp.add_header('Cc', msg['Cc'])
-        rsp.add_header('In-Reply-To', msg['Message-Id'])
+    subj = msg['Subject']
 
-        subj = msg['Subject']
+    file = sanitize_subj(subj)
 
-        name = sanitize_subj(subj)
+    if not subj.startswith('Re: '):
+        subj = 'Re: ' + subj
 
-        if not subj.startswith('Re: '):
-            subj = 'Re: ' + subj
+    rsp.add_header('Subject', subj)
+    rsp.add_header('Content-Type', msg['Content-Type'])
 
-        rsp.add_header('Subject', subj)
-        rsp.add_header('Content-Type', msg['Content-Type'])
+    body = msg.get_body(preferencelist=['plain']).get_payload()
+    lines = [ '> ' + x for x in body.splitlines() ]
+    body = "\n".join(lines)
+    rsp.set_payload(body)
 
-        body = msg.get_body(preferencelist=['plain']).get_payload()
-        lines = [ '> ' + x for x in body.splitlines() ]
-        body = "\n".join(lines)
-        rsp.set_payload(body)
+    return (file, rsp.as_string(policy=policy))
 
-        return (name, rsp.as_string(policy=policy))
-
-def create_replies(new_dir, msg_dir, ref_dir):
+def create_replies(new_dir, msg_dir, ref_dir, message_id, author):
     for name in os.listdir(new_dir):
         path = os.path.join(new_dir, name)
 
         if not os.path.isfile(path):
             continue
 
-        reply_name, contents = create_reply(path)
+        with open(path) as file:
+            policy = email.policy.EmailPolicy(utf8=True)
+            msg = email.message_from_file(file, policy=policy)
 
-        with open(os.path.join(ref_dir, reply_name), "w") as file:
+        if message_id != msg['Message-Id'] and message_id != msg['In-Reply-To']:
+            continue
+        if author != msg['From']:
+            continue
+
+        reply_file, contents = create_reply(msg)
+
+        print(f'create {reply_file}')
+
+        with open(os.path.join(ref_dir, reply_file), "w") as file:
             file.write(contents)
 
-        with open(os.path.join(msg_dir, reply_name), "w") as file:
+        with open(os.path.join(msg_dir, reply_file), "w") as file:
             file.write(contents)
 
 def prepare(linux, message_id, dir, tmux):
@@ -164,7 +177,7 @@ def prepare(linux, message_id, dir, tmux):
         return
     subprocess.check_call(['b4', 'mbox', '-M', message_id, '-n', tmp_dir])
 
-    message_id = find_root_message_id(os.path.join(tmp_dir, 'new'))
+    message_id, author = find_root_message_id(os.path.join(tmp_dir, 'new'))
 
     msg_dir = os.path.join(dir, message_id)
     if os.path.exists(msg_dir):
@@ -178,7 +191,7 @@ def prepare(linux, message_id, dir, tmux):
             os.mkdir(ref_dir)
 
         new_dir = os.path.join(msg_dir, 'new')
-        create_replies(new_dir, msg_dir, ref_dir)
+        create_replies(new_dir, msg_dir, ref_dir, f'<{message_id}>', author)
 
         print(f'created review series in {msg_dir}')
 
@@ -198,7 +211,7 @@ def edit():
 
     subprocess.call(cmd)
 
-def reply():
+def reply(dry):
     if not os.path.exists('cur') or not os.path.exists('ref'):
         print('should be called from the directory with replies...')
         return
@@ -211,6 +224,7 @@ def reply():
             continue
 
         ref_path = os.path.join('ref', name)
+        print("CMP", path, ref_path, filecmp.cmp(path, ref_path))
         if not filecmp.cmp(path, ref_path):
             differ.append(path)
 
@@ -222,14 +236,18 @@ def reply():
     for file in differ:
         print(f'- {file}')
 
-        while True:
-            response = input('continue? (y/n): ')
-            if response.lower() == 'n':
-                return
-            elif response.lower() == 'y':
-                break
+    while True:
+        response = input('continue? (y/n): ')
+        if response.lower() == 'n':
+            return
+        elif response.lower() == 'y':
+            break
 
     for file in differ:
+        if dry:
+            print(f"DRY: cat {file} | msmtp -t")
+            continue
+
         with subprocess.Popen(['msmtp', '-t'], stdin=subprocess.PIPE) as p:
             with open(file) as f:
                 p.communicate(f.read().encode("utf-8"))
@@ -263,6 +281,7 @@ parser.add_argument('-e', '--edit', action='store_true')
 parser.add_argument('-p', '--prepare', action='store_true')
 parser.add_argument('-r', '--reply', action='store_true')
 parser.add_argument('--tmux', action='store_true')
+parser.add_argument('--dry', action='store_true')
 args = parser.parse_args()
 
 if args.cleanup:
@@ -293,4 +312,4 @@ if args.edit:
     edit()
 
 if args.reply:
-    reply()
+    reply(args.dry)
