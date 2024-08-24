@@ -11,6 +11,7 @@ import shutil
 import sys
 
 parser = argparse.ArgumentParser()
+parser.add_argument('--me', type=str, default='sdf@fomichev.me')
 parser.add_argument('--linux', type=str, default='/home/sdf/src/linux')
 parser.add_argument('--inbox', type=str, default='/home/sdf/Mail/all')
 # TODO: switch to "cur" eventually
@@ -51,6 +52,7 @@ def parse_dir(path):
         if 'In-Reply-To' in msg:
             d['In-Reply-To'] = re.sub(r'[<>]', '', msg['In-Reply-To'])
         d['Subject'] = msg['Subject']
+        d['To'] = msg['To']
 
         ret[mail] = d
 
@@ -73,6 +75,17 @@ def have_top_message(mbox, id2path, id):
         id = d['In-Reply-To']
 
     return False
+
+def flag_to_me(mbox, me):
+    for path in mbox:
+        if me in mbox[path]['To']:
+            dst = path + "F"
+            if not args.dry:
+                shutil.move(path, dst)
+            print(f'{path} -> {dst}')
+
+new = parse_dir(os.path.join(args.inbox, 'new'))
+flag_to_me(new, args.me)
 
 inbox = parse_mbox(args.inbox)
 
