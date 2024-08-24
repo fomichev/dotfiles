@@ -165,9 +165,9 @@ if [[ ! -e $KDIR/.config ]]; then
 
 	cat $KDIR/tools/testing/selftests/bpf/config >> $KDIR/.config
 	make $SILENT -j$(nproc) LLVM=$LLVM ARCH=$ARCH olddefconfig
-	make $SILENT -j$(nproc) headers
 fi
 KCFLAGS="-Wno-error=format -Wno-error=array-bounds" \
 	make $SILENT -j$(nproc) LLVM=$LLVM ARCH=$ARCH $TARGETS
+make $SILENT -j$(nproc) LLVM=1 headers
 
 clangd_generate
