@@ -4,7 +4,7 @@ bind index \Cu half-up
 bind index G last-entry
 bind index g noop
 bind index gg first-entry
-bind index d delete-thread
+macro index d "<read-thread><previous-thread><delete-thread>"
 
 bind pager j next-line
 bind pager k previous-line
