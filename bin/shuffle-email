@@ -79,10 +79,14 @@ def have_top_message(mbox, id2path, id):
 def flag_to_me(mbox, me):
     for path in mbox:
         if me in mbox[path]['To']:
-            dst = path + "F"
-            if not args.dry:
-                shutil.move(path, dst)
-            print(f'{path} -> {dst}')
+            flags = path.split(',')[-1]
+            if 'F' not in flags:
+                dst = path + "F"
+                if not args.dry:
+                    shutil.move(path, dst)
+                print(f'flag {path} -> {dst}')
+            else:
+                print(f'skip flaged {path}')
 
 new = parse_dir(os.path.join(args.inbox, 'new'))
 flag_to_me(new, args.me)
@@ -101,7 +105,7 @@ for path in inbox:
         move.append(path)
 
 for path in move:
-    print(f'{path}: {inbox[path]["Subject"]}')
+    print(f'move {path}: {inbox[path]["Subject"]}')
 
 if not args.dry:
     for src in move:
