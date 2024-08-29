@@ -1,0 +1,110 @@
+#!/usr/bin/env python3
+
+import argparse
+import os
+import pathlib
+import subprocess
+import threading
+import time
+
+from watchdog.observers import Observer
+from watchdog.events import FileSystemEventHandler
+
+parser = argparse.ArgumentParser()
+parser.add_argument('--command', type=str, default='krn-build-qemu -S && krn-build-selftests -S && krn-run-script')
+
+class CommandRunner(threading.Thread):
+    def __init__(self, command):
+        super().__init__()
+        self.command = command
+        self.process = None
+        self.cancelled = False
+        self.done = False
+        self.lock = threading.Lock()
+        self.output = []
+        self.err = []
+
+    def consume_stream(self, stream):
+        ret = []
+        while True:
+            line = stream.readline()
+            if not line:
+                break
+            ret.append(line.decode('utf-8').strip())
+        return ret
+
+    def run(self):
+        self.process = subprocess.Popen(self.command, shell=True)
+
+        while self.process.poll() is None:
+            if self.cancelled:
+                self.process.terminate()
+                return
+            time.sleep(0.1)
+        self.done = True
+
+    def cancel(self):
+        self.cancelled = True
+
+class EventHandler(FileSystemEventHandler):
+    def __init__(self, tracked_files):
+        self.lock = threading.Lock()
+        self.updates = set()
+        self.tracked_files = tracked_files
+
+    def on_modified(self, event):
+        path = pathlib.Path(event.src_path)
+        norm = str(path.resolve().relative_to(path.cwd()))
+
+        if norm in self.tracked_files:
+            with self.lock:
+                self.updates.add(norm)
+
+    def get_updates(self):
+        ret = None
+        with self.lock:
+            ret = self.updates
+            self.updates = set()
+        return ret
+
+class EventLoop:
+    def __init__(self, command):
+        self.git_ls_files()
+        self.command = command
+        self.cmd = None
+        self.run_cmd()
+
+    def git_ls_files(self):
+        self.tracked_files = set()
+        ls_files = subprocess.check_output(['git', 'ls-files']).decode("utf-8")
+        for line in ls_files.split("\n"):
+            self.tracked_files.add(line.strip())
+
+    def run_cmd(self):
+        if self.cmd:
+            self.cmd.cancel()
+
+        self.cmd = CommandRunner(self.command)
+        self.cmd.start()
+
+    def run(self):
+        path = "."
+        event_handler = EventHandler(self.tracked_files)
+        observer = Observer()
+        observer.schedule(event_handler, path, recursive=True)
+        observer.start()
+
+        try:
+            while True:
+                updates = event_handler.get_updates()
+                if updates:
+                    self.run_cmd()
+                time.sleep(0.1)
+        except KeyboardInterrupt:
+            observer.stop()
+        observer.join()
+
+if __name__ == "__main__":
+    args = parser.parse_args()
+    loop = EventLoop(args.command)
+    loop.run()
