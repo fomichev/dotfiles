@@ -1,8 +1,10 @@
 #!/usr/bin/env python3
 
 import argparse
+import atexit
 import os
 import pathlib
+import signal
 import subprocess
 import threading
 import time
@@ -12,39 +14,6 @@ from watchdog.events import FileSystemEventHandler
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--command', type=str, default='krn-build-qemu -S && krn-build-selftests -S && krn-run-script')
-
-class CommandRunner(threading.Thread):
-    def __init__(self, command):
-        super().__init__()
-        self.command = command
-        self.process = None
-        self.cancelled = False
-        self.done = False
-        self.lock = threading.Lock()
-        self.output = []
-        self.err = []
-
-    def consume_stream(self, stream):
-        ret = []
-        while True:
-            line = stream.readline()
-            if not line:
-                break
-            ret.append(line.decode('utf-8').strip())
-        return ret
-
-    def run(self):
-        self.process = subprocess.Popen(self.command, shell=True)
-
-        while self.process.poll() is None:
-            if self.cancelled:
-                self.process.terminate()
-                return
-            time.sleep(0.1)
-        self.done = True
-
-    def cancel(self):
-        self.cancelled = True
 
 class EventHandler(FileSystemEventHandler):
     def __init__(self, tracked_files):
@@ -71,8 +40,17 @@ class EventLoop:
     def __init__(self, command):
         self.git_ls_files()
         self.command = command
-        self.cmd = None
-        self.run_cmd()
+        self.process = None
+        self.restart_cmd()
+        atexit.register(self.cleanup)
+
+    def cleanup(self):
+        if self.process:
+            os.killpg(os.getpgid(self.process.pid), signal.SIGKILL)
+            self.process.wait()
+
+            print(f'Builder {self.process.pid} is gone')
+            self.process = None
 
     def git_ls_files(self):
         self.tracked_files = set()
@@ -80,12 +58,11 @@ class EventLoop:
         for line in ls_files.split("\n"):
             self.tracked_files.add(line.strip())
 
-    def run_cmd(self):
-        if self.cmd:
-            self.cmd.cancel()
+    def restart_cmd(self):
+        self.cleanup()
+        self.process = subprocess.Popen(self.command, shell=True, preexec_fn=os.setsid)
+        print(f'Restart builder with pid {self.process.pid}')
 
-        self.cmd = CommandRunner(self.command)
-        self.cmd.start()
 
     def run(self):
         path = "."
@@ -98,7 +75,7 @@ class EventLoop:
             while True:
                 updates = event_handler.get_updates()
                 if updates:
-                    self.run_cmd()
+                    self.restart_cmd()
                 time.sleep(0.1)
         except KeyboardInterrupt:
             observer.stop()
