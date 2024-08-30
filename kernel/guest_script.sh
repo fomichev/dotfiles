@@ -18,7 +18,7 @@ TP_INCLUDE=(
 )
 
 SELFTEST=(
-	drivers/net/stats.py
+	#drivers/net/stats.py
 	#drivers/net/hw/pp_alloc_fail.py
 
 	#bpf/test_maps
@@ -31,6 +31,21 @@ SELFTEST=(
 	#bpf/test_sock_addr.sh
 )
 
+tcpx() {
+	local dev=eth0
+
+	ip addr add 192.168.1.4 dev $dev
+	ip link set $dev up
+	local ret=$(echo -e "hello\nworld" | ./tools/testing/selftests/net/ncdevmem -L -f $dev)
+	echo "[$ret]"
+
+	local want=$(echo -e "hello\nworld")
+	if [ "$ret" != "$want" ]; then
+		echo "FAIL!"
+		exit 1
+	fi
+}
+
 CUSTOM=(
 	#testsuite_bitcoin_miner
 	#testsuite_virtio_perf
@@ -38,6 +53,7 @@ CUSTOM=(
 	#testsuite_ynl_cli
 	#testsuite_tcpdirect
 	#testsuite_bpftool_prog
+	tcpx
 )
 
 testsuite_run false # v2
