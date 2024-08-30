@@ -13,7 +13,7 @@ from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
 
 parser = argparse.ArgumentParser()
-parser.add_argument('--command', type=str, default='krn-build-qemu -s && krn-build-selftests -s && krn-run-script')
+parser.add_argument('--command', type=str, default='krn-build-qemu && krn-build-selftests && krn-run-script')
 
 class EventHandler(FileSystemEventHandler):
     def __init__(self, tracked_files):
