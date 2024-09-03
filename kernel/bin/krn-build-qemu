@@ -161,6 +161,13 @@ if [[ ! -e $KDIR/.config ]]; then
 	set_config CONFIG_FBNIC n
 	set_config CONFIG_STMMAC_ETH # for CONFIG_PHYLINK
 
+	# save compile time by disabling things not used in the VM
+	set_config CONFIG_DRM n
+	set_config CONFIG_SOUND n
+	set_config CONFIG_PCCARD n
+	set_config CONFIG_BACKLIGHT_CLASS_DEVICE n
+	set_config CONFIG_HID_SUPPORT n
+
 	set -x
 
 	cat $KDIR/tools/testing/selftests/bpf/config >> $KDIR/.config
