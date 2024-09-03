@@ -282,10 +282,10 @@ require("lazy").setup({
 			}
 
 			-- pacman -S pyright
-			require"lspconfig".pyright.setup{
-				capabilities = capabilities,
-				on_attach = lsp_on_attach,
-			}
+			--require"lspconfig".pyright.setup{
+			--	capabilities = capabilities,
+			--	on_attach = lsp_on_attach,
+			--}
 
 			-- pacman -S gopls
 			--require"lspconfig".golps.setup{
