@@ -31,12 +31,13 @@ SELFTEST=(
 	#bpf/test_sock_addr.sh
 )
 
-tcpx() {
+tcpx_loopback() {
 	local dev=eth0
+	local addr=192.168.1.4
 
-	ip addr add 192.168.1.4 dev $dev
+	ip addr add $addr dev $dev
 	ip link set $dev up
-	local ret=$(echo -e "hello\nworld" | ./tools/testing/selftests/net/ncdevmem -L -f $dev)
+	local ret=$(echo -e "hello\nworld" | ./tools/testing/selftests/drivers/net/ncdevmem -L -f $dev -s ::ffff:$addr -p 5201)
 	echo "[$ret]"
 
 	local want=$(echo -e "hello\nworld")
@@ -46,6 +47,22 @@ tcpx() {
 	fi
 }
 
+tcpx_selftest() {
+	make \
+		-C tools/testing/selftests \
+		TARGETS="drivers/net" \
+		install INSTALL_PATH=$KDIR/ksft
+
+	#cd $KDIR/ksft
+	#./run_kselftest.sh -t drivers/net:devmem.py
+
+	cd $KDIR/ksft/drivers/net
+	local dev=eth0
+	ip addr add 192.168.1.4 dev $dev
+	ip link set $dev up
+	./devmem.py
+}
+
 CUSTOM=(
 	#testsuite_bitcoin_miner
 	#testsuite_virtio_perf
@@ -53,7 +70,8 @@ CUSTOM=(
 	#testsuite_ynl_cli
 	#testsuite_tcpdirect
 	#testsuite_bpftool_prog
-	tcpx
+	tcpx_loopback
+	#tcpx_selftest
 )
 
 testsuite_run false # v2

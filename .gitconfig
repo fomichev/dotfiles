@@ -11,7 +11,8 @@
 	ca = commit --amend --allow-empty
 	ci = commit -s
 	co = checkout
-	cp = cherry-pick -x
+	cp = cherry-pick --allow-empty
+	cpx = cherry-pick -x
 	cpa = cherry-pick --abort
 	dc = diff --cached
 	d = diff

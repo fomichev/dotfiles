@@ -15,6 +15,8 @@ while getopts "S" opt; do
 done
 shift $((OPTIND -1))
 
+prefer_system_python
+
 set -x
 
 #if [ ! "$(basename $KDIR)" = "linux" ]; then
@@ -32,11 +34,9 @@ PREFIX=
 
 $PREFIX make $SILENT -j$(nproc) -C tools/bpf/bpftool LLVM=$LLVM "$@"
 
-
-SUBSYS="$1"
-if [ -z "$SUBSYS" ]; then
-	SUBSYS=net
+if [ -z "$*" ]; then
+	set -- "drivers/net" "net"
 fi
 
 SAN_CFLAGS="$cflags" \
-$PREFIX make $SILENT -j$(nproc) -C tools/testing/selftests/$SUBSYS LLVM=$LLVM "$@"
+$PREFIX make $SILENT -j$(nproc) -C tools/testing/selftests TARGETS="$*" LLVM=$LLVM
