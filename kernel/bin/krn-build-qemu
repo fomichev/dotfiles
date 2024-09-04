@@ -161,6 +161,13 @@ if [[ ! -e $KDIR/.config ]]; then
 	set_config CONFIG_FBNIC n
 	set_config CONFIG_STMMAC_ETH # for CONFIG_PHYLINK
 
+	cat $KDIR/tools/testing/selftests/bpf/config >> $KDIR/.config
+
+	# disable module signing
+	set_config CONFIG_MODULE_SIG_FORMAT
+	set_config CONFIG_MODULE_SIG n
+	set_config CONFIG_MODULE_COMPRESS_NONE
+
 	# save compile time by disabling things not used in the VM
 	set_config CONFIG_DRM n
 	set_config CONFIG_SOUND n
@@ -169,8 +176,6 @@ if [[ ! -e $KDIR/.config ]]; then
 	set_config CONFIG_HID_SUPPORT n
 
 	set -x
-
-	cat $KDIR/tools/testing/selftests/bpf/config >> $KDIR/.config
 	make $SILENT -j$(nproc) LLVM=$LLVM ARCH=$ARCH olddefconfig
 fi
 KCFLAGS="-Wno-error=format -Wno-error=array-bounds" \
