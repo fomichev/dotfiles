@@ -9,42 +9,96 @@ import subprocess
 import threading
 import time
 
-from watchdog.observers import Observer
-from watchdog.events import FileSystemEventHandler
+import inotify_simple
+
+class InotifyEventHandler:
+    def __init__(self, tracked_files):
+        self.inotify = inotify_simple.INotify()
+        self.tracked_files = tracked_files
+        self.wd = {}
+        self.add_watch('.')
+
+    def add_watch(self, dir):
+        for f in os.listdir(dir):
+            path = os.path.join(dir, f)
+            if not os.path.isdir(path):
+                continue
+
+            wd = self.inotify.add_watch(path, inotify_simple.flags.MODIFY)
+            self.wd[wd] = path
+            self.add_watch(path)
+
+    def stop(self):
+        for wd in self.wd:
+            self.inotify.rm_watch(wd)
+
+    def join(self):
+        pass
+
+    def get_updates(self):
+        read_timeout_ms = 50
+        batch_timeout_ms = 200
+
+        ret = []
+        last_event_time = time.time_ns()
+
+        while True:
+            for event in self.inotify.read(timeout=read_timeout_ms):
+                if event.mask & inotify_simple.flags.ISDIR:
+                    continue
+
+                path = pathlib.Path(os.path.join(self.wd[event.wd], event.name))
+                norm = str(path.resolve().relative_to(path.cwd()))
+
+                if norm not in self.tracked_files:
+                    continue
+
+                ret.append(norm)
+                last_event_time = time.time_ns()
+
+            if ret and time.time_ns() - last_event_time > batch_timeout_ms * 1000:
+                break
+
+        return ret
+
+#from watchdog.observers import Observer
+#from watchdog.events import FileSystemEventHandler
+#
+#class WatchdogEventHandler(FileSystemEventHandler):
+#    def __init__(self, tracked_files):
+#        self.lock = threading.Lock()
+#        self.updates = set()
+#        self.tracked_files = tracked_files
+#
+#        self.observer = Observer()
+#        self.observer.schedule(self, '.', recursive=True)
+#        self.observer.start()
+#
+#    def stop(self):
+#        self.observer.stop()
+#
+#    def join(self):
+#        self.observer.join()
+#
+#    def on_modified(self, event):
+#        path = pathlib.Path(event.src_path)
+#        norm = str(path.resolve().relative_to(path.cwd()))
+#
+#        if norm in self.tracked_files:
+#            with self.lock:
+#                self.updates.add(norm)
+#
+#    def get_updates(self):
+#        ret = None
+#        with self.lock:
+#            ret = self.updates
+#            self.updates = set()
+#        if not ret:
+#            time.sleep(0.1)
+#        return ret
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--command', type=str, default='krn-build-qemu && krn-build-selftests && krn-run-script')
-
-class WatchdogEventHandler(FileSystemEventHandler):
-    def __init__(self, tracked_files):
-        self.lock = threading.Lock()
-        self.updates = set()
-        self.tracked_files = tracked_files
-
-        self.observer = Observer()
-        self.observer.schedule(self, '.', recursive=True)
-        self.observer.start()
-
-    def stop(self):
-        self.observer.stop()
-
-    def join(self):
-        self.observer.join()
-
-    def on_modified(self, event):
-        path = pathlib.Path(event.src_path)
-        norm = str(path.resolve().relative_to(path.cwd()))
-
-        if norm in self.tracked_files:
-            with self.lock:
-                self.updates.add(norm)
-
-    def get_updates(self):
-        ret = None
-        with self.lock:
-            ret = self.updates
-            self.updates = set()
-        return ret
 
 class EventLoop:
     def __init__(self, command):
@@ -75,13 +129,13 @@ class EventLoop:
 
 
     def run(self):
-        event_handler = WatchdogEventHandler(self.tracked_files)
+        #event_handler = WatchdogEventHandler(self.tracked_files)
+        event_handler = InotifyEventHandler(self.tracked_files)
         try:
             while True:
                 updates = event_handler.get_updates()
                 if updates:
                     self.restart_cmd()
-                time.sleep(0.1)
         except KeyboardInterrupt:
             event_handler.stop()
         event_handler.join()
