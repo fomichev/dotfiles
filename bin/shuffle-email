@@ -88,10 +88,22 @@ def flag_to_me(mbox, me):
             else:
                 print(f'skip flaged {path}')
 
+def filter_out_flagged(mbox):
+    ret = {}
+
+    for key, val in mbox.items():
+        flags = key.split(',')[-1]
+        if 'F' in flags:
+            continue
+        ret[key] = val
+
+    return ret
+
 new = parse_dir(os.path.join(args.inbox, 'new'))
 flag_to_me(new, args.me)
 
 inbox = parse_mbox(args.inbox)
+inbox = filter_out_flagged(inbox)
 
 id2path = {}
 
