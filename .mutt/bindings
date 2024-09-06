@@ -5,6 +5,7 @@ bind index G last-entry
 bind index g noop
 bind index gg first-entry
 macro index d "<enter-command>set resolve=no\n<read-thread><delete-thread><enter-command>set resolve=yes\n<next-undeleted>"
+macro index \Cr "<enter-command>set resolve=no\n<read-thread><enter-command>set resolve=yes\n<next-new-then-unread>"
 
 bind pager j next-line
 bind pager k previous-line
