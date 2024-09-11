@@ -11,7 +11,7 @@ import shutil
 import sys
 
 parser = argparse.ArgumentParser()
-parser.add_argument('--me', type=str, default='sdf@fomichev.me')
+parser.add_argument('--me', type=str, default='sdf@fomichev.me,stfomichev@gmail.com')
 parser.add_argument('--linux', type=str, default='/home/sdf/src/linux')
 parser.add_argument('--inbox', type=str, default='/home/sdf/Mail/all')
 # TODO: switch to "cur" eventually
@@ -78,15 +78,16 @@ def have_top_message(mbox, id2path, id):
 
 def flag_to_me(mbox, me):
     for path in mbox:
-        if me in mbox[path]['To']:
-            flags = path.split(',')[-1]
-            if 'F' not in flags:
-                dst = path + "F"
-                if not args.dry:
-                    shutil.move(path, dst)
-                print(f'flag {path} -> {dst}')
-            else:
-                print(f'skip flaged {path}')
+        for my_email in me:
+            if my_email in mbox[path]['To']:
+                flags = path.split(',')[-1]
+                if 'F' not in flags:
+                    dst = path + "F"
+                    if not args.dry:
+                        shutil.move(path, dst)
+                    print(f'flag {path} -> {dst}')
+                else:
+                    print(f'skip flaged {path}')
 
 def filter_out_flagged(mbox):
     ret = {}
@@ -100,7 +101,7 @@ def filter_out_flagged(mbox):
     return ret
 
 new = parse_dir(os.path.join(args.inbox, 'new'))
-flag_to_me(new, args.me)
+flag_to_me(new, args.me.split(','))
 
 inbox = parse_mbox(args.inbox)
 inbox = filter_out_flagged(inbox)
