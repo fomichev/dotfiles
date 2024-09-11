@@ -513,6 +513,7 @@ vim.cmd[[
 	let @a = 'iAcked-by: Stanislav Fomichev <sdf@fomichev.me>'
 	let @r = 'iReviewed-by: Stanislav Fomichev <sdf@fomichev.me>'
 	let @t = 'iTested-by: Stanislav Fomichev <sdf@fomichev.me>'
+	let @d = "i---\npw-bot: cr"
 ]]
 
 -- Local local vimrc
