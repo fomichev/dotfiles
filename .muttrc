@@ -1,5 +1,5 @@
 set realname = "Stanislav Fomichev"
-set from = "Stanislav Fomichev <sdf@fomichev.me>"
+set from = "Stanislav Fomichev <stfomichev@gmail.com>"
 set sendmail = msmtp
 
 set mbox_type = Maildir
