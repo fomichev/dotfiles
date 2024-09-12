@@ -177,5 +177,9 @@ kernel_vmlinux() {
 }
 
 prefer_system_python() {
+	if [ $(which python3) = "/usr/bin/python3" ]; then
+		return
+	fi
+
 	export PATH=$(echo "$PATH" | sed -e "s@/usr/local/bin@@g" | sed -e "s@::@@g" | sed -e "s@^:@@")
 }
