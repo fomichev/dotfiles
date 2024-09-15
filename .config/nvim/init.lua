@@ -424,7 +424,12 @@ require("lazy").setup({
 	},
 	{
 		'nvim-lualine/lualine.nvim',
-		--dependencies = { 'nvim-tree/nvim-web-devicons' }
+		dependencies = { 'nvim-tree/nvim-web-devicons' }
+	},
+	{
+		'stevearc/oil.nvim',
+		opts = {},
+		dependencies = { { "echasnovski/mini.icons", opts = {} } },
 	},
 })
 
