@@ -616,7 +616,7 @@ wk.add({
 		icon = "",
 	},
 	{
-		"<leader>i",
+		"<leader>t",
 		function() harpoon:list():add() end,
 		desc = "Harpoon toggle",
 		--icon = "",
@@ -626,18 +626,6 @@ wk.add({
 		function() harpoon.ui:toggle_quick_menu(harpoon:list()) end,
 		desc = "Harpoon jump",
 		icon = "󱋿",
-	},
-	{
-		"<leader>n",
-		function() harpoon:list():prev() end,
-		desc = "Harpoon prev",
-		icon = "󰮲",
-	},
-	{
-		"<leader>c",
-		function() harpoon:list():next() end,
-		desc = "Harpoon next",
-		icon = "󰮰",
 	},
 	{
 		"<leader>s",
