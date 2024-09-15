@@ -32,7 +32,7 @@ PREFIX=
 #	PREFIX="bear --append -- "
 #fi
 
-$PREFIX make $SILENT -j$(nproc) -C tools/bpf/bpftool LLVM=$LLVM "$@"
+#$PREFIX make $SILENT -j$(nproc) -C tools/bpf/bpftool LLVM=$LLVM "$@"
 
 if [ -z "$*" ]; then
 	set -- "drivers/net" "net"
