@@ -1,116 +1,45 @@
-#!/bin/bash
+#!/usr/bin/env python3
 #
-# Start QEMU with the freshly built kernel and run the test script.
+# krn-bisect -t "krn-test -q net/bpf_offload.py"
 
-set -e
+import argparse
+import subprocess
 
-MYDIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}" )" &>/dev/null && pwd)
-source $MYDIR/../host_lib.sh
+parser = argparse.ArgumentParser()
+parser.add_argument('-g', '--good', type=str, default='net-next/main')
+parser.add_argument('-b', '--bad', type=str, default='HEAD')
+parser.add_argument('--build', type=str, default='krn-mrproper && krn-build-qemu && krn-build-selftests')
+parser.add_argument('-t', '--test', type=str, default='krn-run-script')
+args = parser.parse_args()
 
-compile_and_run() {
-	echo > $KDIR/bisect_status
-	echo "building (see bisect_build if fails)..." 1>&2
-	#touch $KDIR/tools/lib/bpf/libbpf_util.h # hack for some build
-	rm $KDIR/.config
-	touch $KDIR/tools/include/uapi/linux/netdev.h
-	kernel-build-qemu &> $KDIR/bisect_build || {
-		echo skip
-		return
-	}
-	#rm -f $KDIR/tools/lib/bpf/libbpf_util.h # hack for some build
-	#v co $KDIR/tools/lib/bpf/libbpf_util.h || : # hack for some build
-	echo "running the script (see bisect_script)..." 1>&2
-	kernel-run-script -e BISECT=y &> $KDIR/bisect_script || :
-	echo "$(cat $KDIR/bisect_status)"
-}
+def checkout(commit):
+    print(f'checkout {commit}')
+    subprocess.check_call(['git', 'checkout', commit ])
 
-verify() {
-	echo git checkout $GOOD
-	git reset --hard
-	git clean -xdf
-	git checkout $GOOD
-	got=$(compile_and_run)
-	echo got $got for GOOD
-	if [ ! "$got" = ok ]; then
-		echo "good revision unexpectedly got '$got'"
-		exit 1
-	fi
+def compile(cmd):
+    subprocess.check_call([cmd], shell=True)
 
-	echo git checkout $BAD
-	git reset --hard
-	git clean -xdf
-	git checkout $BAD
-	got=$(compile_and_run)
-	echo got $got for BAD
-	if [ ! "$got" = fail ]; then
-		echo "bad revision unexpectedly got '$got'"
-		exit 1
-	fi
+def test(cmd):
+    return subprocess.run([cmd], shell=True).returncode
 
-	git reset --hard
-	git clean -xdf
-}
+def sanity_check(good, bad):
+    print(f'make sure the test passes on {good} and fails on {bad}')
 
-setup() {
-	if [ $# -ne 2 ]; then
-		echo "usage: kernel-bisect <good> <bad>"
-		exit 1
-	fi
+    checkout(good)
+    compile(args.build)
+    if test(args.test) != 0:
+        raise Exception(f'good revision failed the test')
 
-	GOOD="$1"
-	BAD="$2"
-}
+    checkout(bad)
+    compile(args.build)
+    if test(args.test) == 0:
+        raise Exception(f'bad revision passed the test')
 
-setup_bisect() {
-	git bisect start --term-good mybad --term-bad mygood
-	git bisect mybad $BAD
-	git bisect mygood $GOOD
-}
+subprocess.call(['git', 'bisect', 'reset'])
+good = subprocess.check_output(['git', 'rev-parse', args.good]).strip()
+bad = subprocess.check_output(['git', 'rev-parse', args.bad]).strip()
 
-need_to_stop() {
-	local commits_left=$(git bisect visualize --oneline | wc -l)
-
-	echo "$commits_left commits left to bisect"
-
-	test $commits_left -eq 1
-}
-
-step() {
-	if need_to_stop; then
-		echo "nothing else to do!"
-		exit 0
-	fi
-
-	echo trying $(git show | head -n1)
-
-	got=$(compile_and_run)
-
-	echo "last log line: $(tail -n1 $KDIR/bisect_log)"
-
-	if [ "$got" = fail ]; then
-		echo git bisect bad
-		git bisect mybad
-	elif [ "$got" = skip ]; then
-		echo git bisect skip
-		git bisect skip
-	elif [ "$got" = ok ]; then
-		echo git bisect good
-		git bisect mygood
-	else
-		echo "bisect script failed! got: $got"
-		exit 2
-	fi
-}
-
-setup "$@"
-
-echo "verifying script output..."
-verify
-
-echo "starting bisect..."
-setup_bisect
-
-echo "starting bisect..."
-while :; do
-	step
-done
+sanity_check(good, bad)
+subprocess.check_call(['git', 'bisect', 'start', args.bad, args.good])
+subprocess.check_call(['git', 'bisect', 'run', 'sh', '-c', f'{args.build} || exit 125; {args.test}'])
+subprocess.check_call(['git', 'bisect', 'reset'])
