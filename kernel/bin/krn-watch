@@ -98,7 +98,8 @@ class InotifyEventHandler:
 #        return ret
 
 parser = argparse.ArgumentParser()
-parser.add_argument('--command', type=str, default='krn-build-qemu && krn-build-selftests && krn-run-script')
+parser.add_argument('-b', '--build', type=str, default='krn-build-qemu && krn-build-selftests')
+parser.add_argument('-t', '--test', type=str, default='krn-run-script')
 
 class EventLoop:
     def __init__(self, command):
@@ -142,5 +143,5 @@ class EventLoop:
 
 if __name__ == "__main__":
     args = parser.parse_args()
-    loop = EventLoop(args.command)
+    loop = EventLoop(f'{args.build} && {args.test}')
     loop.run()
