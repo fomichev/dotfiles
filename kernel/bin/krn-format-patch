@@ -32,18 +32,23 @@ if [ ! -z "$SUFFIX" ]; then
 	prefix="$prefix $SUFFIX"
 fi
 
-since=$(remote_main_branch "$remote")
-till="HEAD"
-if [ ! -z "$1" ]; then
-	till="$1"
-	shift
+range="$@"
+if [ -z "$range" ]; then
+	since=$(remote_main_branch "$remote")
+	till="HEAD"
+	if [ ! -z "$1" ]; then
+		till="$1"
+		shift
+	fi
+	range="$since".."$till"
 fi
+
 
 if [ "$(get_branch_tag)" = "rfc" ]; then
 	prefix="RFC"
 fi
 
-first_outgoing_sha="$(git log --format=format:%H "$since".."$till" | tail -n 1)"
+first_outgoing_sha="$(git log --format=format:%H "$range" | tail -n 1)"
 cover_letter="$(git show $first_outgoing_sha | awk -f $MYDIR/../parse_cover_letter.awk)"
 
 if [ -z "$cover_letter" ]; then
@@ -55,7 +60,7 @@ git format-patch \
 	--subject-prefix="$prefix $remote" \
 	$FLAGS \
 	"$@" \
-	"$since".."$till"
+	"$range"
 
 for f in *.patch; do
 	cat "$f" | awk -f "$MYDIR/../remove_cover_letter.awk" > "${f}.bak"
