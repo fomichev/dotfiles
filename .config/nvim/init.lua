@@ -324,44 +324,20 @@ require("lazy").setup({
 		end,
 	},
 	{
-		"David-Kunz/gen.nvim",
-		opts = {
-			model = "llama3",
+		"olimorris/codecompanion.nvim",
+		dependencies = {
+			"nvim-lua/plenary.nvim",
+			"nvim-treesitter/nvim-treesitter",
+			"hrsh7th/nvim-cmp",
+			{
+				"stevearc/dressing.nvim",
+				opts = {},
+			},
+			"nvim-telescope/telescope.nvim",
 		},
 		config = function ()
-			require "gen".prompts = {
-				Generate = {
-					prompt = "$input",
-					replace = true,
-				},
-				Comment = {
-					prompt = "Explain the following code snippet and write it as a comment, just output the final text without additional quotes around it:\n$text",
-					replace = true,
-				},
-				Ask = {
-					prompt = "Regarding the following text, $input:\n$text",
-				},
-				Summarize = {
-					prompt = "Summarize the following text:\n$text",
-				},
-				Rewrite = {
-					prompt = "Change the following text, $input, just output the final text without additional quotes around it:\n$text",
-					replace = true,
-				},
-				Review = {
-					prompt = "Review the following code and make concise suggestions:\n```$filetype\n$text\n```",
-				},
-				Fix_Grammar = {
-					prompt = "Modify the following text to improve grammar and spelling, just output the final text without additional quotes around it:\n$text",
-					replace = true,
-				},
-				Fix_Wording = {
-					prompt = "Modify the following text to use better wording, just output the final text without additional quotes around it:\n$text",
-					replace = true,
-				},
-			}
-
-			vim.keymap.set({ "n", "v" }, "<Leader>x", ":Gen<CR>")
+			vim.keymap.set({ "n", "v" }, "<Leader>x", ":CodeCompanionToggle<CR>")
+			vim.keymap.set({ "v" }, "ga", ":CodeCompanionAdd<CR>")
 		end,
 	},
 	{
@@ -446,9 +422,75 @@ require("lazy").setup({
 			"nvim-telescope/telescope.nvim",
 		},
 	},
+	{
+		'nvim-lualine/lualine.nvim',
+		--dependencies = { 'nvim-tree/nvim-web-devicons' }
+	},
 })
 
 vim.keymap.set('n', '<Leader>d', vim.diagnostic.setloclist)
+
+require("codecompanion").setup({
+	strategies = {
+		chat = {
+			adapter = "ollama",
+		},
+		inline = {
+			adapter = "ollama",
+		},
+		agent = {
+			adapter = "ollama",
+		},
+	},
+	adapters = {
+		ollama = function()
+			return require("codecompanion.adapters").extend("ollama", {
+				env = {
+					url = "http://localhost:11434",
+				},
+				headers = {
+					["Content-Type"] = "application/json",
+				},
+				parameters = {
+					sync = true,
+				},
+				schema = {
+					model = {
+						default = "deepseek-coder-v2:16b",
+					},
+				},
+			})
+		end,
+	},
+})
+
+require('lualine').setup({
+	options = {
+		theme = 'base16',
+		--component_separators = '',
+		--section_separators = { left = '', right = '' },
+	},
+	sections = {
+		lualine_a = { { 'mode', right_padding = 2 }, },
+		lualine_b = { { 'filename', path = 1 }, 'branch', },
+		lualine_c = { '%=', },
+		lualine_x = {},
+		lualine_y = { 'filetype', 'progress' },
+		lualine_z = { { 'location', left_padding = 2 }, },
+	},
+	inactive_sections = {
+		lualine_a = { 'filename' },
+		lualine_b = {},
+		lualine_c = {},
+		lualine_x = {},
+		lualine_y = {},
+		lualine_z = { 'location' },
+	},
+	tabline = {},
+	extensions = {},
+})
+
+require('codecompanion-lualine')
 
 -- Harpoon
 
