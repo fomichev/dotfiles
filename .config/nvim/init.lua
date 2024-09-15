@@ -556,6 +556,7 @@ vim.cmd[[
 	let @r = 'iReviewed-by: Stanislav Fomichev <sdf@fomichev.me>'
 	let @t = 'iTested-by: Stanislav Fomichev <sdf@fomichev.me>'
 	let @d = "i---\npw-bot: cr"
+	let @c = "i-----BEGIN COVER LETTER-----\n-----END COVER LETTER-----"
 ]]
 
 -- Local local vimrc
