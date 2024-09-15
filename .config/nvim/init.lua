@@ -307,6 +307,11 @@ require("lazy").setup({
 					desc = "Telescope grep",
 				},
 				{
+					"<leader>G",
+					builtin.grep_string,
+					desc = "Telescope grep cursor",
+				},
+				{
 					"<leader>b",
 					builtin.buffers,
 					desc = "Telescope buffers",
