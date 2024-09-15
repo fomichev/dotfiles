@@ -7,11 +7,11 @@ startup_mode = "Maximized"
 
 [font]
 size = 18
-normal.family = "CommitMono"
+normal.family = "CommitMono Nerd Font"
 normal.style = "Regular"
-bold.family = "CommitMono"
+bold.family = "CommitMono Nerd Font"
 bold.style = "Bold"
-italic.family = "CommitMono"
+italic.family = "CommitMono Nerd Font"
 italic.style = "Italic"
 
 [bell]
