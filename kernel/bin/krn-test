@@ -10,6 +10,14 @@ trap cleanup EXIT
 
 chmod +x $script
 
+args=""
+while getopts "q" opt; do
+	case $opt in
+		q) args="$args -q" ;;
+	esac
+done
+shift $((OPTIND -1))
+
 cat <<EOF > $script
 #!/bin/bash
 source \$MYDIR/../guest_lib.sh
@@ -21,4 +29,4 @@ EOF
 SCRIPT="$MYDIR/../guest_script.sh"
 
 ENVIRON_ARG="MYDIR='$MYDIR' HOME='$HOME'" \
-	~/bin/q -s "$script"
+	~/bin/q $args -s "$script"
