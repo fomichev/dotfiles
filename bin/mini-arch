@@ -1,0 +1,3 @@
+#!/bin/bash
+
+ET_NO_TELEMETRY=yes et -t 11434:11434 mini-arch.duckdns.org
