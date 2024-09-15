@@ -645,3 +645,9 @@ wk.add({
 		desc = "LSP diagnostics",
 	},
 })
+
+vim.api.nvim_create_user_command("Explore", function()
+  local current_file = vim.fn.expand("%:p")
+  local current_dir = vim.fn.fnamemodify(current_file, ":h")
+  vim.cmd("silent! lua require('oil').open('" .. current_dir .. "')")
+end, {})
