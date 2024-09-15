@@ -63,12 +63,20 @@ def parse_mbox(path):
     new = parse_dir(os.path.join(path, 'new'))
     return cur | new
 
+def flagged(path):
+    flags = path.split(',')[-1]
+    return 'F' in flags
+
 def have_top_message(mbox, id2path, id):
     while True:
         if id not in id2path:
             return False
 
-        d = mbox[id2path[id]]
+        path = id2path[id]
+        if flagged(path):
+            return true
+
+        d = mbox[path]
         if 'In-Reply-To' not in d:
             return True
 
@@ -80,8 +88,7 @@ def flag_to_me(mbox, me):
     for path in mbox:
         for my_email in me:
             if my_email in mbox[path]['To']:
-                flags = path.split(',')[-1]
-                if 'F' not in flags:
+                if not flagged(path):
                     dst = path + "F"
                     if not args.dry:
                         shutil.move(path, dst)
@@ -93,8 +100,7 @@ def filter_out_flagged(mbox):
     ret = {}
 
     for key, val in mbox.items():
-        flags = key.split(',')[-1]
-        if 'F' in flags:
+        if flagged(key):
             continue
         ret[key] = val
 
