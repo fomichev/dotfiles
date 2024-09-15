@@ -345,6 +345,7 @@ require("lazy").setup({
 						"<leader>x",
 						":CodeCompanionToggle<CR>",
 						desc = "Code companion",
+						icon = " ",
 					},
 				},
 				{
@@ -353,6 +354,7 @@ require("lazy").setup({
 						"ga",
 						":CodeCompanionAdd<CR>",
 						desc = "Code companion add",
+						icon = " ",
 					},
 				},
 			})
@@ -588,46 +590,55 @@ wk.add({
 		"<leader>y",
 		function() harpoon:list():select(1) end,
 		desc = "Harpoon #1",
+		icon = "",
 	},
 	{
 		"<leader>u",
 		function() harpoon:list():select(2) end,
 		desc = "Harpoon #2",
+		icon = "",
 	},
 	{
 		"<leader>i",
 		function() harpoon:list():select(3) end,
 		desc = "Harpoon #3",
+		icon = "",
 	},
 	{
 		"<leader>o",
 		function() harpoon:list():select(4) end,
 		desc = "Harpoon #4",
+		icon = "",
 	},
 	{
 		"<leader>i",
 		function() harpoon:list():add() end,
 		desc = "Harpoon toggle",
+		--icon = "",
 	},
 	{
 		"<leader>j",
 		function() harpoon.ui:toggle_quick_menu(harpoon:list()) end,
 		desc = "Harpoon jump",
+		icon = "󱋿",
 	},
 	{
 		"<leader>n",
 		function() harpoon:list():prev() end,
 		desc = "Harpoon prev",
+		icon = "󰮲",
 	},
 	{
 		"<leader>c",
 		function() harpoon:list():next() end,
 		desc = "Harpoon next",
+		icon = "󰮰",
 	},
 	{
 		"<leader>s",
 		":set nospell!<CR>",
 		desc = "Spellcheck",
+		icon = "",
 	},
 	{
 		"<leader>;",
