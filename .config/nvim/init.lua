@@ -93,12 +93,6 @@ end
 
 vim.o.grepprg = "g --vimgrep --no-heading"
 
-vim.api.nvim_create_user_command(
-	"Grep",
-	"execute 'silent grep <args>' | botright copen | redraw",
-	{nargs = "+"}
-)
-
 -- Color 80 column
 vim.o.colorcolumn = "80"
 
@@ -308,7 +302,7 @@ require("lazy").setup({
 					desc = "Telescope files",
 				},
 				{
-					"<leader>/",
+					"<leader>g",
 					builtin.live_grep,
 					desc = "Telescope grep",
 				},
@@ -588,8 +582,6 @@ vim.cmd[[
 	endif
 ]]
 
-vim.keymap.set("n", "<Leader>g", ":Grep<space>")
-
 local wk = require("which-key")
 wk.add({
 	{
@@ -636,10 +628,6 @@ wk.add({
 		"<leader>s",
 		":set nospell!<CR>",
 		desc = "Spellcheck",
-	},
-	{
-		"<leader>g",
-		desc = "Grep",
 	},
 	{
 		"<leader>;",
