@@ -13,6 +13,11 @@ RELEASE=${RELEASE:-$(kernel_release)}
 LLVM=${LLVM:-1}
 SILENT="-s"
 
+CC="clang"
+if [ -e /usr/bin/ccache ]; then
+	CC="ccache clang"
+fi
+
 if [ $ASAN -eq 1 ]; then
 	if [ ! "$CONFIG" -eq "smp" ]; then
 		echo "ASAN=1 works only with CONFIG=smp"
@@ -54,7 +59,7 @@ case "$CONFIG" in
 esac
 
 if [[ ! -e $KDIR/.config ]]; then
-	make $SILENT -j$(nproc) LLVM=$LLVM ARCH=$ARCH ${ARCH}_defconfig
+	make $SILENT -j$(nproc) CC="$CC" LLVM=$LLVM ARCH=$ARCH ${ARCH}_defconfig
 
 	set +x
 
@@ -176,10 +181,12 @@ if [[ ! -e $KDIR/.config ]]; then
 	set_config CONFIG_HID_SUPPORT n
 
 	set -x
-	make $SILENT -j$(nproc) LLVM=$LLVM ARCH=$ARCH olddefconfig
+	make $SILENT -j$(nproc) CC="$CC" LLVM=$LLVM ARCH=$ARCH olddefconfig
 fi
+
 KCFLAGS="-Wno-error=format -Wno-error=array-bounds" \
-	make $SILENT -j$(nproc) LLVM=$LLVM ARCH=$ARCH $TARGETS
-make $SILENT -j$(nproc) LLVM=1 headers
+make $SILENT -j$(nproc) CC="$CC" LLVM=$LLVM ARCH=$ARCH $TARGETS
+
+make $SILENT -j$(nproc) CC="$CC" LLVM=1 headers
 
 clangd_generate
