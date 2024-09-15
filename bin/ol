@@ -2,12 +2,15 @@
 
 BIN=$HOME/src/ollama/ollama
 
+export OLLAMA_HOST=0.0.0.0
+
 if [ ! -e $BIN ]; then
 	BIN=/usr/bin/ollama
 fi
 
-#MODEL=dolphin-mixtral
-MODEL=llama3
+MODEL=llama3.1 # 8b
+#MODEL=deepseek-coder-v2 # 16b
+#MODEL=codestral # 22b
 
 set -- `getopt s $*`
 [ ! $? -eq 0 ] && { exit 1; }
