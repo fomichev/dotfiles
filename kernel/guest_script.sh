@@ -27,41 +27,10 @@ SELFTEST=(
 	#bpf/test_kmod.sh
 	#bpf/test_lwt_seg6local.sh
 	#bpf/test_xsk.sh
-	#bpf/test_offload.py
 	#bpf/test_sock_addr.sh
+
+	#net/bpf_offload.py
 )
-
-tcpx_loopback() {
-	local dev=eth0
-	local addr=192.168.1.4
-
-	ip addr add $addr dev $dev
-	ip link set $dev up
-	local ret=$(echo -e "hello\nworld" | ./tools/testing/selftests/drivers/net/ncdevmem -L -f $dev -s ::ffff:$addr -p 5201)
-	echo "[$ret]"
-
-	local want=$(echo -e "hello\nworld")
-	if [ "$ret" != "$want" ]; then
-		echo "FAIL!"
-		exit 1
-	fi
-}
-
-tcpx_selftest() {
-	make \
-		-C tools/testing/selftests \
-		TARGETS="drivers/net" \
-		install INSTALL_PATH=$KDIR/ksft
-
-	#cd $KDIR/ksft
-	#./run_kselftest.sh -t drivers/net:devmem.py
-
-	cd $KDIR/ksft/drivers/net
-	local dev=eth0
-	ip addr add 192.168.1.4 dev $dev
-	ip link set $dev up
-	./devmem.py
-}
 
 CUSTOM=(
 	#testsuite_bitcoin_miner
@@ -70,7 +39,7 @@ CUSTOM=(
 	#testsuite_ynl_cli
 	#testsuite_tcpdirect
 	#testsuite_bpftool_prog
-	tcpx_loopback
+	#tcpx_loopback
 	#tcpx_selftest
 )
 

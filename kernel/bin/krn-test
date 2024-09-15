@@ -1,0 +1,24 @@
+#!/bin/bash
+
+MYDIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}" )" &>/dev/null && pwd)
+
+script=$(mktemp -p $(pwd))
+cleanup() {
+  rm -f "$script"
+}
+trap cleanup EXIT
+
+chmod +x $script
+
+cat <<EOF > $script
+#!/bin/bash
+source \$MYDIR/../guest_lib.sh
+cd tools/testing/selftests
+eval "$@"
+testsuite_run false # v2
+EOF
+
+SCRIPT="$MYDIR/../guest_script.sh"
+
+ENVIRON_ARG="MYDIR='$MYDIR' HOME='$HOME'" \
+	~/bin/q -s "$script"
