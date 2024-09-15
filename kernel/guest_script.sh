@@ -33,12 +33,11 @@ SELFTEST=(
 )
 
 CUSTOM=(
-	#testsuite_bitcoin_miner
-	#testsuite_virtio_perf
-	#testsuite_netdev_sim
-	#testsuite_ynl_cli
-	#testsuite_tcpdirect
-	#testsuite_bpftool_prog
+	#bitcoin_miner
+	#virtio_perf
+	#netdev_sim
+	#ynl_cli
+	#bpftool_prog
 	#tcpx_loopback
 	#tcpx_selftest
 )

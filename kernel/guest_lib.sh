@@ -378,7 +378,7 @@ syz_execprog() {
 	(cd /tmp && cp $SYZ_DIR/syz-executor . && $SYZ_DIR/syz-execprog "$@" $path)
 }
 
-testsuite_syzkaller() {
+run_syzkaller() {
 	if [ ! -e "$1" ]; then
 		return
 	fi
@@ -398,7 +398,7 @@ testsuite_syzkaller() {
 	#set -x
 }
 
-testsuite_syzkaller_c() {
+run_syzkaller_c() {
 	if [ ! -e "$1" ]; then
 		return
 	fi
@@ -433,12 +433,58 @@ testsuite_syzkaller_c() {
 	#set -x
 }
 
-testsuite_bitcoin_miner() {
+create_netdevsim() {
+	local name="$1"
+
+	echo 0 1 > /sys/bus/netdevsim/new_device
+
+	dev_path=$(ls -d /sys/bus/netdevsim/devices/netdevsim0/net/*)
+	dev=$(echo $dev_path | rev | cut -d/ -f1 | rev)
+
+	/usr/local/google/home/sdf/src/iproute2_upstream/ip/ip link show dev eth1
+
+	ip link set dev $dev name netdevsim0
+	ip link set dev netdevsim0 up
+}
+
+__run_all_tests() {
+	for custom in ${CUSTOM[@]}; do
+		eval $custom
+	done
+
+	run_syzkaller_c $KDIR/rep.c || :
+	run_syzkaller $KDIR/rep.syz || :
+
+	for bin in ${SELFTEST[@]}; do
+		run_selftest $(echo "$bin" | tr ':' ' ') || :
+	done
+
+	#rm -f $ST_DIR/bpf/bpf_testmod.ko
+	run_test_progs -t "$(echo ${TP_INCLUDE[@]} | tr ' ' ',')" || :
+	run_test_progs -b "$(echo ${TP_EXCLUDE[@]} | tr ' ' ',')" || :
+	run_test_progs -n "$TP_NUM" || :
+}
+
+testsuite_run() {
+	testsuite_begin "$@"
+
+	if [ "$BISECT" = "y" ]; then
+		bisect_run __run_all_tests
+	else
+		__run_all_tests
+	fi
+
+	testsuite_end
+}
+
+##### custom tests #####
+
+bitcoin_miner() {
 	cd /usr/local/google/home/sdf/src/xdp-btc-miner
 	./mine
 }
 
-testsuite_virtio_perf() {
+virtio_perf() {
 	while :; do
 		tcp_stream -B 65536 -Z --skip-rx-copy
 	done
@@ -485,21 +531,7 @@ testsuite_virtio_perf() {
 	# ~/src/FlameGraph/flamegraph.pl out.perf-folded > perf.svg
 }
 
-create_netdevsim() {
-	local name="$1"
-
-	echo 0 1 > /sys/bus/netdevsim/new_device
-
-	dev_path=$(ls -d /sys/bus/netdevsim/devices/netdevsim0/net/*)
-	dev=$(echo $dev_path | rev | cut -d/ -f1 | rev)
-
-	/usr/local/google/home/sdf/src/iproute2_upstream/ip/ip link show dev eth1
-
-	ip link set dev $dev name netdevsim0
-	ip link set dev netdevsim0 up
-}
-
-testsuite_netdev_sim() {
+netdev_sim() {
 	cd $KDIR/tools/testing/selftests/bpf
 	./test_offload.py |& tee $KDIR/scratch.txt
 
@@ -520,7 +552,7 @@ testsuite_netdev_sim() {
 	ethtool -g eth0
 }
 
-testsuite_ynl_cli() {
+ynl_cli() {
 	ip6tables -I OUTPUT -o lo -p sctp --sport 10123 -j LOG
 	ip6tables -A OUTPUT -o lo -p sctp --sport 10123 -j DROP
 	$HOME/tmp/sctp_test --logtostderr
@@ -531,56 +563,19 @@ testsuite_ynl_cli() {
 	testsuite_end
 }
 
-testsuite_tcpdirect() {
-	local ip="::1"
-
-	dd if=/dev/random of=$KDIR/8k bs=8192 count=1
-
-	$ST_DIR/net/ncdevmem -s $ip -c $ip -f eth1 -n 0000:06:00.0 -l -p 5201
-	#cat $KDIR/8k | $ST_DIR/net/ncdevmem -s $ip -c $ip -f eth1 -n 0000:06:00.0 -p 5201
-	cat $KDIR/8k | $ST_DIR/net/ncdevmem -s $ip -c $ip -f eth1 -n 0000:06:00.0 -p 5201
-}
-
-testsuite_bpftool_prog() {
+bpftool_prog() {
 	pftool prog load ~/tmp/raw_tp.o /sys/fs/bpf/x
 	bpftool prog loadall ./tools/testing/selftests/bpf/test_sk_lookup.bpf.o /sys/fs/bpf/x
 	bpftool prog attach pinned /sys/fs/bpf/x/lookup_pass sk_lookup
 	bpftool prog attach pinned /sys/fs/bpf/x/lookup_pass sk_lookup
 }
 
-__run_all_tests() {
-	for custom in ${CUSTOM[@]}; do
-		eval $custom
-	done
-
-	testsuite_syzkaller_c $KDIR/rep.c || :
-	testsuite_syzkaller $KDIR/rep.syz || :
-
-	for bin in ${SELFTEST[@]}; do
-		run_selftest $(echo "$bin" | tr ':' ' ') || :
-	done
-
-	#rm -f $ST_DIR/bpf/bpf_testmod.ko
-	run_test_progs -t "$(echo ${TP_INCLUDE[@]} | tr ' ' ',')" || :
-	run_test_progs -b "$(echo ${TP_EXCLUDE[@]} | tr ' ' ',')" || :
-	run_test_progs -n "$TP_NUM" || :
-}
-
-testsuite_run() {
-	testsuite_begin "$@"
-
-	if [ "$BISECT" = "y" ]; then
-		bisect_run __run_all_tests
-	else
-		__run_all_tests
-	fi
-
-	testsuite_end
-}
 
 tcpx_loopback() {
 	local dev=eth0
 	local addr=192.168.1.4
+
+	cd $KDIR
 
 	ip addr add $addr dev $dev
 	ip link set $dev up
@@ -595,6 +590,8 @@ tcpx_loopback() {
 }
 
 tcpx_selftest() {
+	cd $KDIR
+
 	make \
 		-C tools/testing/selftests \
 		TARGETS="drivers/net" \
