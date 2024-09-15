@@ -11,44 +11,7 @@ if not (vim.uv or vim.loop).fs_stat(lazypath) then
 end
 vim.opt.rtp:prepend(lazypath)
 
--- Free leader keys:
--- qwe__   yuiop[]\
--- _____   __k__'
--- zx___   nm_._
---
--- <Leader>y Harpoon #1
--- <Leader>u Harpoon #2
--- <Leader>i Harpoon #3
--- <Leader>o Harpoon #4
---
--- <Leader>a LSP actions
--- <Leader>b Telescope buffers
--- <Leader>c Harpoon prev tag
--- <Leader>d LSP show diagnostics
---
--- <Leader>f Telescope files
--- <Leader>g Grep
--- <Leader>h Telescope help
--- <Leader>j Harpoon show
--- <Leader>k LSP docs
--- <Leader>l Toggle list
--- <Leader>x Ollama
--- <Leader>r Telescope old files
--- <Leader>s Disable spell checker
--- <Leader>t Harpoon tag
--- <Leader>v Harpoon next tag
---
--- <Leader>; Disable search
--- <Leader>/ Telescope grep
--- <Leader>. LSP format
---
--- gD Goto declaration
--- gd Goto definition
--- gi Goto implementation
--- gr Goto references
-
 vim.g.mapleader = " "
---vim.keymap.set("n", "\\", ",")
 
 -- Don't use mouse
 vim.o.mouse = ""
@@ -121,8 +84,6 @@ vim.o.smartindent = false
 vim.o.spelllang = "en_us"
 vim.o.spell = true
 
-vim.keymap.set("n", "<Leader>s", ":set nospell!<CR>")
-
 for _, v in ipairs({ "help", "qf", "gitendemail", }) do
 	vim.api.nvim_create_autocmd("FileType", {
 		pattern = v,
@@ -131,7 +92,6 @@ for _, v in ipairs({ "help", "qf", "gitendemail", }) do
 end
 
 vim.o.grepprg = "g --vimgrep --no-heading"
-vim.keymap.set("n", "<Leader>g", ":Grep<space>")
 
 vim.api.nvim_create_user_command(
 	"Grep",
@@ -168,21 +128,11 @@ vim.keymap.set("n", "#", ":keepjumps normal! mi#`i<CR>")
 vim.keymap.set("n", "/", "/\\v")
 vim.keymap.set("n", "?", "?\\v")
 
--- Disable search highlight
-vim.keymap.set("n", "<Leader>;", ":silent :nohlsearch<CR>")
-
 -- Toggle list option
 vim.o.listchars = "tab:> ,trail:-,nbsp:+,eol:$"
-vim.keymap.set("n", "<Leader>l", ":set nolist!<CR>")
 
 -- Use sudo to save file
 vim.keymap.set("c", "w!!", "w !sudo tee % > /dev/null")
-
--- Moving with Up/Down/Left/Right over wrapped lines
-vim.keymap.set("n", "<Left>", "gh")
-vim.keymap.set("n", "<Down>", "gj")
-vim.keymap.set("n", "<Up>", "gk")
-vim.keymap.set("n", "<Right>", "gl")
 
 -- Jump between windows easily
 vim.keymap.set("n", "<C-h>", "<C-w>h")
@@ -232,14 +182,6 @@ local lsp_buffer_augroup = vim.api.nvim_create_augroup("lsp-buffer", {})
 local lsp_on_attach = function(client, bufnr)
 	local opts = { noremap = true, silent = true, buffer = bufnr }
 
-	vim.keymap.set("n", "gD", vim.lsp.buf.declaration, opts)
-	vim.keymap.set("n", "gd", vim.lsp.buf.definition, opts)
-	vim.keymap.set("n", "gi", vim.lsp.buf.implementation, opts)
-	vim.keymap.set("n", "gr", vim.lsp.buf.references, opts)
-	vim.keymap.set("n", "<Leader>k", vim.lsp.buf.hover, opts)
-	vim.keymap.set({ "n", "v" }, "<Leader>a", vim.lsp.buf.code_action, opts)
-	vim.keymap.set({ "n", "v" }, "<Leader>.", vim.lsp.buf.format, opts)
-
 	local function aucmd(event, callback)
 		vim.api.nvim_create_autocmd(event, { group = lsp_buffer_augroup, buffer = bufnr, callback = callback })
 	end
@@ -247,6 +189,48 @@ local lsp_on_attach = function(client, bufnr)
 	if client.server_capabilities.inlayHintProvider then
 		vim.lsp.inlay_hint.enable(true)
 	end
+
+	local wk = require("which-key")
+	wk.add({
+		{
+			"<leader>k",
+			vim.lsp.buf.hover,
+			desc = "LSP hover",
+		},
+		{
+			"gD",
+			vim.lsp.buf.declaration,
+			desc = "Go to declaration",
+		},
+		{
+			"gd",
+			vim.lsp.buf.definition,
+			desc = "Go to definition",
+		},
+		{
+			"gi",
+			vim.lsp.buf.implementation,
+			desc = "Go to implementation",
+		},
+		{
+			"gr",
+			vim.lsp.buf.references,
+			desc = "Show references",
+		},
+		{
+			mode = { "n", "v" },
+			{
+				"<leader>a",
+				vim.lsp.buf.code_action,
+				desc = "LSP action",
+			},
+			{
+				"<leader>.",
+				vim.lsp.buf.format,
+				desc = "LSP format",
+			},
+		},
+	})
 
 --	if client.server_capabilities.documentFormattingProvider then
 --		if vim.bo[bufnr].filetype ~= "c" then
@@ -316,11 +300,34 @@ require("lazy").setup({
 		dependencies = { "nvim-lua/plenary.nvim" },
 		config = function ()
 			local builtin = require("telescope.builtin")
-			vim.keymap.set("n", "<Leader>f", builtin.find_files, {})
-			vim.keymap.set("n", "<Leader>/", builtin.live_grep, {})
-			vim.keymap.set("n", "<Leader>b", builtin.buffers, {})
-			vim.keymap.set("n", "<Leader>h", builtin.help_tags, {})
-			vim.keymap.set("n", "<Leader>r", builtin.oldfiles, {})
+			local wk = require("which-key")
+			wk.add({
+				{
+					"<leader>f",
+					builtin.find_files,
+					desc = "Telescope files",
+				},
+				{
+					"<leader>/",
+					builtin.live_grep,
+					desc = "Telescope grep",
+				},
+				{
+					"<leader>b",
+					builtin.buffers,
+					desc = "Telescope buffers",
+				},
+				{
+					"<leader>h",
+					builtin.help_tags,
+					desc = "Telescope help",
+				},
+				{
+					"<leader>r",
+					builtin.oldfiles,
+					desc = "Telescope recent",
+				},
+			})
 		end,
 	},
 	{
@@ -336,8 +343,25 @@ require("lazy").setup({
 			"nvim-telescope/telescope.nvim",
 		},
 		config = function ()
-			vim.keymap.set({ "n", "v" }, "<Leader>x", ":CodeCompanionToggle<CR>")
-			vim.keymap.set({ "v" }, "ga", ":CodeCompanionAdd<CR>")
+			local wk = require("which-key")
+			wk.add({
+				{
+					mode = { "n", "v" },
+					{
+						"<leader>x",
+						":CodeCompanionToggle<CR>",
+						desc = "Code companion",
+					},
+				},
+				{
+					mode = { "v" },
+					{
+						"ga",
+						":CodeCompanionAdd<CR>",
+						desc = "Code companion add",
+					},
+				},
+			})
 		end,
 	},
 	{
@@ -431,9 +455,16 @@ require("lazy").setup({
 		opts = {},
 		dependencies = { { "echasnovski/mini.icons", opts = {} } },
 	},
+	{
+		"folke/which-key.nvim",
+		event = "VeryLazy",
+		opts = {
+			-- your configuration comes here
+			-- or leave it empty to use the default settings
+			-- refer to the configuration section below
+		},
+	},
 })
-
-vim.keymap.set('n', '<Leader>d', vim.diagnostic.setloclist)
 
 require("codecompanion").setup({
 	strategies = {
@@ -497,24 +528,10 @@ require('lualine').setup({
 
 require('codecompanion-lualine')
 
--- Harpoon
-
 local harpoon = require('harpoon')
 harpoon:setup({})
 
-vim.keymap.set("n", "<Leader>t", function() harpoon:list():add() end)
-vim.keymap.set("n", "<Leader>j", function() harpoon.ui:toggle_quick_menu(harpoon:list()) end)
-
-vim.keymap.set("n", "<Leader>y", function() harpoon:list():select(1) end)
-vim.keymap.set("n", "<Leader>u", function() harpoon:list():select(2) end)
-vim.keymap.set("n", "<Leader>i", function() harpoon:list():select(3) end)
-vim.keymap.set("n", "<Leader>o", function() harpoon:list():select(4) end)
-
-vim.keymap.set("n", "<Leader>v", function() harpoon:list():prev() end)
-vim.keymap.set("n", "<Leader>c", function() harpoon:list():next() end)
-
-local cmp = require"cmp"
-
+local cmp = require('cmp')
 cmp.setup({
 	snippet = {
 		expand = function(args)
@@ -570,3 +587,73 @@ vim.cmd[[
 		luafile $HOME/local/nvim.lua
 	endif
 ]]
+
+vim.keymap.set("n", "<Leader>g", ":Grep<space>")
+
+local wk = require("which-key")
+wk.add({
+	{
+		"<leader>y",
+		function() harpoon:list():select(1) end,
+		desc = "Harpoon #1",
+	},
+	{
+		"<leader>u",
+		function() harpoon:list():select(2) end,
+		desc = "Harpoon #2",
+	},
+	{
+		"<leader>i",
+		function() harpoon:list():select(3) end,
+		desc = "Harpoon #3",
+	},
+	{
+		"<leader>o",
+		function() harpoon:list():select(4) end,
+		desc = "Harpoon #4",
+	},
+	{
+		"<leader>i",
+		function() harpoon:list():add() end,
+		desc = "Harpoon toggle",
+	},
+	{
+		"<leader>j",
+		function() harpoon.ui:toggle_quick_menu(harpoon:list()) end,
+		desc = "Harpoon jump",
+	},
+	{
+		"<leader>n",
+		function() harpoon:list():prev() end,
+		desc = "Harpoon prev",
+	},
+	{
+		"<leader>c",
+		function() harpoon:list():next() end,
+		desc = "Harpoon next",
+	},
+	{
+		"<leader>s",
+		":set nospell!<CR>",
+		desc = "Spellcheck",
+	},
+	{
+		"<leader>g",
+		desc = "Grep",
+	},
+	{
+		"<leader>;",
+		":silent :nohlsearch<CR>",
+		desc = "Reset /",
+	},
+	{
+		"<leader>l",
+		":set nolist!<CR>",
+		desc = "Special characters",
+	},
+	{
+		"<leader>d",
+		vim.diagnostic.setloclist,
+		desc = "LSP diagnostics",
+	},
+})
