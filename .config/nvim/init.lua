@@ -489,6 +489,9 @@ require("codecompanion").setup({
 				},
 				schema = {
 					model = {
+						-- https://aider.chat/docs/leaderboards/
+						-- https://huggingface.co/spaces/bigcode/bigcode-models-leaderboard
+						-- https://evalplus.github.io/leaderboard.html
 						default = "deepseek-coder-v2:16b",
 					},
 				},
