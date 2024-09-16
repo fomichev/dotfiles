@@ -9,7 +9,7 @@ alias ......='cd ../../../../.. && p'
 alias ls='ls --color=auto'
 alias l='ls -AF --group-directories-first';
 alias a='ls -lah'
-alias ta='tmux attach -d -t 0'
+alias ta='tmux attach -d -t $(tmux list-sessions | head -n1 | cut -d: -f1)'
 alias j='jobs -l'
 alias info='info --vi-keys'
 alias _='sudo'

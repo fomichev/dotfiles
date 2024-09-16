@@ -589,6 +589,41 @@ tcpx_loopback() {
 	fi
 }
 
+tcpx_loopback2() {
+	local dev=eth0
+	local addr=192.168.1.4
+	local bin=./tools/testing/selftests/drivers/net/ncdevmem
+	#local bin=~/local/fbsource/buck-out/v2/gen/fbcode/scripts/dmm/netcat/netcat
+
+	$bin -P -f $dev -s ::ffff:$addr -p 5201
+	return
+
+	ip addr add $addr dev $dev
+	ip link set $dev up
+
+	local length=4096
+	random_string=$(tr -dc 'a-zA-Z0-9' < /dev/urandom | fold -w $length | head -n 1)
+
+	#echo $random_string
+
+	echo "$random_string" > input.txt
+	echo "$random_string" >> input.txt
+
+	local ret=$(cat input.txt | $bin -L -f $dev -s ::ffff:$addr -p 5201)
+	local want=$(cat input.txt)
+
+	#local ret=$(echo -e "hello\nworld" | $bin -L -f $dev -s ::ffff:$addr -p 5201)
+	#local want=$(echo -e "hello\nworld")
+
+	#dmesg -C
+
+	echo "[$ret]"
+	if [ "$ret" != "$want" ]; then
+		echo "FAIL!"
+		exit 1
+	fi
+}
+
 tcpx_selftest() {
 	cd $KDIR
 
