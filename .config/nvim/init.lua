@@ -328,22 +328,20 @@ require("lazy").setup({
 				},
 			})
 
-
 			local telescope = require("telescope")
 			telescope.setup({
 				defaults = {
-				vimgrep_arguments = {
-					          "g",
-						  "--color=never",
-						  "--no-heading",
-						  "--with-filename",
-						  "--line-number",
-						  "--column",
-						  "--smart-case"
+					vimgrep_arguments = {
+							  "g",
+							  "--color=never",
+							  "--no-heading",
+							  "--with-filename",
+							  "--line-number",
+							  "--column",
+							  "--smart-case"
+					},
 				},
 			})
-
-
 		end,
 	},
 	{
