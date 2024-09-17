@@ -327,6 +327,23 @@ require("lazy").setup({
 					desc = "Telescope recent",
 				},
 			})
+
+
+			local telescope = require("telescope")
+			telescope.setup({
+				defaults = {
+				vimgrep_arguments = {
+					          "g",
+						  "--color=never",
+						  "--no-heading",
+						  "--with-filename",
+						  "--line-number",
+						  "--column",
+						  "--smart-case"
+				},
+			})
+
+
 		end,
 	},
 	{
@@ -350,7 +367,7 @@ require("lazy").setup({
 						"<leader>x",
 						":CodeCompanionToggle<CR>",
 						desc = "Code companion",
-						icon = " ",
+					icon = " ",
 					},
 				},
 				{
