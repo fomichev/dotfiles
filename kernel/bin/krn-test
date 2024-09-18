@@ -21,7 +21,6 @@ shift $((OPTIND -1))
 cat <<EOF > $script
 #!/bin/bash
 source \$MYDIR/../guest_lib.sh
-cd tools/testing/selftests
 eval "$@"
 testsuite_run false # v2
 EOF

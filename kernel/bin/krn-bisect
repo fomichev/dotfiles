@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 #
-# krn-bisect -t "krn-test -q net/bpf_offload.py"
+# krn-bisect -t "krn-test -q 'SELFTEST=(net/bpf_offload.py)'"
 
 import argparse
 import subprocess
