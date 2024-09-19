@@ -41,6 +41,8 @@ bin/monarch-policies
 .config/autostart/
 .config/brasero/
 .config/calibre/
+.config/ccache/
+.config/cef_user_data/
 .config/cni/
 .config/compiz-1/
 .config/configstore/
@@ -79,7 +81,7 @@ bin/monarch-policies
 .config/gtk-3.0/
 .config/guitarix/
 .config/guix/
-.config/helix/runtime/
+.config/helix/runtime
 .config/hexchat/
 .config/ibus/
 .config/inkscape/

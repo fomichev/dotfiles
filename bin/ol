@@ -2,8 +2,6 @@
 
 BIN=$HOME/src/ollama/ollama
 
-export OLLAMA_HOST=0.0.0.0
-
 if [ ! -e $BIN ]; then
 	BIN=/usr/bin/ollama
 fi
@@ -21,10 +19,8 @@ fi
 #MODEL=qwen2.5-coder:7b        # https://ollama.com/library/qwen2.5-coder:7b
 MODEL=gemma2:27b               # https://ollama.com/library/gemma2:27b
 
-OP=run
 while getopts "im:s" opt; do
 	case $opt in
-		s) OP=serve ;;
 		m) MODEL="$OPTARG" ;;
 		i) echo "$MODEL"; exit 0 ;;
 		*) echo "Unknown argument $1"; exit 1 ;;
@@ -32,34 +28,5 @@ while getopts "im:s" opt; do
 done
 shift $((OPTIND -1))
 [ ! $? -eq 0 ] && { exit 1; }
-
-if [ "$OP" = "serve" ]; then
-	exec $BIN serve "$@"
-fi
-
-stop_ollama() {
-	systemctl --user stop ollama.service
-}
-
-wait_ollama() {
-	while ! $BIN list &>/dev/null; do
-		sleep .5
-	done
-}
-
-remote=false
-if ss -tuln | grep -q ':11434'; then
-	remote=true
-fi
-
-
-if ! $remote; then
-	if ! systemctl --user is-active ollama.service &>/dev/null; then
-		echo ollama is not running, starting up...
-		systemctl --user start ollama.service
-		wait_ollama
-		trap stop_ollama EXIT
-	fi
-fi
 
 $BIN run $MODEL "$@"
