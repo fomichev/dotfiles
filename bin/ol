@@ -8,6 +8,7 @@ if [ ! -e $BIN ]; then
 	BIN=/usr/bin/ollama
 fi
 
+# https://livecodebench.github.io/leaderboard.html
 # https://aider.chat/docs/leaderboards/
 # https://huggingface.co/spaces/bigcode/bigcode-models-leaderboard
 # https://evalplus.github.io/leaderboard.html
@@ -17,6 +18,7 @@ fi
 #MODEL=deepseek-coder-v2 # 16b
 #MODEL=codestral # 22b
 MODEL=qwen2.5:32b # 32b
+#MODEL=qwen2.5-coder:7b # https://ollama.com/library/qwen2.5-coder:7b
 
 OP=run
 while getopts "im:s" opt; do
