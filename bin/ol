@@ -8,28 +8,27 @@ if [ ! -e $BIN ]; then
 	BIN=/usr/bin/ollama
 fi
 
-MODEL=llama3.1 # 8b
+# https://aider.chat/docs/leaderboards/
+# https://huggingface.co/spaces/bigcode/bigcode-models-leaderboard
+# https://evalplus.github.io/leaderboard.html
+# https://lmarena.ai/
+
+#MODEL=llama3.1 # 8b
 #MODEL=deepseek-coder-v2 # 16b
 #MODEL=codestral # 22b
-
-set -- `getopt s $*`
-[ ! $? -eq 0 ] && { exit 1; }
+MODEL=qwen2.5:32b # 32b
 
 OP=run
-
-while [ ! "$1" = "--" ]; do
-	case "$1" in
-	-s)
-		OP=serve
-		;;
-	*)
-		echo "Unknown argument $1"
-		exit 1
-		;;
+while getopts "im:s" opt; do
+	case $opt in
+		s) OP=serve ;;
+		m) MODEL="$OPTARG" ;;
+		i) echo "$MODEL"; exit 0 ;;
+		*) echo "Unknown argument $1"; exit 1 ;;
 	esac
-	shift
 done
-shift
+shift $((OPTIND -1))
+[ ! $? -eq 0 ] && { exit 1; }
 
 if [ "$OP" = "serve" ]; then
 	exec $BIN serve "$@"
@@ -45,11 +44,19 @@ wait_ollama() {
 	done
 }
 
-if ! systemctl --user is-active ollama.service &>/dev/null; then
-	echo ollama is not running, starting up...
-	systemctl --user start ollama.service
-	wait_ollama
-	trap stop_ollama EXIT
+remote=false
+if ss -tuln | grep -q ':11434'; then
+	remote=true
+fi
+
+
+if ! $remote; then
+	if ! systemctl --user is-active ollama.service &>/dev/null; then
+		echo ollama is not running, starting up...
+		systemctl --user start ollama.service
+		wait_ollama
+		trap stop_ollama EXIT
+	fi
 fi
 
 $BIN run $MODEL "$@"

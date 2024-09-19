@@ -492,6 +492,15 @@ require("codecompanion").setup({
 	},
 	adapters = {
 		ollama = function()
+			local model = "llama3.1"
+			local handle = io.popen("ol -i")
+			if handle then
+				model = handle:read("*a"):gsub("\n", "")
+				handle:close()
+			else
+				print("Failed to execute ol -i`" )
+			end
+
 			return require("codecompanion.adapters").extend("ollama", {
 				env = {
 					url = "http://localhost:11434",
@@ -504,10 +513,7 @@ require("codecompanion").setup({
 				},
 				schema = {
 					model = {
-						-- https://aider.chat/docs/leaderboards/
-						-- https://huggingface.co/spaces/bigcode/bigcode-models-leaderboard
-						-- https://evalplus.github.io/leaderboard.html
-						default = "deepseek-coder-v2:16b",
+						default = model,
 					},
 				},
 			})
