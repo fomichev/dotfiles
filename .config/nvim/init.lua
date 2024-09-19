@@ -101,10 +101,6 @@ vim.o.undofile = true
 vim.o.undolevels = 1000
 
 vim.o.termguicolors = true
--- Uncomment on mosh
--- https://github.com/mobile-shell/mosh/commit/fa9335f737a057c0b43fe9165dc0ef0f32a5887f
--- https://github.com/mobile-shell/mosh/commit/ce7ba37ad4e493769a126db2b39b8a9aa9121278
-vim.o.termguicolors = false
 
 local quicfix = vim.api.nvim_create_augroup("quickfix", {clear = true})
 
@@ -140,11 +136,6 @@ vim.keymap.set("n", "N", "Nzzzv")
 
 -- E (Explore) clashes with something else
 vim.api.nvim_create_user_command("E", "Explore", { nargs = 0})
-
---vim.api.nvim_create_autocmd({ "BufRead", "BufNew" }, {
-	--pattern = "*mutt-*",
-	--command = "setlocal filetype=mail"
---})
 
 vim.api.nvim_create_autocmd({ "BufRead", "BufNew" }, {
 	pattern = "*.md",
@@ -410,50 +401,6 @@ require("lazy").setup({
 		"hrsh7th/nvim-cmp",
 		event = "InsertEnter",
 	},
-	-- {
-	-- 	"epwalsh/obsidian.nvim",
-	-- 	lazy = false,
-	-- 	event = {
-	-- 		"BufReadPre ~/Documents/Obsidian/Main/**.md",
-	-- 		"BufNewFile ~/Documents/Obsidian/Main/**.md",
-	-- 		"BufReadPre ~/src/kernel-scripts/Kernel/**.md",
-	-- 		"BufNewFile ~/src/kernel-scripts/Kernel/**.md",
-	-- 	},
-	-- 	dependencies = {
-	-- 		"nvim-lua/plenary.nvim",
-	-- 	},
-	-- 	opts = {
-	-- 		workspaces = {
-	-- 			{
-	-- 				name = "Main",
-	-- 				path = "~/Documents/Obsidian/Main/",
-	-- 			},
-	-- 			{
-	-- 				name = "Kernel",
-	-- 				path = "~/src/kernel-scripts/Kernel/",
-	-- 			},
-	-- 		},
-	-- 		daily_notes = {
-	-- 			folder = "Journal/",
-	-- 			date_format = "%Y-%m-%d",
-	-- 			template = 'journal.md'
-	-- 		},
-	-- 		templates = {
-	-- 			subdir = ".templates",
-	-- 		},
-	-- 		ui = {
-	-- 			checkboxes = {
-	-- 				[" "] = { char = "☐", hl_group = "ObsidianTodo" },
-	-- 				["x"] = { char = "✔", hl_group = "ObsidianDone" },
-	-- 			},
-	-- 			external_link_icon = { char = "", hl_group = "ObsidianExtLinkIcon" },
-	-- 		},
-	-- 		note_path_func = function(spec)
-	-- 			local path = spec.dir / tostring(spec.title)
-	-- 			return path:with_suffix(".md")
-	-- 		end,
-	-- 	},
-	-- },
 	{
 		"ThePrimeagen/harpoon",
 		branch = "harpoon2",
@@ -524,8 +471,6 @@ require("codecompanion").setup({
 require('lualine').setup({
 	options = {
 		theme = 'base16',
-		--component_separators = '',
-		--section_separators = { left = '', right = '' },
 	},
 	sections = {
 		lualine_a = { { 'mode', right_padding = 2 }, },
@@ -575,8 +520,8 @@ cmp.setup({
 -- Load base16 color scheme
 local current_theme_name = os.getenv('BASE16_THEME')
 if current_theme_name and vim.g.colors_name ~= 'base16-'..current_theme_name then
-  vim.cmd('let base16colorspace=256')
-  vim.cmd('colorscheme base16-'..current_theme_name)
+	vim.cmd('let base16colorspace=256')
+	vim.cmd('colorscheme base16-'..current_theme_name)
 end
 
 -- Use OCS 52 for clipboard
@@ -639,7 +584,6 @@ wk.add({
 		"<leader>t",
 		function() harpoon:list():add() end,
 		desc = "Harpoon toggle",
-		--icon = "",
 	},
 	{
 		"<leader>j",
@@ -671,7 +615,7 @@ wk.add({
 })
 
 vim.api.nvim_create_user_command("Explore", function()
-  local current_file = vim.fn.expand("%:p")
-  local current_dir = vim.fn.fnamemodify(current_file, ":h")
-  vim.cmd("silent! lua require('oil').open('" .. current_dir .. "')")
+	local current_file = vim.fn.expand("%:p")
+	local current_dir = vim.fn.fnamemodify(current_file, ":h")
+	vim.cmd("silent! lua require('oil').open('" .. current_dir .. "')")
 end, {})
