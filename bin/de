@@ -1,0 +1,9 @@
+#!/bin/bash
+
+if [ ! -d "$*" ]; then
+	echo "$* is not a directory"
+	exit 1
+fi
+
+
+cd "$*" && e .
