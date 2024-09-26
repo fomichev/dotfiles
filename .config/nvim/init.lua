@@ -429,7 +429,7 @@ require("oil").setup({
 	use_default_keymaps = false,
 	keymaps = {
 		["<CR>"] = "actions.select",
-		["t"] = { "actions.select", opts = { tab = true }, desc = "Open the entry in new tab" },
+		["t"] = { "actions.select", opts = { tab = true } },
 		["p"] = "actions.preview",
 		["<C-r>"] = "actions.refresh",
 		["-"] = "actions.parent",
