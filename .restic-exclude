@@ -8,6 +8,7 @@
 /tmp
 /var/lib/bitcoin
 /var/lib/bitcoind
+/var/lib/ollama
 /home/sdf/data/bitcoind
 /var/log
 /var/run
