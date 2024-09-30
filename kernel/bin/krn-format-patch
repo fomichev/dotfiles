@@ -32,17 +32,23 @@ if [ ! -z "$SUFFIX" ]; then
 	prefix="$prefix $SUFFIX"
 fi
 
-range="$@"
-if [ -z "$range" ]; then
+range="$*"
+if [[ -z "$range" ]]; then
+	# default: no arguments
 	since=$(remote_main_branch "$remote")
 	till="HEAD"
-	if [ ! -z "$1" ]; then
-		till="$1"
-		shift
-	fi
 	range="$since".."$till"
+else
+	if [[ ! "$*" =~ ^-[0-9]+$ ]]; then
+		# -X
+		since=$(remote_main_branch "$remote")
+		till="$*"
+		range="$since".."$till"
+	else
+		# till sha1
+		:
+	fi
 fi
-
 
 if [ "$(get_branch_tag)" = "rfc" ]; then
 	prefix="RFC"
