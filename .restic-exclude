@@ -8,7 +8,6 @@
 /tmp
 /var/lib/bitcoin
 /var/lib/bitcoind
-/var/lib/ollama
 /home/sdf/data/bitcoind
 /var/log
 /var/run
@@ -47,3 +46,4 @@
 /home/sdf/.BitwigStudio/cache/
 /home/sdf/.wine/
 /home/sdf/data/frigate/storage
+/home/sdf/data/ollama/
