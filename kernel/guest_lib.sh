@@ -577,7 +577,7 @@ tcpx_loopback() {
 
 	ip addr add $addr dev $dev
 	ip link set $dev up
-	local ret=$(echo -e "hello\nworld" | ./tools/testing/selftests/drivers/net/ncdevmem -L -f $dev -s ::ffff:$addr -p 5201)
+	local ret=$(echo -e "hello\nworld" | ./tools/testing/selftests/drivers/net/hw/ncdevmem -L -f $dev -s ::ffff:$addr -p 5201)
 	echo "[$ret]"
 
 	local want=$(echo -e "hello\nworld")
@@ -614,13 +614,13 @@ tcpx_selftest() {
 
 	make \
 		-C tools/testing/selftests \
-		TARGETS="drivers/net" \
+		TARGETS="drivers/net/hw" \
 		install INSTALL_PATH=$KDIR/ksft
 
 	#cd $KDIR/ksft
 	#./run_kselftest.sh -t drivers/net:devmem.py
 
-	cd $KDIR/ksft/drivers/net
+	cd $KDIR/ksft/drivers/net/hw
 	local dev=eth0
 	ip addr add 192.168.1.4 dev $dev
 	ip link set $dev up
