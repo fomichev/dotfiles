@@ -104,13 +104,4 @@ layout:
 	$(call Layout,kinesis/kint2pp,sdf,keyboard/kinesis.svg)
 
 flash_kinesis:
-	(cd $(QMK) && qmk flash -kb handwired/kinesis -km sdf)
-
-flash_kinesis_kint:
-	(cd $(QMK) && qmk flash -kb kinesis/kint2pp -km sdf)
-
-flash_sofle:
-	(cd $(QMK) && qmk flash -kb sofle -km sdf)
-
-flash_sofle_choc:
-	(cd $(QMK) && qmk flash -kb sofle_choc -km sdf)
+	(cd $(QMK) && qmk flash -kb kinesis/redux -km fomichev)
