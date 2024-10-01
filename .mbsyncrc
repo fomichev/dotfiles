@@ -1,0 +1,22 @@
+IMAPAccount stfomichev
+Host imap.gmail.com
+User stfomichev@gmail.com
+PassCmd "/home/sdf/bin/secret gmail-stfomichev"
+TLSType IMAPS
+CertificateFile /etc/ssl/certs/ca-certificates.crt
+PipelineDepth 50
+
+IMAPStore stfomichev-remote
+Account stfomichev
+
+MaildirStore stfomichev-local
+Path ~/Mail/stfomichev/
+Inbox ~/Mail/stfomichev/inbox
+Subfolders Verbatim
+
+Channel stfomichev
+Far :stfomichev-remote:
+Near :stfomichev-local:
+Patterns *
+Create Near
+SyncState *
