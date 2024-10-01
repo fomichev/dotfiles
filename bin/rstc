@@ -48,6 +48,13 @@ docker_update() {
 	done
 }
 
+backup_email() {
+	if [ ! -e $HOME/.mbsyncrc ]; then
+		return
+	fi
+	mbsync -a
+}
+
 system_upgrade() {
 	say 'update system'
 	sudo /usr/bin/pacman --noconfirm -Sy archlinux-keyring
@@ -78,30 +85,6 @@ system_cleanup() {
 		flatpak uninstall --assumeyes --noninteractive --unused || :
 	fi
 	sudo /usr/bin/pacman --noconfirm -Scc || :
-}
-
-standard_notes() {
-	local oldest_backup=$(ls -t ~/Downloads/Standard\ Notes\ Backup\ -\ S*.zip | head -n1)
-	if [[ -z "$oldest_backup" ]]; then
-		echo "Skipping notes backup!"
-		return
-	fi
-	echo "Saving oldest notes backup: $oldest_backup"
-	unzip -c "$oldest_backup" 'Standard Notes Backup and Import File.txt' | pass insert -mf notes
-}
-
-google_drive() {
-	if [[ -d $HOME/Drive ]]; then
-		say 'pull could data'
-		DRY=n $HOME/bin/cloud pull
-	fi
-}
-
-google_photos() {
-	if [[ -d $HOME/Pictures/Google ]]; then
-		say 'fetch google photos'
-		$HOME/.local/bin/gphotos-sync ~/Pictures/Google/
-	fi
 }
 
 is_running() {
@@ -141,9 +124,6 @@ if [[ $# -eq 0 ]]; then
 	trap failure EXIT
 
 	do_notify "started"
-	#standard_notes
-	#google_drive
-	#google_photos
 
 	do_rstc \
 		--verbose \
@@ -158,6 +138,7 @@ if [[ $# -eq 0 ]]; then
 	do_rstc stats
 	do_notify "finished"
 	docker_update
+	backup_email
 	system_upgrade
 	system_cleanup
 	system_pacnew
