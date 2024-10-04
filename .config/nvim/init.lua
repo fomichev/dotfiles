@@ -393,10 +393,13 @@ require("lazy").setup({
 			})
 		end,
 	},
-	"hrsh7th/cmp-nvim-lsp",
-	"hrsh7th/cmp-buffer",
-	"hrsh7th/cmp-path",
-	"hrsh7th/cmp-cmdline",
+	"hrsh7th/cmp-nvim-lsp", -- completions from language server
+	"hrsh7th/cmp-buffer", -- completions from buffer content
+	"hrsh7th/cmp-path", -- completions for filesystem paths
+	{
+		"tzachar/cmp-ai",
+		dependencies = "nvim-lua/plenary.nvim",
+	},
 	{
 		"hrsh7th/nvim-cmp",
 		event = "InsertEnter",
@@ -424,6 +427,28 @@ require("lazy").setup({
 		opts = {},
 	},
 })
+
+-- local cmp_ai = require("cmp_ai.config")
+-- cmp_ai:setup({
+-- 	max_lines = 100,
+-- 	provider = "Ollama",
+-- 	provider_options = {
+-- 		-- {{- if .Suffix }}<|fim_prefix|>{{ .Prompt }}<|fim_suffix|>{{ .Suffix }}<|fim_middle|>{{ else ... }}
+-- 		model = "qwen2.5-coder:7b",
+-- 		--model = "qwen2.5-coder:1.5b",
+-- 		prompt = function(lines_before, lines_after)
+-- 			return lines_before
+-- 		end,
+-- 		suffix = function(lines_after)
+-- 			return lines_after
+-- 		end,
+-- 	},
+-- 	notify = true,
+-- 	notify_callback = function(msg)
+-- 		vim.notify(msg)
+-- 	end,
+-- 	run_on_every_keystroke = false,
+-- })
 
 require("oil").setup({
 	use_default_keymaps = false,
@@ -522,15 +547,24 @@ cmp.setup({
 	},
 	window = {},
 	mapping = cmp.mapping.preset.insert({
-		["<C-Space>"] = cmp.mapping.complete(),
+		['<C-Space>'] = cmp.mapping(
+			cmp.mapping.complete({
+				-- config = {
+				-- 	sources = cmp.config.sources({
+				-- 		{ name = 'cmp_ai' },
+				-- 	}),
+				-- },
+			}),
+			{ 'i' }
+		),
 		['<C-b>'] = cmp.mapping.scroll_docs(-4),
 		['<C-f>'] = cmp.mapping.scroll_docs(4),
 	}),
-	sources = cmp.config.sources({
+	sources = {
 		{ name = "nvim_lsp" },
-	}, {
 		{ name = "buffer" },
-	})
+		{ name = "path" },
+	},
 })
 
 -- Load base16 color scheme
