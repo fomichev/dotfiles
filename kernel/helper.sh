@@ -1,33 +1,69 @@
 #!/bin/bash
 
 SWAP=false
-DEV=eth0
 
+DEV=$DEV0
 GPU=$GPU0
 HOST_IP=$HOST0_IP
 PEER_IP=$PEER0_IP
 
-while getopts "0123r" opt; do
+while getopts "0123456789r" opt; do
 	case $opt in
 		r) SWAP=true ;;
 		0) ;;
 		1)
-			DEV="eth1"
-			GPU=$GPU1
-			HOST_IP=$HOST1_IP
-			PEER_IP=$PEER1_IP
+			DEV="$DEV1"
+			GPU="$GPU1"
+			HOST_IP="$HOST1_IP"
+			PEER_IP="$PEER1_IP"
 			;;
 		2)
-			DEV="eth2"
-			GPU=$GPU2
-			HOST_IP=$HOST2_IP
-			PEER_IP=$PEER2_IP
+			DEV="$DEV2"
+			GPU="$GPU2"
+			HOST_IP="$HOST2_IP"
+			PEER_IP="$PEER2_IP"
 			;;
 		3)
-			DEV="eth3"
-			GPU=$GPU3
-			HOST_IP=$HOST3_IP
-			PEER_IP=$PEER3_IP
+			DEV="$DEV3"
+			GPU="$GPU3"
+			HOST_IP="$HOST3_IP"
+			PEER_IP="$PEER3_IP"
+			;;
+		4)
+			DEV="$DEV4"
+			GPU="$GPU4"
+			HOST_IP="$HOST4_IP"
+			PEER_IP="$PEER4_IP"
+			;;
+		5)
+			DEV="$DEV5"
+			GPU="$GPU5"
+			HOST_IP="$HOST5_IP"
+			PEER_IP="$PEER5_IP"
+			;;
+		6)
+			DEV="$DEV6"
+			GPU="$GPU6"
+			HOST_IP="$HOST6_IP"
+			PEER_IP="$PEER6_IP"
+			;;
+		7)
+			DEV="$DEV7"
+			GPU="$GPU7"
+			HOST_IP="$HOST7_IP"
+			PEER_IP="$PEER7_IP"
+			;;
+		8)
+			DEV="$DEV8"
+			GPU="$GPU8"
+			HOST_IP="$HOST8_IP"
+			PEER_IP="$PEER8_IP"
+			;;
+		9)
+			DEV="$DEV9"
+			GPU="$GPU9"
+			HOST_IP="$HOST9_IP"
+			PEER_IP="$PEER9_IP"
 			;;
 	esac
 done
@@ -36,8 +72,8 @@ shift $((OPTIND -1))
 
 [[ -z "$HOST" ]] && { echo "HOST is undefined"; exit 1; }
 [[ -z "$PEER" ]] && { echo "PEER is undefined"; exit 1; }
-[[ -z "$HOST_IP" ]] && { echo "HOST_IP is undefined"; exit 1; }
-[[ -z "$PEER_IP" ]] && { echo "PEER_IP is undefined"; exit 1; }
+[[ -z "$HOST_IP" ]] && { echo "HOST_IP is undefined - run generate_spec?"; exit 1; }
+[[ -z "$PEER_IP" ]] && { echo "PEER_IP is undefined - run generate_spec?"; exit 1; }
 
 if $SWAP; then
 	tmp=$HOST
@@ -111,6 +147,43 @@ want_no_args() {
 	fi
 }
 
+__dev_addr() {
+	local host="$1"
+	local dev="$2"
+
+	ssh root@$host ip -6 addr show dev $dev | grep global | grep -v deprecated | awk '{ print $2 }' | awk -F/ '{print $1}'
+}
+
+generate_spec() {
+	local host_ips=()
+	local peer_ips=()
+	local devs=()
+	local ethn=4
+	local bethn=0
+
+	if [[ $ethn -gt 0 ]]; then
+		for i in `seq 0 $(( $ethn - 1 ))`; do
+			devs+=(eth${i})
+			host_ips+=($(__dev_addr $HOST eth${i}))
+			peer_ips+=($(__dev_addr $PEER eth${i}))
+		done
+	fi
+
+	if [[ $bethn -gt 0 ]]; then
+		for i in `seq 0 $(( $bethn -1 ))`; do
+			devs+=(beth${i})
+			host_ips+=($(__dev_addr $HOST beth${i}))
+			peer_ips+=($(__dev_addr $PEER beth${i}))
+		done
+	fi
+
+	for i in `seq 0 $(( ${#devs[@]} - 1 ))`; do
+		echo DEV${i}=${devs[$i]}
+		echo HOST${i}_IP=${host_ips[$i]}
+		echo PEER${i}_IP=${peer_ips[$i]}
+	done
+}
+
 # HELPERS
 
 enable_tcphds() {
@@ -164,7 +237,6 @@ stop_networkd() {
 	ssh root@$1 systemctl stop systemd-networkd.service || :
 }
 
-
 add_routes() {
 	want_no_args
 
@@ -180,22 +252,20 @@ add_routes() {
 	fi
 }
 
-# TODO: have a command to collect ips for the host
-
 ksft_copy() {
-	want_arg1
+	want_no_args
 
 	pushd $LINUX
 	make \
 		-C tools/testing/selftests \
 		TARGETS="drivers/net" \
 		install INSTALL_PATH=~/tmp/ksft
-	rsync -ra --delete ~/tmp/ksft root@${1}:
+	rsync -ra --delete ~/tmp/ksft root@${HOST}:
 	popd
 }
 
 ksft_tcpx() {
-	want_arg1 "$@"
+	want_no_args
 
 	pushd $LINUX
 
@@ -206,8 +276,8 @@ ksft_tcpx() {
 	cfg+="REMOTE_TYPE=ssh\n"
 	cfg+="REMOTE_ARGS=root@${PEER}\n"
 
-	echo -e "$cfg" | ssh root@$1 "cat > ksft/drivers/net/net.config"
-	ssh root@$1 "export PATH=/bin:/usr/bin:/usr/sbin; cd ksft && ./run_kselftest.sh -t drivers/net:devmem.py"
+	echo -e "$cfg" | ssh root@$HOST "cat > ksft/drivers/net/net.config"
+	ssh root@$HOST "export PATH=/bin:/usr/bin:/usr/sbin; cd ksft && ./run_kselftest.sh -t drivers/net:devmem.py"
 
 	popd
 }
@@ -230,7 +300,6 @@ copy_kperf() {
 	scp client server root@$1
 	popd
 }
-
 
 run_kperf() {
 	want_no_args
