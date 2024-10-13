@@ -1,18 +1,3 @@
-/dev
-/lost+found
-/media
-/mnt
-/proc
-/run
-/sys
-/tmp
-/var/lib/bitcoin
-/var/lib/bitcoind
-/home/sdf/data/bitcoind
-/var/log
-/var/run
-/var/cache
-/var/tmp
 /home/sdf/.mail/.notmuch
 /home/sdf/.cache
 /home/sdf/.var
@@ -22,6 +7,8 @@
 /home/sdf/.mozilla
 /home/sdf/.gem
 /home/sdf/.cargo
+/home/sdf/.ccache
+/home/sdf/.ollama
 /home/sdf/.xargo
 /home/sdf/.bundle
 /home/sdf/src/dotfiles/.local/share/Trash
@@ -43,7 +30,7 @@
 /home/sdf/Downloads
 /home/sdf/Mail
 /home/sdf/hass/www/mp4/
-/home/sdf/.BitwigStudio/cache/
+/home/sdf/.BitwigStudio/
 /home/sdf/.wine/
 /home/sdf/data/frigate/storage
 /home/sdf/data/ollama/

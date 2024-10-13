@@ -23,7 +23,7 @@ failure() {
 do_rstc() {
 	say restic -r "$REPO" "$@"
 	set +e
-	sudo -E restic -r "$REPO" "$@" 2>&1 | cat
+	restic -r "$REPO" "$@" 2>&1 | cat
 	ret=$?
 	set -e
 
@@ -126,13 +126,12 @@ if [[ $# -eq 0 ]]; then
 	do_notify "started"
 
 	do_rstc \
-		--verbose \
 		$ARGS \
+		--verbose=2 \
 		--exclude-file $HOME/src/dotfiles/.restic-exclude \
-		backup /
+		backup $HOME
 
 	do_rstc unlock
-
 	do_rstc snapshots
 	do_rstc forget --keep-within 95d --prune
 	do_rstc stats
