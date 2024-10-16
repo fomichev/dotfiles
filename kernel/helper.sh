@@ -72,8 +72,10 @@ shift $((OPTIND -1))
 
 [[ -z "$HOST" ]] && { echo "HOST is undefined"; exit 1; }
 [[ -z "$PEER" ]] && { echo "PEER is undefined"; exit 1; }
-[[ -z "$HOST_IP" ]] && { echo "HOST_IP is undefined - run generate_spec?"; exit 1; }
-[[ -z "$PEER_IP" ]] && { echo "PEER_IP is undefined - run generate_spec?"; exit 1; }
+if [ ! "$1" = "generate_spec" ]; then
+	[[ -z "$HOST_IP" ]] && { echo "HOST_IP is undefined - run generate_spec?"; exit 1; }
+	[[ -z "$PEER_IP" ]] && { echo "PEER_IP is undefined - run generate_spec?"; exit 1; }
+fi
 
 if $SWAP; then
 	tmp=$HOST
@@ -184,7 +186,28 @@ generate_spec() {
 	done
 }
 
+cons() {
+	local name="cons"
+
+	tmux new-window -n "$name"
+	tmux split-window -h -t $name
+	tmux split-window -v -t $name
+	tmux select-pane -t "${name}.1"
+	tmux split-window -v
+
+	tmux send-keys -t "${name}.1" "cons $HOST" 
+	tmux send-keys -t "${name}.2" "cons $PEER"
+	tmux send-keys -t "${name}.3" "ssh root@$HOST"
+	tmux send-keys -t "${name}.4" "ssh root@$PEER"
+}
+
 # HELPERS
+
+begin_trace() {
+	want_arg1 "$@"
+
+	ssh root@$1 "echo BEGIN > /sys/kernel/debug/tracing/trace_marker"
+}
 
 enable_tcphds() {
 	want_arg1 "$@"
@@ -204,10 +227,10 @@ enable_hw_gro() {
 	ssh root@$1 ethtool -K $DEV rx-gro-hw on
 }
 
-set_mtu_4k() {
+set_mtu() {
 	want_arg1 "$@"
 
-	# 4096+72
+	# 4096+72 or +86?
 	#ssh root@$1 ip link set mtu 4168 dev $DEV
 	ssh root@$1 ip link set mtu 4096 dev $DEV
 }
@@ -238,7 +261,7 @@ stop_networkd() {
 }
 
 add_routes() {
-	want_no_args
+	want_no_args "$@"
 
 	if [ ! "$DEV" = "eth0" ]; then
 		ssh root@$PEER "ip -6 route add $HOST_IP dev $DEV src $PEER_IP" || :
@@ -250,10 +273,12 @@ add_routes() {
 		#root@twshared0548.04.eag5
 		#ip -6 neigh add 2401:db00:35a:c1ee:bace:0:3e0:0 lladdr 76:d4:dd:2a:47:e9 dev beth2
 	fi
+
+	# TODO: add 4k MSS route?
 }
 
 ksft_copy() {
-	want_no_args
+	want_no_args "$@"
 
 	pushd $LINUX
 	make \
@@ -261,11 +286,12 @@ ksft_copy() {
 		TARGETS="drivers/net" \
 		install INSTALL_PATH=~/tmp/ksft
 	rsync -ra --delete ~/tmp/ksft root@${HOST}:
+	rsync -ra --delete ~/tmp/ksft root@${PEER}:
 	popd
 }
 
 ksft_tcpx() {
-	want_no_args
+	want_no_args "$@"
 
 	pushd $LINUX
 
@@ -283,7 +309,7 @@ ksft_tcpx() {
 }
 
 build_kperf() {
-	want_no_args
+	want_no_args "$@"
 
 	pushd ~/src/kperf
 	rm -rf ccan/src/generator
@@ -296,13 +322,13 @@ copy_kperf() {
 	want_arg1 "$@"
 
 	pushd ~/src/kperf
-	ssh root@$1 pkill server
-	scp client server root@$1
+	ssh root@${1} pkill server || :
+	scp client server root@${1}:
 	popd
 }
 
 run_kperf() {
-	want_no_args
+	want_no_args "$@"
 
 	local args=""
 	args="$args --pin-off 1"
@@ -325,8 +351,15 @@ run_kperf() {
 	run_in_pane kperf "$reset" "$server" "$client"
 }
 
+trace_pipe() {
+	want_arg1 "$@"
+
+	echo 1 | ssh root@$1 tee /sys/kernel/debug/tracing/tracing_on
+	ssh root@$1 cat /sys/kernel/debug/tracing/trace_pipe
+}
+
 run_iperf3() {
-	want_no_args
+	want_no_args "$@"
 
 	local server="iperf3 -s -B ${HOST_IP}"
 	local client="iperf3 -c ${HOST_IP} -Z -l 1024K -t 60 --congestion cubic"
@@ -336,7 +369,7 @@ run_iperf3() {
 }
 
 ynl_regen() {
-	want_no_args
+	want_no_args "$@"
 
 	# TODO: move to krn-regen-ynl?
 	pushd ${LINUX}/tools/net/ynl/generated
@@ -344,4 +377,27 @@ ynl_regen() {
 	make ethtool-user.h
 	make ethtool-user.c
 	make ethtool-user.o
+}
+
+dump_cpu_layout() {
+	want_arg1 "$@"
+
+	ssh root@$1 cat /proc/cpuinfo | krn-core-layout
+}
+
+dump_irq_affinity() {
+	want_arg1 "$@"
+
+	local affinities=()
+
+	local irqs=$(ssh root@$1 "ls -1 /sys/class/net/$DEV/device/msi_irqs/")
+
+	for irq in $irqs; do
+		local affinity=$(ssh root@$1 "cat /proc/irq/$irq/effective_affinity_list")
+		affinities+=($affinity)
+	done
+
+	local show="${affinities[@]/%/,}"
+	echo "SHOW $show"
+	ssh root@$1 cat /proc/cpuinfo | krn-core-layout -s "$show"
 }
