@@ -1,0 +1,78 @@
+#!/usr/bin/env python3
+
+import sys
+import argparse
+
+sockets = {}
+
+thread_len = 4
+
+parser = argparse.ArgumentParser()
+parser.add_argument('-s', '--show', type=str)
+parser.add_argument('-c', '--cols_per_line', type=int, default=8)
+
+args = parser.parse_args()
+
+show = []
+if args.show:
+    if ',' in args.show:
+        show = [ int(x) for x in args.show.strip(',').split(',')]
+    else:
+        show = [ int(x) for x in args.show.split(' ')]
+cores_per_line = args.cols_per_line
+
+for line in sys.stdin:
+    cols = [ x.strip() for x in line.split(':') ]
+    if len(cols) != 2:
+        continue
+    if cols[0] == 'processor':
+        cpuid = int(cols[1])
+    elif cols[0] == 'physical id':
+        socket = int(cols[1])
+    elif cols[0] == 'core id':
+        coreid = int(cols[1])
+
+        if socket not in sockets:
+            sockets[socket] = {}
+
+        if coreid not in sockets[socket]:
+            sockets[socket][coreid] = []
+
+        sockets[socket][coreid].append(cpuid)
+
+for socket in sockets.keys():
+    print(f"SOCKET {socket}:")
+
+    keys = list(sockets[socket].keys())
+
+    for i in range(0, len(sockets[socket]), cores_per_line):
+        for j in range(cores_per_line):
+            coreid = keys[i+j]
+            core = sockets[socket][coreid]
+            lhs = core[0]
+
+            lhs_pre = ""
+            lhs_post = ""
+
+            for hc in show:
+                if hc == core[0]:
+                    lhs_pre = "\033[31m"
+                    lhs_post = "\033[0m"
+                    break
+
+            rhs = ""
+
+            rhs_pre = ""
+            rhs_post = ""
+
+            if len(core) > 1:
+                rhs = core[1]
+
+                for hc in show:
+                    if hc == core[1]:
+                        rhs_pre = "\033[31m"
+                        rhs_post = "\033[0m"
+                        break
+
+            print(f"[{lhs_pre}{lhs:{thread_len}}{lhs_post} {rhs_pre}{rhs:{thread_len}}{rhs_post}]", end='')
+        print()
