@@ -2,16 +2,170 @@
 
 import sys
 import argparse
-
-sockets = {}
+import time
+import datetime
 
 thread_len = 4
 
 parser = argparse.ArgumentParser()
 parser.add_argument('-s', '--show', type=str)
 parser.add_argument('-c', '--cols_per_line', type=int, default=8)
+parser.add_argument('--cpuinfo', type=str, default='/proc/cpuinfo')
+parser.add_argument('--stat', type=str, default='/proc/stat')
+parser.add_argument('-u', '--utilization', action='store_true')
 
 args = parser.parse_args()
+
+def read_cpuload(path):
+    stats = {}
+    with open(path, 'r') as f:
+        for line in f:
+            cols = line.split(' ' )
+            if cols[0] == 'cpu':
+                continue
+            if not cols[0].startswith('cpu'):
+                continue
+
+            cols[0] = int(cols[0].replace('cpu', ''))
+            cols = [ int(x) for x in cols ]
+
+            cpu = cols[0]
+            stats[cpu] = {
+                'user': cols[1],
+                'nice': cols[2],
+                'system': cols[3],
+                'idle': cols[4],
+                'iowait': cols[5],
+                'irq': cols[6],
+                'softirq': cols[7],
+                'steal': cols[8],
+            }
+
+    return stats
+
+def diff_cpuload(before, after):
+    diff = {}
+    for k in before.keys():
+        diff[k] = after[k] - before[k]
+    return diff
+
+def parse_layout(cpuinfo):
+    sockets = {}
+
+    for line in cpuinfo:
+        cols = [ x.strip() for x in line.split(':') ]
+        if len(cols) != 2:
+            continue
+        if cols[0] == 'processor':
+            cpuid = int(cols[1])
+        elif cols[0] == 'physical id':
+            socket = int(cols[1])
+        elif cols[0] == 'core id':
+            coreid = int(cols[1])
+
+            if socket not in sockets:
+                sockets[socket] = {}
+
+            if coreid not in sockets[socket]:
+                sockets[socket][coreid] = []
+
+            sockets[socket][coreid].append(cpuid)
+
+    return sockets
+
+def red(val):
+    return f"\033[31m{val}\033[0m"
+
+def yellow(val):
+    return f"\033[33m{val}\033[0m"
+
+def range_to_symbol(val):
+    sym = ' '
+
+    # ⢀⣀⣠⣤⣴⣶⣾⣿⡮⡯
+    if val >= 99:
+        sym = '⡯'
+    if val >= 95:
+        sym = '⡮'
+    elif val >= 90:
+        sym = "⣿"
+    elif val >= 80:
+        sym = "⣾"
+    elif val >= 70:
+        sym = "⣶"
+    elif val >= 60:
+        sym = "⣴"
+    elif val >= 50:
+        sym = "⣤"
+    elif val >= 40:
+        sym = "⣠"
+    elif val >= 20:
+        sym = "⣀"
+    elif val >= 10:
+        sym = "⢀"
+
+    return sym
+
+def utilization(before, after, cpu):
+    diff = diff_cpuload(before[cpu], after[cpu])
+    totl = sum(diff.values())
+
+    irq = (diff['irq'] + diff['softirq']) * 100 // totl
+    user = (diff['user'] + diff['nice']) * 100 // totl
+    system = (diff['system'] + diff['iowait']) * 100 // totl
+
+    return red(range_to_symbol(irq)) + yellow(range_to_symbol(system)) + range_to_symbol(user)
+
+def print_layout(sockets, cpuload_before, cpuload_after):
+    now = datetime.datetime.now()
+    for socket in sockets.keys():
+        print(f"SOCKET {socket} {now}")
+
+        keys = list(sockets[socket].keys())
+
+        for i in range(0, len(sockets[socket]), cores_per_line):
+            for j in range(cores_per_line):
+                if i+j not in keys:
+                    continue
+
+                coreid = keys[i+j]
+                core = sockets[socket][coreid]
+                lhs = core[0]
+
+                lhs_pre = ""
+                lhs_post = ""
+
+                for hc in show:
+                    if hc == core[0]:
+                        lhs_pre = "\033[31m"
+                        lhs_post = "\033[0m"
+                        break
+
+                rhs = ""
+
+                rhs_pre = ""
+                rhs_post = ""
+
+                if len(core) > 1:
+                    rhs = core[1]
+
+                    for hc in show:
+                        if hc == core[1]:
+                            rhs_pre = "\033[31m"
+                            rhs_post = "\033[0m"
+                            break
+
+                if cpuload_before and cpuload_after:
+                    lhs = utilization(before, after, lhs)
+
+                    if len(core) > 1:
+                        rhs = utilization(before, after, rhs)
+                    #print(f"{lhs} {rhs}|", end='')
+                    print(f"[{lhs}|{rhs}]", end='')
+                else:
+                    #print(f"[{lhs_pre}{lhs:{thread_len}}{lhs_post} {rhs_pre}{rhs:{thread_len}}{rhs_post}]", end='')
+                    print(f"{lhs_pre}{lhs:{thread_len}}{lhs_post} {rhs_pre}{rhs:{thread_len}}{rhs_post}|", end='')
+            print()
 
 show = []
 if args.show:
@@ -21,58 +175,20 @@ if args.show:
         show = [ int(x) for x in args.show.split(' ')]
 cores_per_line = args.cols_per_line
 
-for line in sys.stdin:
-    cols = [ x.strip() for x in line.split(':') ]
-    if len(cols) != 2:
-        continue
-    if cols[0] == 'processor':
-        cpuid = int(cols[1])
-    elif cols[0] == 'physical id':
-        socket = int(cols[1])
-    elif cols[0] == 'core id':
-        coreid = int(cols[1])
+if args.cpuinfo == '-':
+    cpuinfo = sys.stdin
+else:
+    cpuinfo = open(args.cpuinfo, "r")
 
-        if socket not in sockets:
-            sockets[socket] = {}
+layout = parse_layout(cpuinfo)
 
-        if coreid not in sockets[socket]:
-            sockets[socket][coreid] = []
+if args.utilization:
+    before = read_cpuload(args.stat)
 
-        sockets[socket][coreid].append(cpuid)
+    while True:
+        time.sleep(1)
+        after = read_cpuload(args.stat)
+        print_layout(layout, before, after)
+        before = after
 
-for socket in sockets.keys():
-    print(f"SOCKET {socket}:")
-
-    keys = list(sockets[socket].keys())
-
-    for i in range(0, len(sockets[socket]), cores_per_line):
-        for j in range(cores_per_line):
-            coreid = keys[i+j]
-            core = sockets[socket][coreid]
-            lhs = core[0]
-
-            lhs_pre = ""
-            lhs_post = ""
-
-            for hc in show:
-                if hc == core[0]:
-                    lhs_pre = "\033[31m"
-                    lhs_post = "\033[0m"
-                    break
-
-            rhs = ""
-
-            rhs_pre = ""
-            rhs_post = ""
-
-            if len(core) > 1:
-                rhs = core[1]
-
-                for hc in show:
-                    if hc == core[1]:
-                        rhs_pre = "\033[31m"
-                        rhs_post = "\033[0m"
-                        break
-
-            print(f"[{lhs_pre}{lhs:{thread_len}}{lhs_post} {rhs_pre}{rhs:{thread_len}}{rhs_post}]", end='')
-        print()
+print_layout(layout, None, None)
