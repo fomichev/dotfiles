@@ -123,8 +123,6 @@ run_in_pane() {
 	local server="$3"
 	local client="$4"
 
-	add_routes
-
 	echo "$server"
 	echo "$client"
 
@@ -161,7 +159,7 @@ generate_spec() {
 	local peer_ips=()
 	local devs=()
 	local ethn=4
-	local bethn=0
+	local bethn=4
 
 	if [[ $ethn -gt 0 ]]; then
 		for i in `seq 0 $(( $ethn - 1 ))`; do
@@ -260,12 +258,45 @@ stop_networkd() {
 	ssh root@$1 systemctl stop systemd-networkd.service || :
 }
 
+add_lladdr() {
+	want_no_args "$@"
+
+	if [ ! "$DEV" = "eth0" ]; then
+		local lladdr=$(ssh root@$HOST ip -6 neigh show dev $DEV | grep b00c | awk '{print $3}')
+
+		echo ssh root@$HOST "ip -6 neigh add $PEER_IP lladdr $lladdr dev $DEV"
+		echo ssh root@$PEER "ip -6 neigh add $HOST_IP lladdr $lladdr dev $DEV"
+
+		echo "ip -6 neigh add $PEER_IP lladdr $lladdr dev $DEV"
+		echo "ip -6 neigh add $HOST_IP lladdr $lladdr dev $DEV"
+	fi
+}
+
+add_ssh_keys() {
+	local host_key=$(ssh root@$HOST cat .ssh/id_rsa.pub)
+	local peer_key=$(ssh root@$PEER cat .ssh/id_rsa.pub)
+
+	echo "$host_key" | ssh root@$PEER tee -a .ssh/authorized_keys
+	echo "$peer_key" | ssh root@$HOST tee -a .ssh/authorized_keys
+}
+
 add_routes() {
 	want_no_args "$@"
 
 	if [ ! "$DEV" = "eth0" ]; then
-		ssh root@$PEER "ip -6 route add $HOST_IP dev $DEV src $PEER_IP" || :
-		ssh root@$HOST "ip -6 route add $PEER_IP dev $DEV src $HOST_IP" || :
+		local via="fe80::face:b00c"
+
+		if [[ "$DEV" == beth* ]]; then
+			local via="fe80::be:face:b00c"
+		fi
+
+		ssh root@$PEER "ip -6 route del $HOST_IP dev $DEV src $PEER_IP" || :
+		ssh root@$HOST "ip -6 route del $PEER_IP dev $DEV src $HOST_IP" || :
+
+		echo ssh root@$PEER "ip -6 route add $HOST_IP dev $DEV via $via src $PEER_IP pref low"
+		echo ssh root@$HOST "ip -6 route add $PEER_IP dev $DEV via $via src $HOST_IP pref low"
+		ssh root@$PEER "ip -6 route add $HOST_IP dev $DEV via $via src $PEER_IP pref low" || :
+		ssh root@$HOST "ip -6 route add $PEER_IP dev $DEV via $via src $HOST_IP pref low" || :
 
 		# ip neigh show | grep b00c - take BE or FE lladdr
 		#root@twshared0506.04.eag5
@@ -398,6 +429,25 @@ dump_irq_affinity() {
 	done
 
 	local show="${affinities[@]/%/,}"
-	echo "SHOW $show"
+	echo "SHOW CORES: $show"
 	ssh root@$1 cat /proc/cpuinfo | krn-core-layout -s "$show"
+}
+
+run_ssh() {
+	want_arg1 "$@"
+
+	ssh -t root@${1}
+}
+
+run_strace() {
+	want_arg1 "$@"
+
+	ssh root@${1} 'strace  -e "!sched_yield" -p $(pgrep nccl_send)'
+}
+
+core_util() {
+	want_arg1 "$@"
+
+	scp ~/src/dotfiles/kernel/bin/krn-core-layout root@${1}:
+	ssh -t root@${1} "./krn-core-layout -u"
 }
