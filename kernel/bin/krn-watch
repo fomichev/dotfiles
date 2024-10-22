@@ -23,6 +23,8 @@ class InotifyEventHandler:
             path = os.path.join(dir, f)
             if not os.path.isdir(path):
                 continue
+            if not os.path.islink(path):
+                continue
 
             wd = self.inotify.add_watch(path, inotify_simple.flags.MODIFY)
             self.wd[wd] = path

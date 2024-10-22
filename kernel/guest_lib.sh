@@ -626,3 +626,34 @@ tcpx_selftest() {
 	ip link set $dev up
 	./devmem.py
 }
+
+mrqcat_selftest() {
+	#tc qdisc add dev lo root netem loss 10%
+	ip link set lo mtu 1500
+	ethtool -K lo gso off
+	ethtool -K lo gro off
+
+	local expect_mb=4
+	./tools/testing/selftests/net/mrqcat -a ::ffff:127.0.0.1 -p 8888 -t -e $(( $expect_mb * 1024 * 1024 )) &
+	#nc -l -p 8888 &
+	#echo -e "hello\nworld" | nc -N 127.0.0.1 8888
+	dd if=/dev/urandom bs=$expect_mb count=$(( 1024 * 1024 )) | nc -O 1000 -N 127.0.0.1 8888
+
+	./tools/testing/selftests/net/mrqcat -O -a ::ffff:127.0.0.1 -p 8889 -t -e $(( $expect_mb * 1024 * 1024 )) &
+	#nc -l -p 8888 &
+	#echo -e "hello\nworld" | nc -N 127.0.0.1 8888
+	dd if=/dev/urandom bs=$expect_mb count=$(( 1024 * 1024 )) | nc -O 1000 -N 127.0.0.1 8889
+
+	# TODO: retry the above with TAP and external dd + nc
+}
+
+kperf_loopback() {
+	local kperf=$HOME/src/kperf
+	local args=""
+	args+=" --msg-zerocopy"
+	args+=" --msg-trunc"
+
+	$kperf/server -a localhost --no-daemon &
+	sleep 1
+	$kperf/client --src localhost --dst localhost $args
+}
