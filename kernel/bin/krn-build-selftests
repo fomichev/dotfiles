@@ -35,8 +35,9 @@ PREFIX=
 #$PREFIX make $SILENT -j$(nproc) -C tools/bpf/bpftool LLVM=$LLVM "$@"
 
 if [ -z "$*" ]; then
-	set -- "drivers/net" "net"
+	set -- "net" "drivers/net" "drivers/net/hw"
 fi
 
+FORCE_TARGETS=1 \
 SAN_CFLAGS="$cflags" \
 $PREFIX make $SILENT -j$(nproc) -C tools/testing/selftests TARGETS="$*" LLVM=$LLVM
