@@ -125,6 +125,7 @@ if [[ ! -e $KDIR/.config ]]; then
 	set_config CONFIG_VLAN_8021Q
 	set_config CONFIG_NET_ACT_VLAN
 	set_config CONFIG_NET_SCH_FQ
+	set_config CONFIG_NET_SCH_NETEM
 	set_config CONFIG_VIRTIO_VSOCKETS
 	set_config CONFIG_NET_VRF
 
@@ -147,6 +148,8 @@ if [[ ! -e $KDIR/.config ]]; then
 	set_config CONFIG_MLX4_EN
 	set_config CONFIG_MLX5_CORE
 	set_config CONFIG_MLX5_CORE_EN
+	set_config CONFIG_MLX5_EN_IPSEC # ipsec_offload
+	set_config CONFIG_INET6_ESP_OFFLOAD # ipsec_offload
 
 	set_config CONFIG_CMDLINE_BOOL
 	set_config CONFIG_CMDLINE "oops=panic panic=10 io_delay=0xed libata.allow_tpm=1 nmi_watchdog=panic tco_start=1 quiet slab_nomerge fb_tunnels=none firmware_class.path=/var/google/session msr.allow_writes=on acpi_enforce_resources=lax video=efifb:off hest_disable=1 erst_disable=1 bert_disable=1 retbleed=off eagerfpu=on kvm_amd.nested=0 debug_pagealloc=on intel_iommu=optin pcie_port_pm=off scsi_mod.force_queue_depth=1,512:0 scsi_mod.scan=async libata.ata_probe_timeout=30 pm80xx.spinup_group=5 pm80xx.spinup_interval_ms=10000 pm80xx.spinup_group_decrease=1"
@@ -161,6 +164,8 @@ if [[ ! -e $KDIR/.config ]]; then
 	# cb80ddc67152 break console!
 	#set_config CONFIG_BPF_PRELOAD $y_dbx
 	#set_config CONFIG_BPF_PRELOAD_UMD $y_dbx
+
+	set_config CONFIG_MACSEC # macsec_offload
 
 	set_config CONFIG_UDMABUF
 	set_config CONFIG_FBNIC n
