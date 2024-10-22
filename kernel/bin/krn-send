@@ -50,6 +50,25 @@ git_send() {
 	git send-email $ARGS "$@" $KDIR/*.patch
 }
 
+maybe_add_to_cc() {
+	for cc in "$@"; do
+		if echo "$ARGS" | grep -q "$cc"; then
+			echo "skip adding $cc"
+			continue
+		fi
+
+		echo "adding $cc"
+		cc $cc
+	done
+}
+
+extra_maintainers() {
+	local maintainers="$(./scripts/get_maintainer.pl --remove-duplicates --email --git-min-percent 25 -- *.patch)"
+
+	maybe_add_to_cc $(echo "$maintainers" | awk -F'(' '{print $1}' | grep -v '<')
+	maybe_add_to_cc $(echo "$maintainers" | awk -F'(' '{print $1}' | grep '<' | awk -F'<' '{print $2}' | tr -d '>')
+}
+
 try_to_send_to() {
 	case $target in
 		net|net-next)
@@ -105,6 +124,8 @@ try_to_send_to() {
 			;;
 	esac
 
+	extra_maintainers
+
 	git_send --validate --dry-run
 
 	echo "Sending to $target! Continue? [y/n]: "
@@ -120,13 +141,16 @@ try_to_send_to() {
 			exit 1
 			;;
 	esac
+
+	exit 0
 }
 
-targets="$@ $(get_branch_name) $(get_branch_remote)"
+targets="$@ $(get_branch_remote) $(get_branch_name)"
 
 for target in $targets; do
+	echo $target
 	try_to_send_to $target
 done
 
-echo "Could find suitable target in $targets"
+echo "Could not find suitable target in $targets"
 exit 1
