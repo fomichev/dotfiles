@@ -286,6 +286,7 @@ require("lazy").setup({
 		config = function ()
 			local builtin = require("telescope.builtin")
 			local wk = require("which-key")
+			local bafa = require('bafa.ui')
 			wk.add({
 				{
 					"<leader>f",
@@ -302,10 +303,15 @@ require("lazy").setup({
 					builtin.grep_string,
 					desc = "Telescope grep cursor",
 				},
+--				{
+--					"<leader>b",
+--					builtin.buffers,
+--					desc = "Telescope buffers",
+--				},
 				{
 					"<leader>b",
-					builtin.buffers,
-					desc = "Telescope buffers",
+					bafa.toggle,
+					desc = "Buffers",
 				},
 				{
 					"<leader>h",
@@ -426,6 +432,7 @@ require("lazy").setup({
 		event = "VeryLazy",
 		opts = {},
 	},
+	{ 'mistweaverco/bafa.nvim' },
 })
 
 -- local cmp_ai = require("cmp_ai.config")
