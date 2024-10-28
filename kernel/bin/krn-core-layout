@@ -5,7 +5,7 @@ import argparse
 import time
 import datetime
 
-thread_len = 4
+thread_len = 3
 
 parser = argparse.ArgumentParser()
 parser.add_argument('-s', '--show', type=str)
@@ -108,22 +108,28 @@ def range_to_symbol(val):
 
 def utilization(before, after, cpu):
     diff = diff_cpuload(before[cpu], after[cpu])
-    totl = sum(diff.values())
+    diff_totl = sum(diff.values())
 
-    irq = (diff['irq'] + diff['softirq']) * 100 // totl
-    user = (diff['user'] + diff['nice']) * 100 // totl
-    system = (diff['system'] + diff['iowait']) * 100 // totl
+    irq = (diff['irq'] + diff['softirq']) * 100 // diff_totl
+    idle = diff['idle'] * 100 // diff_totl
+    system = (diff['system'] + diff['iowait']) * 100 // diff_totl
 
-    return red(range_to_symbol(irq)) + yellow(range_to_symbol(system)) + range_to_symbol(user)
+    return range_to_symbol(100 - idle) + red(range_to_symbol(irq)) + yellow(range_to_symbol(system))
 
 def print_layout(sockets, cpuload_before, cpuload_after):
     now = datetime.datetime.now()
+
+    ln = 0
+
     for socket in sockets.keys():
         print(f"SOCKET {socket} {now}")
 
         keys = list(sockets[socket].keys())
 
         for i in range(0, len(sockets[socket]), cores_per_line):
+            print(f"{ln:02x} ", end='')
+            ln += 1
+
             for j in range(cores_per_line):
                 if i+j not in keys:
                     continue
@@ -163,8 +169,7 @@ def print_layout(sockets, cpuload_before, cpuload_after):
                     #print(f"{lhs} {rhs}|", end='')
                     print(f"[{lhs}|{rhs}]", end='')
                 else:
-                    #print(f"[{lhs_pre}{lhs:{thread_len}}{lhs_post} {rhs_pre}{rhs:{thread_len}}{rhs_post}]", end='')
-                    print(f"{lhs_pre}{lhs:{thread_len}}{lhs_post} {rhs_pre}{rhs:{thread_len}}{rhs_post}|", end='')
+                    print(f"[{lhs_pre}{lhs:{thread_len}}{lhs_post}|{rhs_pre}{rhs:{thread_len}}{rhs_post}]", end='')
             print()
 
 show = []
