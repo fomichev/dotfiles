@@ -14,15 +14,15 @@ show = log -pvr
 st = status
 
 [extensions]
-record =
+#record =
 hgk =
 graphlog =
 rebase =
 color =
-pager =
+#pager =
 purge =
 mq =
-transplant =
+#transplant =
 
 [color]
 status.modified = magenta bold
@@ -51,3 +51,7 @@ nodates = True
 showfunc = True
 
 %include ~/local/.hgrc
+
+[isl]
+submitAsDraft = false
+pull-button-choice = "arc pull"
