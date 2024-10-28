@@ -225,6 +225,23 @@ enable_hw_gro() {
 	ssh root@$1 ethtool -K $DEV rx-gro-hw on
 }
 
+disable_hw_gro() {
+	want_arg1 "$@"
+
+	ssh root@$1 ethtool -K $DEV rx-gro-hw off
+}
+
+enable_irq_coal() {
+	ssh root@$1 "ethtool -C $DEV rx-usecs 33 rx-frames 88 tx-usecs 19 tx-frames 128"
+	ssh root@$1 "ethtool -c $DEV"
+}
+
+disable_irq_coal() {
+	ssh root@$1 "ethtool -C $DEV rx-usecs 0 rx-frames 0 tx-usecs 0 tx-frames 0"
+	#ssh root@$1 "ethtool -C $DEV rx-usecs 30 rx-frames 64 tx-usecs 20 tx-frames 64"
+	ssh root@$1 "ethtool -c $DEV"
+}
+
 set_mtu() {
 	want_arg1 "$@"
 
@@ -295,17 +312,9 @@ add_routes() {
 
 		echo ssh root@$PEER "ip -6 route add $HOST_IP dev $DEV via $via src $PEER_IP pref low"
 		echo ssh root@$HOST "ip -6 route add $PEER_IP dev $DEV via $via src $HOST_IP pref low"
-		ssh root@$PEER "ip -6 route add $HOST_IP dev $DEV via $via src $PEER_IP pref low" || :
-		ssh root@$HOST "ip -6 route add $PEER_IP dev $DEV via $via src $HOST_IP pref low" || :
-
-		# ip neigh show | grep b00c - take BE or FE lladdr
-		#root@twshared0506.04.eag5
-		#ip -6 neigh add 2401:db00:35a:c1e0:bace:0:22f:0 lladdr 76:d4:dd:2a:47:e9 dev beth2
-		#root@twshared0548.04.eag5
-		#ip -6 neigh add 2401:db00:35a:c1ee:bace:0:3e0:0 lladdr 76:d4:dd:2a:47:e9 dev beth2
+		ssh root@$PEER "ip -6 route add $HOST_IP dev $DEV via $via src $PEER_IP $EXTRA_ROUTE pref low" || :
+		ssh root@$HOST "ip -6 route add $PEER_IP dev $DEV via $via src $HOST_IP $EXTRA_ROUTE pref low" || :
 	fi
-
-	# TODO: add 4k MSS route?
 }
 
 ksft_copy() {
@@ -437,6 +446,12 @@ run_ssh() {
 	want_arg1 "$@"
 
 	ssh -t root@${1}
+}
+
+run_btop() {
+	want_arg1 "$@"
+
+	ssh -t root@${1} btop
 }
 
 run_strace() {
