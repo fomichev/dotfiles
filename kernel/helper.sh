@@ -90,26 +90,35 @@ fi
 # GENERIC
 
 main() {
+	local args
+	local cmd
+
 	for cmd in "$@"; do
 		# run command with $PEER as arg 1
 		if [[ "$cmd" == peer@* ]]; then
 			cmd=${cmd#peer@}
-			eval $cmd $PEER
+			args=$(echo "$cmd" | cut -d: -f2- | tr ":" " ")
+			cmd=$(echo "$cmd" | cut -d: -f1)
+			eval $cmd $PEER $args
 			continue
 		fi
 
 		# run command with $HOST as arg 1
 		if [[ "$cmd" == host@* ]]; then
 			cmd=${cmd#host@}
-			eval $cmd $HOST
+			args=$(echo "$cmd" | cut -d: -f2- | tr ":" " ")
+			cmd=$(echo "$cmd" | cut -d: -f1)
+			eval $cmd $HOST $args
 			continue
 		fi
 
 		# same as peer@cmd host@cmd
 		if [[ "$cmd" == both@* ]]; then
 			cmd=${cmd#both@}
-			eval $cmd $HOST
-			eval $cmd $PEER
+			args=$(echo "$cmd" | cut -d: -f2- | tr ":" " ")
+			cmd=$(echo "$cmd" | cut -d: -f1)
+			eval $cmd $HOST $args
+			eval $cmd $PEER $args
 			continue
 		fi
 
@@ -134,8 +143,15 @@ run_in_pane() {
 }
 
 want_arg1() {
-	if [ -z "$1" ]; then
+	if [ $# -lt 1 ]; then
 		echo "HOST/PEER not provided"
+		exit 1
+	fi
+}
+
+want_arg2() {
+	if [ $# -lt 2 ]; then
+		echo "extra argument not provided"
 		exit 1
 	fi
 }
@@ -229,6 +245,18 @@ disable_hw_gro() {
 	want_arg1 "$@"
 
 	ssh root@$1 ethtool -K $DEV rx-gro-hw off
+}
+
+enable_gro() {
+	want_arg1 "$@"
+
+	ssh root@$1 ethtool -K $DEV generic-receive-offload on
+}
+
+disable_gro() {
+	want_arg1 "$@"
+
+	ssh root@$1 ethtool -K $DEV generic-receive-offload off
 }
 
 enable_irq_coal() {
@@ -381,6 +409,7 @@ run_kperf() {
 	#args="$args --max-pace 2000000000" # 15Gbps
 	#args="$args --time 10"
 	#args="$args --time 30"
+	args="$args --time 300"
 	#args="$args -n 8"
 	#args="$args -n 16"
 
@@ -402,7 +431,9 @@ run_iperf3() {
 	want_no_args "$@"
 
 	local server="iperf3 -s -B ${HOST_IP}"
-	local client="iperf3 -c ${HOST_IP} -Z -l 1024K -t 60 --congestion cubic"
+	local client="iperf3 -c ${HOST_IP} -Z -l 1024K -t 3600 --congestion cubic"
+	#local client="iperf3 -c ${HOST_IP} -Z -l 1024K -t 3600 --congestion bbr"
+	#local client="iperf3 -c ${HOST_IP} -Z -l 1024K -t 60 --congestion cubic"
 	local reset="pkill iperf3"
 
 	run_in_pane iperf3 "$reset" "$server" "$client"
@@ -465,4 +496,28 @@ core_util() {
 
 	scp ~/src/dotfiles/kernel/bin/krn-core-layout root@${1}:
 	ssh -t root@${1} "./krn-core-layout -u"
+}
+
+run_skb_latency() {
+	want_arg1 "$@"
+	local h=$1
+	shift
+
+	pushd ~/src/skb_latency
+	scp skb_latency root@${h}: && ssh root@$h ./skb_latency "$@" | ./plot
+	popd
+}
+
+run_bpftrace() {
+	want_arg2 "$@"
+
+	local host="$1"
+	local script="$2"
+	shift
+	shift
+
+	# TODO: support extra args
+	set -- 2s
+
+	cat ~/src/dotfiles/kernel/bpftrace/${script}.bpftrace | ssh -t root@${host} "timeout -s INT $* bpftrace -"
 }
