@@ -286,7 +286,6 @@ require("lazy").setup({
 		config = function ()
 			local builtin = require("telescope.builtin")
 			local wk = require("which-key")
-			local bafa = require('bafa.ui')
 			wk.add({
 				{
 					"<leader>f",
@@ -303,15 +302,17 @@ require("lazy").setup({
 					builtin.grep_string,
 					desc = "Telescope grep cursor",
 				},
---				{
---					"<leader>b",
---					builtin.buffers,
---					desc = "Telescope buffers",
---				},
 				{
 					"<leader>b",
-					bafa.toggle,
-					desc = "Buffers",
+					function ()
+						builtin.buffers{
+							sort_mru = true,
+							sort_lastused = true,
+							initial_mode = "normal",
+
+						}
+					end,
+					desc = "Telescope buffers",
 				},
 				{
 					"<leader>h",
@@ -336,6 +337,13 @@ require("lazy").setup({
 							  "--line-number",
 							  "--column",
 							  "--smart-case"
+					},
+					mappings = {
+						n = {
+							["d"] = require("telescope.actions").delete_buffer,
+							["q"] = require("telescope.actions").close,
+
+						},
 					},
 				},
 			})
@@ -411,14 +419,6 @@ require("lazy").setup({
 		event = "InsertEnter",
 	},
 	{
-		"ThePrimeagen/harpoon",
-		branch = "harpoon2",
-		dependencies = {
-			"nvim-lua/plenary.nvim",
-			"nvim-telescope/telescope.nvim",
-		},
-	},
-	{
 		'nvim-lualine/lualine.nvim',
 		dependencies = { 'nvim-tree/nvim-web-devicons' }
 	},
@@ -432,7 +432,6 @@ require("lazy").setup({
 		event = "VeryLazy",
 		opts = {},
 	},
-	{ 'mistweaverco/bafa.nvim' },
 })
 
 -- local cmp_ai = require("cmp_ai.config")
@@ -542,9 +541,6 @@ require('lualine').setup({
 
 require('codecompanion-lualine')
 
-local harpoon = require('harpoon')
-harpoon:setup({})
-
 local cmp = require('cmp')
 cmp.setup({
 	snippet = {
@@ -613,41 +609,6 @@ vim.cmd[[
 
 local wk = require("which-key")
 wk.add({
-	{
-		"<leader>y",
-		function() harpoon:list():select(1) end,
-		desc = "Harpoon #1",
-		icon = "",
-	},
-	{
-		"<leader>u",
-		function() harpoon:list():select(2) end,
-		desc = "Harpoon #2",
-		icon = "",
-	},
-	{
-		"<leader>i",
-		function() harpoon:list():select(3) end,
-		desc = "Harpoon #3",
-		icon = "",
-	},
-	{
-		"<leader>o",
-		function() harpoon:list():select(4) end,
-		desc = "Harpoon #4",
-		icon = "",
-	},
-	{
-		"<leader>t",
-		function() harpoon:list():add() end,
-		desc = "Harpoon toggle",
-	},
-	{
-		"<leader>j",
-		function() harpoon.ui:toggle_quick_menu(harpoon:list()) end,
-		desc = "Harpoon jump",
-		icon = "󱋿",
-	},
 	{
 		"<leader>s",
 		":set nospell!<CR>",
