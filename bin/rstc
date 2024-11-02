@@ -52,6 +52,9 @@ backup_email() {
 	if [ ! -e $HOME/.mbsyncrc ]; then
 		return
 	fi
+	if [ ! -e /usr/bin/mbsync ]; then
+		return
+	fi
 	mbsync -a
 }
 
@@ -97,12 +100,12 @@ tail_journal() {
 
 do_notify() {
 	if command -v notify-send &> /dev/null; then
-		notify-send "$@"
+		notify-send "$@" || :
 	elif command -v telegram-send &> /dev/null; then
-		telegram-send "$@"
+		telegram-send "$@" || :
 	fi
 
-	$HOME/bin/systemd-email sdf@fomichev.me $SERVICE "$(hostname) backup $@"
+	$HOME/bin/systemd-email sdf@fomichev.me $SERVICE "$(hostname) backup $@" || :
 }
 
 # Started without arguments.
@@ -138,9 +141,11 @@ if [[ $# -eq 0 ]]; then
 	do_notify "finished"
 	docker_update
 	backup_email
-	system_upgrade
-	system_cleanup
-	system_pacnew
+	if [ -e /usr/bin/pacman ]; then
+		system_upgrade
+		system_pacnew
+		system_cleanup
+	fi
 	do_notify "updated"
 	trap - EXIT
 	exit
