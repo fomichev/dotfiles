@@ -303,7 +303,7 @@ require("lazy").setup({
 					desc = "Telescope grep cursor",
 				},
 				{
-					"r",
+					"m",
 					function ()
 						builtin.buffers{
 							sort_mru = true,
@@ -520,20 +520,33 @@ require('lualine').setup({
 		theme = 'base16',
 	},
 	sections = {
-		lualine_a = { { 'mode', right_padding = 2 }, },
-		lualine_b = { { 'filename', path = 1 }, 'branch', },
+		lualine_a = {
+			'mode',
+		},
+		lualine_b = {
+			{ 'filename', path = 1 },
+			'branch',
+		},
 		lualine_c = { '%=', },
 		lualine_x = {},
-		lualine_y = { 'filetype', 'progress' },
-		lualine_z = { { 'location', left_padding = 2 }, },
+		lualine_y = {
+			{
+				'buffers',
+				mode = 4,
+			},
+			'filetype',
+		},
+		lualine_z = {
+			'progress',
+		},
 	},
 	inactive_sections = {
-		lualine_a = { 'filename' },
+		lualine_a = {},
 		lualine_b = {},
 		lualine_c = {},
 		lualine_x = {},
 		lualine_y = {},
-		lualine_z = { 'location' },
+		lualine_z = {},
 	},
 	tabline = {},
 	extensions = {},
