@@ -303,7 +303,7 @@ require("lazy").setup({
 					desc = "Telescope grep cursor",
 				},
 				{
-					"<leader>b",
+					"r",
 					function ()
 						builtin.buffers{
 							sort_mru = true,
@@ -340,7 +340,7 @@ require("lazy").setup({
 					},
 					mappings = {
 						n = {
-							["d"] = require("telescope.actions").delete_buffer,
+							["dd"] = require("telescope.actions").delete_buffer,
 							["q"] = require("telescope.actions").close,
 
 						},
