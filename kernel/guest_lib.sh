@@ -574,11 +574,12 @@ bpftool_prog() {
 tcpx_loopback() {
 	local dev=eth0
 	local addr=192.168.1.4
+	#local addr_prefix=::ffff:
+	#local addr=fc00::1
 
 	ip addr add $addr dev $dev
 	ip link set $dev up
-	#local ret=$(echo -e "hello\nworld" | ./tools/testing/selftests/drivers/net/hw/ncdevmem -L -f $dev -s ::ffff:$addr -p 5201)
-	local ret=$(echo -e "hello\nworld" | ./tools/testing/selftests/drivers/net/hw/ncdevmem -L -f $dev -s $addr -p 5201)
+	local ret=$(echo -e "hello\nworld" | ./tools/testing/selftests/drivers/net/hw/ncdevmem -L -f $dev -s $addr_prefix$addr -p 5201)
 	echo "[$ret]"
 
 	local want=$(echo -e "hello\nworld")

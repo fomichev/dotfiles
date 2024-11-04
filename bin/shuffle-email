@@ -12,9 +12,9 @@ import sys
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--me', type=str, default='sdf@fomichev.me,stfomichev@gmail.com')
+parser.add_argument('--ignore', type=str, default='patchwork-bot+netdevbpf@kernel.org')
 parser.add_argument('--linux', type=str, default='/home/sdf/src/linux')
 parser.add_argument('--inbox', type=str, default='/home/sdf/Mail/all')
-# TODO: switch to "cur" eventually
 parser.add_argument('--archive', type=str, default='/home/sdf/Mail/archive/new')
 parser.add_argument('--dry', default=False, action='store_true')
 
@@ -53,6 +53,7 @@ def parse_dir(path):
             d['In-Reply-To'] = re.sub(r'[<>]', '', msg['In-Reply-To'])
         d['Subject'] = msg['Subject']
         d['To'] = msg['To']
+        d['From'] = msg['From']
 
         ret[mail] = d
 
@@ -84,10 +85,11 @@ def have_top_message(mbox, id2path, id):
 
     return False
 
-def flag_to_me(mbox, me):
+def flag_to_me(new, me):
+    mbox = parse_dir(new)
     for path in mbox:
-        for my_email in me:
-            if my_email in mbox[path]['To']:
+        for email in me:
+            if email in mbox[path]['To']:
                 if not flagged(path):
                     dst = path + "F"
                     if not args.dry:
@@ -106,8 +108,18 @@ def filter_out_flagged(mbox):
 
     return ret
 
-new = parse_dir(os.path.join(args.inbox, 'new'))
-flag_to_me(new, args.me.split(','))
+def unread_ignored(new, cur, ignore):
+    mbox = parse_dir(new)
+    for path in mbox:
+        for email in ignore:
+            if email in mbox[path]['From']:
+                dst = path.replace(new, cur)
+                if not args.dry:
+                    print(f'unread {path} -> {dst} (from {email})')
+                    shutil.move(path, dst)
+
+flag_to_me(os.path.join(args.inbox, 'new'), args.me.split(','))
+unread_ignored(os.path.join(args.inbox, 'new'), os.path.join(args.inbox, 'cur'), args.ignore.split(','))
 
 inbox = parse_mbox(args.inbox)
 inbox = filter_out_flagged(inbox)
