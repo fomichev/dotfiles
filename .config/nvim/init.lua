@@ -535,9 +535,10 @@ require('lualine').setup({
 				mode = 4,
 			},
 			'filetype',
+			'progress',
 		},
 		lualine_z = {
-			'progress',
+			'location',
 		},
 	},
 	inactive_sections = {
