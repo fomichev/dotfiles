@@ -19,12 +19,9 @@ prefer_system_python
 
 set -x
 
-#if [ ! "$(basename $KDIR)" = "linux" ]; then
-	#rm -f $KDIR/tools/testing/selftests/bpf/prog_tests/tests.h
-#fi
-
 cflags+=" -Wno-error=unused-function"
 cflags+=" -Wno-error=unused-variable"
+cflags+=" -Wformat-truncation"
 
 PREFIX=
 
@@ -39,5 +36,4 @@ if [ -z "$*" ]; then
 fi
 
 FORCE_TARGETS=1 \
-SAN_CFLAGS="$cflags" \
-$PREFIX make $SILENT -j$(nproc) -C tools/testing/selftests TARGETS="$*" LLVM=$LLVM
+$PREFIX make $SILENT -j$(nproc) -C tools/testing/selftests TARGETS="$*" LLVM=$LLVM USERCFLAGS="$cflags"
