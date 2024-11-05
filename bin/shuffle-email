@@ -15,7 +15,7 @@ parser.add_argument('--me', type=str, default='sdf@fomichev.me,stfomichev@gmail.
 parser.add_argument('--ignore', type=str, default='patchwork-bot+netdevbpf@kernel.org')
 parser.add_argument('--linux', type=str, default='/home/sdf/src/linux')
 parser.add_argument('--inbox', type=str, default='/home/sdf/Mail/all')
-parser.add_argument('--archive', type=str, default='/home/sdf/Mail/archive/new')
+parser.add_argument('--archive', type=str, default='/home/sdf/Mail/archive')
 parser.add_argument('--dry', default=False, action='store_true')
 
 args = parser.parse_args()
@@ -119,7 +119,7 @@ def unread_ignored(new, cur, ignore):
                     shutil.move(path, dst)
 
 flag_to_me(os.path.join(args.inbox, 'new'), args.me.split(','))
-unread_ignored(os.path.join(args.inbox, 'new'), os.path.join(args.inbox, 'cur'), args.ignore.split(','))
+unread_ignored(os.path.join(args.inbox, 'new'), os.path.join(args.archive, 'cur'), args.ignore.split(','))
 
 inbox = parse_mbox(args.inbox)
 inbox = filter_out_flagged(inbox)
@@ -140,6 +140,6 @@ for path in move:
 
 if not args.dry:
     for src in move:
-        dst = os.path.join(args.archive, os.path.basename(src))
+        dst = os.path.join(args.archive, 'new', os.path.basename(src))
         print(f'{src} -> {dst}')
         shutil.move(src, dst)
