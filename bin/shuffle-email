@@ -12,7 +12,7 @@ import sys
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--me', type=str, default='sdf@fomichev.me,stfomichev@gmail.com')
-parser.add_argument('--ignore', type=str, default='patchwork-bot+netdevbpf@kernel.org')
+parser.add_argument('--archive-seen', type=str, default='patchwork-bot+netdevbpf@kernel.org,lkp@intel.com')
 parser.add_argument('--linux', type=str, default='/home/sdf/src/linux')
 parser.add_argument('--inbox', type=str, default='/home/sdf/Mail/all')
 parser.add_argument('--archive', type=str, default='/home/sdf/Mail/archive')
@@ -64,9 +64,9 @@ def parse_mbox(path):
     new = parse_dir(os.path.join(path, 'new'))
     return cur | new
 
-def flagged(path):
+def flagged(path, flag):
     flags = path.split(',')[-1]
-    return 'F' in flags
+    return flag in flags
 
 def have_top_message(mbox, id2path, id):
     while True:
@@ -74,7 +74,7 @@ def have_top_message(mbox, id2path, id):
             return False
 
         path = id2path[id]
-        if flagged(path):
+        if flagged(path, 'F'):
             return true
 
         d = mbox[path]
@@ -90,7 +90,7 @@ def flag_to_me(new, me):
     for path in mbox:
         for email in me:
             if email in mbox[path]['To']:
-                if not flagged(path):
+                if not flagged(path, 'F'):
                     dst = path + "F"
                     if not args.dry:
                         shutil.move(path, dst)
@@ -102,24 +102,23 @@ def filter_out_flagged(mbox):
     ret = {}
 
     for key, val in mbox.items():
-        if flagged(key):
+        if flagged(key, 'F'):
             continue
         ret[key] = val
 
     return ret
 
-def unread_ignored(new, cur, ignore):
-    mbox = parse_dir(new)
-    for path in mbox:
-        for email in ignore:
-            if email in mbox[path]['From']:
-                dst = path.replace(new, cur)
-                if not args.dry:
-                    print(f'unread {path} -> {dst} (from {email})')
-                    shutil.move(path, dst)
+def move_all(move, subdir, seen):
+    for src in move:
+        dst = os.path.join(args.archive, subdir, os.path.basename(src))
+
+        if seen and not flagged(dst, 'S'):
+            dst = path + 'S'
+
+        print(f'{src} -> {dst}')
+        shutil.move(src, dst)
 
 flag_to_me(os.path.join(args.inbox, 'new'), args.me.split(','))
-unread_ignored(os.path.join(args.inbox, 'new'), os.path.join(args.archive, 'cur'), args.ignore.split(','))
 
 inbox = parse_mbox(args.inbox)
 inbox = filter_out_flagged(inbox)
@@ -129,17 +128,30 @@ id2path = {}
 for path, d in inbox.items():
     id2path[d['Message-Id']] = path
 
-move = []
+move_new = []
+move_seen = []
+archive_seen = args.archive_seen.split(',')
 
 for path in inbox:
     if not have_top_message(inbox, id2path, inbox[path]['Message-Id']):
-        move.append(path)
+        new = True
 
-for path in move:
-    print(f'move {path}: {inbox[path]["Subject"]}')
+        for email in archive_seen:
+            if email in inbox[path]['From']:
+                new = False
+                break
+
+        if new:
+            move_new.append(path)
+        else:
+            move_seen.append(path)
+
+for path in move_new:
+    print(f'move new {path}: {inbox[path]["Subject"]}')
+
+for path in move_seen:
+    print(f'move seen {path}: {inbox[path]["Subject"]}')
 
 if not args.dry:
-    for src in move:
-        dst = os.path.join(args.archive, 'new', os.path.basename(src))
-        print(f'{src} -> {dst}')
-        shutil.move(src, dst)
+    move_all(move_new, 'new', False)
+    move_all(move_seen, 'cur', True)
