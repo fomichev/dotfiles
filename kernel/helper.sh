@@ -77,6 +77,7 @@ if [ ! "$1" = "generate_spec" ]; then
 	[[ -z "$PEER_IP" ]] && { echo "PEER_IP is undefined - run generate_spec?"; exit 1; }
 fi
 
+NAME_SUFFIX=
 if $SWAP; then
 	tmp=$HOST
 	HOST=$PEER
@@ -85,6 +86,7 @@ if $SWAP; then
 	tmp=$HOST_IP
 	HOST_IP=$PEER_IP
 	PEER_IP=$tmp
+	NAME_SUFFIX=R
 fi
 
 # GENERIC
@@ -94,11 +96,12 @@ main() {
 	local cmd
 
 	for cmd in "$@"; do
+		args=$(echo "$cmd" | cut -d: -f2- | tr ":" " ")
+		cmd=$(echo "$cmd" | cut -d: -f1)
+
 		# run command with $PEER as arg 1
 		if [[ "$cmd" == peer@* ]]; then
 			cmd=${cmd#peer@}
-			args=$(echo "$cmd" | cut -d: -f2- | tr ":" " ")
-			cmd=$(echo "$cmd" | cut -d: -f1)
 			eval $cmd $PEER $args
 			continue
 		fi
@@ -106,8 +109,6 @@ main() {
 		# run command with $HOST as arg 1
 		if [[ "$cmd" == host@* ]]; then
 			cmd=${cmd#host@}
-			args=$(echo "$cmd" | cut -d: -f2- | tr ":" " ")
-			cmd=$(echo "$cmd" | cut -d: -f1)
 			eval $cmd $HOST $args
 			continue
 		fi
@@ -115,14 +116,16 @@ main() {
 		# same as peer@cmd host@cmd
 		if [[ "$cmd" == both@* ]]; then
 			cmd=${cmd#both@}
-			args=$(echo "$cmd" | cut -d: -f2- | tr ":" " ")
-			cmd=$(echo "$cmd" | cut -d: -f1)
 			eval $cmd $HOST $args
 			eval $cmd $PEER $args
 			continue
 		fi
 
-		eval $cmd
+		if [ "$cmd" = "$args" ]; then
+			args=""
+		fi
+
+		eval $cmd $args
 	done
 }
 
@@ -135,7 +138,7 @@ run_in_pane() {
 	echo "$server"
 	echo "$client"
 
-	local name="run_$name"
+	local name="run_$name$NAME_SUFFIX"
 	tmux new-window -n "$name" "ssh -t root@$HOST 'echo reset; $reset; echo run; $server; sleep 30'" &
 	sleep 5
 	tmux split-window -h -t $name "ssh -t root@$PEER 'echo reset; $reset; echo run; $client; sleep 30'"
@@ -260,14 +263,29 @@ disable_gro() {
 }
 
 enable_irq_coal() {
+	want_arg1 "$@"
+
 	ssh root@$1 "ethtool -C $DEV rx-usecs 33 rx-frames 88 tx-usecs 19 tx-frames 128"
 	ssh root@$1 "ethtool -c $DEV"
 }
 
 disable_irq_coal() {
+	want_arg1 "$@"
+
 	ssh root@$1 "ethtool -C $DEV rx-usecs 0 rx-frames 0 tx-usecs 0 tx-frames 0"
-	#ssh root@$1 "ethtool -C $DEV rx-usecs 30 rx-frames 64 tx-usecs 20 tx-frames 64"
 	ssh root@$1 "ethtool -c $DEV"
+}
+
+enable_gro_normal_batch() {
+	want_arg1 "$@"
+
+	ssh root@$1 "sysctl net.core.gro_normal_batch=8"
+}
+
+disable_gro_normal_batch() {
+	want_arg1 "$@"
+
+	ssh root@$1 "sysctl net.core.gro_normal_batch=1"
 }
 
 set_mtu() {
@@ -396,24 +414,25 @@ copy_kperf() {
 }
 
 run_kperf() {
-	want_no_args "$@"
-
 	local args=""
 	args="$args --pin-off 1"
 	args="$args --msg-trunc"
 	args="$args --msg-zerocopy"
+	args="$args $*"
 
 	#args="$args --tcp-cc=bbr"
 	#args="$args --tcp-cc=cubic"
 	#args="$args --tcp-cc=dctcp"
-	#args="$args --max-pace 2000000000" # 15Gbps
-	#args="$args --time 10"
-	#args="$args --time 30"
-	args="$args --time 300"
-	#args="$args -n 8"
-	#args="$args -n 16"
+	#args="$args --max-pace=2000000000" # 15Gbps
+	#args="$args --time=10"
+	#args="$args --time=30"
+	#args="$args --time=300"
+	#args="$args -n=8"
+	#args="$args -n=16"
 
-	local server="./server -a ${HOST_IP} --no-daemon"
+	#local server_args="--mrq"
+
+	local server="./server -a ${HOST_IP} --no-daemon $server_args"
 	local client="./server -a ${PEER_IP} --no-daemon & sleep 1; ./client --src ${PEER_IP} --dst ${HOST_IP} $args"
 	local reset="./server --kill"
 
@@ -431,10 +450,11 @@ run_iperf3() {
 	want_no_args "$@"
 
 	local server="iperf3 -s -B ${HOST_IP}"
-	local client="iperf3 -c ${HOST_IP} -Z -l 1024K -t 3600 --congestion cubic"
+	local client="iperf3 -c ${HOST_IP} -Z -l 1024K -t 3600" # --congestion cubic"
 	#local client="iperf3 -c ${HOST_IP} -Z -l 1024K -t 3600 --congestion bbr"
 	#local client="iperf3 -c ${HOST_IP} -Z -l 1024K -t 60 --congestion cubic"
 	local reset="pkill iperf3"
+	#local reset="echo ok"
 
 	run_in_pane iperf3 "$reset" "$server" "$client"
 }
@@ -498,13 +518,34 @@ core_util() {
 	ssh -t root@${1} "./krn-core-layout -u"
 }
 
+core_util_top() {
+	want_arg1 "$@"
+
+	scp ~/src/dotfiles/kernel/bin/krn-core-layout root@${1}:
+	ssh -t root@${1} "./krn-core-layout -u -t 5"
+}
+
+core_perf() {
+	want_arg2 "$@"
+	local cpu=$2
+	ssh -t root@$1 "perf record -g -C $cpu -- sleep 5"
+	ssh -t root@$1 perf report --children
+}
+
 run_skb_latency() {
 	want_arg1 "$@"
 	local h=$1
 	shift
 
 	pushd ~/src/skb_latency
-	scp skb_latency root@${h}: && ssh root@$h ./skb_latency "$@" | ./plot
+
+	local scale="us"
+
+	#if echo "$*" | grep -q "-s 1"; then
+		scale="ns"
+	#fi
+
+	scp skb_latency root@${h}: && ssh root@$h ./skb_latency "$@" | ./plot -s $scale
 	popd
 }
 

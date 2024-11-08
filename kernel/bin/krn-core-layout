@@ -13,6 +13,8 @@ parser.add_argument('-c', '--cols_per_line', type=int, default=8)
 parser.add_argument('--cpuinfo', type=str, default='/proc/cpuinfo')
 parser.add_argument('--stat', type=str, default='/proc/stat')
 parser.add_argument('-u', '--utilization', action='store_true')
+parser.add_argument('-t', '--top', type=int)
+parser.add_argument('-1', '--once', action='store_true')
 
 args = parser.parse_args()
 
@@ -106,15 +108,53 @@ def range_to_symbol(val):
 
     return sym
 
-def utilization(before, after, cpu):
-    diff = diff_cpuload(before[cpu], after[cpu])
+def irq_idle_sys(before, after):
+    diff = diff_cpuload(before, after)
     diff_totl = sum(diff.values())
 
     irq = (diff['irq'] + diff['softirq']) * 100 // diff_totl
     idle = diff['idle'] * 100 // diff_totl
     system = (diff['system'] + diff['iowait']) * 100 // diff_totl
 
+    return irq, idle, system
+
+def utilization_bars(irq, idle, system):
     return range_to_symbol(100 - idle) + red(range_to_symbol(irq)) + yellow(range_to_symbol(system))
+
+def find_sibling(sockets, want_cpu):
+    for socket in sockets:
+        for core in sockets[socket]:
+            for cpu in sockets[socket][core]:
+                if want_cpu == cpu:
+                    return sockets[socket][core]
+    return None
+
+def print_top(sockets, cpuload_before, cpuload_after, n):
+    util = {}
+    util_list = []
+
+    for socket in sockets:
+        for core in sockets[socket]:
+            for cpu in sockets[socket][core]:
+                irq, idle, system = irq_idle_sys(before[cpu], after[cpu])
+                util[cpu] = (irq, idle, system)
+                util_list.append((cpu, irq, idle, system))
+
+    util_list = sorted(util_list, key=lambda x: x[2])
+    for i in util_list:
+        cpu, irq, idle, system = i
+        user = 100 - idle - system - irq
+
+        core = find_sibling(sockets, cpu)
+        lhs = utilization_bars(*util[core[0]])
+        rhs = utilization_bars(*util[core[1]])
+        print(f"cpu {cpu:{thread_len}} idle {idle:3}% irq {irq:3}% sys {system:3}% usr {user:3}% [{lhs}|{rhs}]")
+
+        n -= 1
+        if n <= 0:
+            break
+
+    print()
 
 def print_layout(sockets, cpuload_before, cpuload_after):
     now = datetime.datetime.now()
@@ -162,10 +202,10 @@ def print_layout(sockets, cpuload_before, cpuload_after):
                             break
 
                 if cpuload_before and cpuload_after:
-                    lhs = utilization(before, after, lhs)
+                    lhs = utilization_bars(*irq_idle_sys(before[lhs], after[lhs]))
 
                     if len(core) > 1:
-                        rhs = utilization(before, after, rhs)
+                        rhs = utilization_bars(*irq_idle_sys(before[rhs], after[rhs]))
                     #print(f"{lhs} {rhs}|", end='')
                     print(f"[{lhs}|{rhs}]", end='')
                 else:
@@ -193,7 +233,13 @@ if args.utilization:
     while True:
         time.sleep(1)
         after = read_cpuload(args.stat)
-        print_layout(layout, before, after)
+        if args.top:
+            print_top(layout, before, after, args.top)
+        else:
+            print_layout(layout, before, after)
         before = after
 
-print_layout(layout, None, None)
+        if args.once:
+            break
+else:
+    print_layout(layout, None, None)
