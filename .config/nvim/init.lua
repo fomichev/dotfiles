@@ -606,14 +606,6 @@ end
 --  },
 --}
 
-vim.cmd[[
-	let @a = 'iAcked-by: Stanislav Fomichev <sdf@fomichev.me>'
-	let @r = 'iReviewed-by: Stanislav Fomichev <sdf@fomichev.me>'
-	let @t = 'iTested-by: Stanislav Fomichev <sdf@fomichev.me>'
-	let @d = "i---\npw-bot: cr"
-	let @c = "i-----BEGIN COVER LETTER-----\n-----END COVER LETTER-----"
-]]
-
 -- Local local vimrc
 vim.cmd[[
 	if filereadable(expand($HOME) . "/local/nvim.lua")
@@ -643,6 +635,41 @@ wk.add({
 		"<leader>d",
 		vim.diagnostic.setloclist,
 		desc = "LSP diagnostics",
+	},
+	{
+		"<leader>ia",
+		function()
+			vim.api.nvim_put({'Acked-by: Stanislav Fomichev <sdf@fomichev.me>'}, 'l', true, true)
+		end,
+		desc = "Acked-by",
+	},
+	{
+		"<leader>ir",
+		function()
+			vim.api.nvim_put({'Reviewed-by: Stanislav Fomichev <sdf@fomichev.me>'}, 'l', true, true)
+		end,
+		desc = "Reviewed-by",
+	},
+	{
+		"<leader>it",
+		function()
+			vim.api.nvim_put({'Tested-by: Stanislav Fomichev <sdf@fomichev.me>'}, 'l', true, true)
+		end,
+		desc = "Tested-by",
+	},
+	{
+		"<leader>ic",
+		function()
+			vim.api.nvim_put({'---', 'pw-bot: cr'}, 'l', true, true)
+		end,
+		desc = "pw-bot: cr",
+	},
+	{
+		"<leader>il",
+		function()
+			vim.api.nvim_put({'-----BEGIN COVER LETTER-----', '-----END COVER LETTER-----'}, 'l', true, true)
+		end,
+		desc = "BEGIN COVER LETTER",
 	},
 })
 
