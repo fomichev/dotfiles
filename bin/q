@@ -11,7 +11,7 @@ QEMU_MACH="accel=kvm:tcg" # q35 for pass-through
 
 #NRCPU=${NRCPU:-4}
 #MEMORY=${MEMORY:-8192}
-NRCPU=${NRCPU:-1}
+NRCPU=${NRCPU:-4}
 MEMORY=${MEMORY:-1024}
 TAP_QUEUES=${TAP_QUEUES:-$NRCPU}
 TAP_MQ=${TAP_MQ:-true}
@@ -39,6 +39,7 @@ IMAGE_INIT="/sbin/init.real"
 SCRIPT=${SCRIPT:-}
 ENVIRON_ARG=${ENVIRON_ARG:-}
 MY_ARCH=$(uname -m)
+USE_KVM=${USE_KVM:-false}
 
 QUIET=${QUIET:-false}
 GDB=${GDB:-false}
@@ -47,8 +48,8 @@ MODULES=${MODULES:-false}
 TTY=${TTY:-ttyS0}
 SSH=${SSH:-false}
 FWD_PORT=${FWD_PORT:-}
-NET_USER=${NET_USER:-true}
-NET_TAP=${NET_TAP:-false}
+NET_USER=${NET_USER:-false}
+NET_TAP=${NET_TAP:-true}
 NET_VHOST=${NET_VHOST:-false}
 # }}}
 
@@ -168,8 +169,10 @@ host() {
 
 	local accel
 	if [[ "${MY_ARCH}" = "${ARCH}" ]]; then
-		accel+=" -machine $QEMU_MACH"
-		accel+=" -enable-kvm"
+		if $USE_KVM; then
+			accel+=" -machine $QEMU_MACH"
+			accel+=" -enable-kvm"
+		fi
 	fi
 
 	fixup host
@@ -179,7 +182,11 @@ host() {
 	case "${ARCH}" in
 		x86_64)
 			if [[ "${MY_ARCH}" = "${ARCH}" ]]; then
-				cpu="host"
+				if $USE_KVM; then
+					cpu="host"
+				else
+					cpu="max"
+				fi
 			fi
 			;;
 		arm64)
