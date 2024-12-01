@@ -577,35 +577,17 @@ tcpx_loopback() {
 	#local addr_prefix=::ffff:
 	#local addr=fc00::1
 
-	ip addr add $addr dev $dev
-	ip link set $dev up
-	local ret=$(echo -e "hello\nworld" | ./tools/testing/selftests/drivers/net/hw/ncdevmem -L -f $dev -s $addr_prefix$addr -p 5201)
-	echo "[$ret]"
-
-	local want=$(echo -e "hello\nworld")
-	if [ "$ret" != "$want" ]; then
-		echo "FAIL!"
-		exit 1
-	fi
-}
-
-tcpx_loopback_large() {
-	local dev=eth0
-	local addr=192.168.1.4
-	local bin=./tools/testing/selftests/drivers/net/ncdevmem
+	cat /dev/urandom | tr -dc '[:print:]' | head -c 1M > random_file.txt
+	#cat /dev/urandom | tr -dc '[:print:]' | head -c 128K > random_file.txt
+	#echo -e "hello\nworld" > random_file.txt
 
 	ip addr add $addr dev $dev
 	ip link set $dev up
-
-	local length=$(( 1024 * 1024 ))
-	local random_string=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w $length | head -n 1)
-	echo "$random_string" > input.txt
-
-	local ret=$(cat input.txt | $bin -L -f $dev -s ::ffff:$addr -p 5201)
-	local want=$(cat input.txt)
-
-	echo "[$ret]"
-	if [ "$ret" != "$want" ]; then
+	cat random_file.txt | ./tools/testing/selftests/drivers/net/hw/ncdevmem -L -f $dev -s $addr_prefix$addr -p 5201 > random_file2.txt
+	local got=$(cat random_file2.txt | sha256sum -)
+	local want=$(cat random_file.txt | sha256sum -)
+	echo "['$got' vs '$want']"
+	if [ "$got" != "$want" ]; then
 		echo "FAIL!"
 		exit 1
 	fi
