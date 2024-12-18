@@ -88,3 +88,5 @@
 
 [include]
 	path = ~/local/.gitconfig
+[http "https://git.internal.tfbnw.net/"]
+	sslCert = /var/facebook/credentials/sdf/x509/sdf.pem

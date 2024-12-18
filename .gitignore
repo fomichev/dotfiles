@@ -40,6 +40,7 @@ bin/monarch-policies
 .config/ardour8/
 .config/autostart/
 .config/brasero/
+.config/btop/
 .config/calibre/
 .config/ccache/
 .config/cef_user_data/

@@ -7,6 +7,8 @@ GPU=$GPU0
 HOST_IP=$HOST0_IP
 PEER_IP=$PEER0_IP
 
+KSFT_DIR="drivers/net/hw"
+
 while getopts "0123456789r" opt; do
 	case $opt in
 		r) SWAP=true ;;
@@ -322,17 +324,13 @@ stop_networkd() {
 }
 
 add_lladdr() {
-	want_no_args "$@"
+	local lladdr=$(ssh root@$HOST ip -6 neigh show dev $DEV | grep b00c | awk '{print $3}')
 
-	if [ ! "$DEV" = "eth0" ]; then
-		local lladdr=$(ssh root@$HOST ip -6 neigh show dev $DEV | grep b00c | awk '{print $3}')
+	echo ssh root@$HOST "ip -6 neigh add $PEER_IP lladdr $lladdr dev $DEV"
+	echo ssh root@$PEER "ip -6 neigh add $HOST_IP lladdr $lladdr dev $DEV"
 
-		echo ssh root@$HOST "ip -6 neigh add $PEER_IP lladdr $lladdr dev $DEV"
-		echo ssh root@$PEER "ip -6 neigh add $HOST_IP lladdr $lladdr dev $DEV"
-
-		echo "ip -6 neigh add $PEER_IP lladdr $lladdr dev $DEV"
-		echo "ip -6 neigh add $HOST_IP lladdr $lladdr dev $DEV"
-	fi
+	echo "ip -6 neigh add $PEER_IP lladdr $lladdr dev $DEV"
+	echo "ip -6 neigh add $HOST_IP lladdr $lladdr dev $DEV"
 }
 
 add_ssh_keys() {
@@ -344,35 +342,33 @@ add_ssh_keys() {
 }
 
 add_routes() {
-	want_no_args "$@"
+	local via="fe80::face:b00c"
+	local pref="high"
 
-	if [ ! "$DEV" = "eth0" ]; then
-		local via="fe80::face:b00c"
-
-		if [[ "$DEV" == beth* ]]; then
-			local via="fe80::be:face:b00c"
-		fi
-
-		ssh root@$PEER "ip -6 route del $HOST_IP dev $DEV src $PEER_IP" || :
-		ssh root@$HOST "ip -6 route del $PEER_IP dev $DEV src $HOST_IP" || :
-
-		echo ssh root@$PEER "ip -6 route add $HOST_IP dev $DEV via $via src $PEER_IP pref low"
-		echo ssh root@$HOST "ip -6 route add $PEER_IP dev $DEV via $via src $HOST_IP pref low"
-		ssh root@$PEER "ip -6 route add $HOST_IP dev $DEV via $via src $PEER_IP $EXTRA_ROUTE pref low" || :
-		ssh root@$HOST "ip -6 route add $PEER_IP dev $DEV via $via src $HOST_IP $EXTRA_ROUTE pref low" || :
+	if [[ "$DEV" == beth* ]]; then
+		local via="fe80::be:face:b00c"
 	fi
+
+	ssh root@$PEER "ip -6 route del $HOST_IP dev $DEV src $PEER_IP" || :
+	ssh root@$HOST "ip -6 route del $PEER_IP dev $DEV src $HOST_IP" || :
+
+	echo ssh root@$PEER "ip -6 route add $HOST_IP dev $DEV via $via src $PEER_IP $EXTRA_ROUTE pref $pref"
+	echo ssh root@$HOST "ip -6 route add $PEER_IP dev $DEV via $via src $HOST_IP $EXTRA_ROUTE pref $pref"
+	ssh root@$PEER "ip -6 route add $HOST_IP dev $DEV via $via src $PEER_IP $EXTRA_ROUTE pref $pref" || :
+	ssh root@$HOST "ip -6 route add $PEER_IP dev $DEV via $via src $HOST_IP $EXTRA_ROUTE pref $pref" || :
 }
 
 ksft_copy() {
 	want_no_args "$@"
 
 	pushd $LINUX
+	echo make
 	make \
 		-C tools/testing/selftests \
-		TARGETS="drivers/net" \
+		TARGETS="$KSFT_DIR" \
 		install INSTALL_PATH=~/tmp/ksft
 	rsync -ra --delete ~/tmp/ksft root@${HOST}:
-	rsync -ra --delete ~/tmp/ksft root@${PEER}:
+	#rsync -ra --delete ~/tmp/ksft root@${PEER}:
 	popd
 }
 
@@ -388,8 +384,8 @@ ksft_tcpx() {
 	cfg+="REMOTE_TYPE=ssh\n"
 	cfg+="REMOTE_ARGS=root@${PEER}\n"
 
-	echo -e "$cfg" | ssh root@$HOST "cat > ksft/drivers/net/net.config"
-	ssh root@$HOST "export PATH=/bin:/usr/bin:/usr/sbin; cd ksft && ./run_kselftest.sh -t drivers/net:devmem.py"
+	echo -e "$cfg" | ssh root@$HOST "cat > ksft/$KSFT_DIR/net.config"
+	ssh root@$HOST "export PATH=/bin:/usr/bin:/usr/sbin; cd ksft && ./run_kselftest.sh -t ${KSFT_DIR}:devmem.py"
 
 	popd
 }
@@ -416,8 +412,10 @@ copy_kperf() {
 run_kperf() {
 	local args=""
 	args="$args --pin-off 1"
-	args="$args --msg-trunc"
+	#args="$args --msg-trunc"
+	args="$args --devmem-rx"
 	args="$args --msg-zerocopy"
+	#args="$args --udmabuf-size-mb=64"
 	args="$args $*"
 
 	#args="$args --tcp-cc=bbr"
@@ -527,8 +525,11 @@ core_util_top() {
 
 core_perf() {
 	want_arg2 "$@"
+
 	local cpu=$2
-	ssh -t root@$1 "perf record -g -C $cpu -- sleep 5"
+	local sleep=2
+
+	ssh -t root@$1 "perf record -g -C $cpu -- sleep $sleep"
 	ssh -t root@$1 perf report --children
 }
 

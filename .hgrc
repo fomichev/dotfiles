@@ -53,5 +53,5 @@ showfunc = True
 %include ~/local/.hgrc
 
 [isl]
-submitAsDraft = false
+submitAsDraft = true
 pull-button-choice = "arc pull"

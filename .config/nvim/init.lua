@@ -137,21 +137,6 @@ vim.keymap.set("n", "N", "Nzzzv")
 -- E (Explore) clashes with something else
 vim.api.nvim_create_user_command("E", "Explore", { nargs = 0})
 
-vim.api.nvim_create_autocmd({ "BufRead", "BufNew" }, {
-	pattern = "*.md",
-	command = "setlocal filetype=markdown"
-})
-
-vim.api.nvim_create_autocmd({ "BufRead", "BufNew" }, {
-	pattern = "*.cls",
-	command = "setlocal filetype=tex"
-})
-
-vim.api.nvim_create_autocmd({ "BufRead", "BufNew" }, {
-	pattern = "*.h",
-	command = "setlocal filetype=c"
-})
-
 -- CursorHold timeout
 vim.o.updatetime = 500
 
@@ -587,7 +572,7 @@ cmp.setup({
 -- Load base16 color scheme
 local current_theme_name = os.getenv('BASE16_THEME')
 if current_theme_name and vim.g.colors_name ~= 'base16-'..current_theme_name then
-	vim.cmd('let base16colorspace=256')
+	vim.cmd('let base16_colorspace=256')
 	vim.cmd('colorscheme base16-'..current_theme_name)
 end
 
