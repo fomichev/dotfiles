@@ -458,8 +458,7 @@ require("oil").setup({
 	},
 })
 
---local adapter = "ollama"
-local adapter = "copilot"
+local adapter = "ollama" -- "copilot"
 
 require("codecompanion").setup({
 	strategies = {
