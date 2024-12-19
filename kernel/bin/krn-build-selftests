@@ -32,7 +32,7 @@ PREFIX=
 #$PREFIX make $SILENT -j$(nproc) -C tools/bpf/bpftool LLVM=$LLVM "$@"
 
 if [ -z "$*" ]; then
-	set -- "net" "drivers/net" "drivers/net/hw"
+	set -- "net" "drivers/net" "drivers/net/hw" "bpf"
 fi
 
 FORCE_TARGETS=1 \

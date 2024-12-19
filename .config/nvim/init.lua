@@ -216,6 +216,7 @@ local lsp_on_attach = function(client, bufnr)
 end
 
 require("lazy").setup({
+	"github/copilot.vim", -- :Copilot
 	"will133/vim-dirdiff",
 	"tinted-theming/base16-vim",
 	{
@@ -353,7 +354,7 @@ require("lazy").setup({
 					mode = { "n", "v" },
 					{
 						"<leader>x",
-						":CodeCompanionToggle<CR>",
+						":CodeCompanionChat Toggle<CR>",
 						desc = "Code companion",
 					icon = " ",
 					},
@@ -457,16 +458,19 @@ require("oil").setup({
 	},
 })
 
+--local adapter = "ollama"
+local adapter = "copilot"
+
 require("codecompanion").setup({
 	strategies = {
 		chat = {
-			adapter = "ollama",
+			adapter = adapter,
 		},
 		inline = {
-			adapter = "ollama",
+			adapter = adapter,
 		},
 		agent = {
-			adapter = "ollama",
+			adapter = adapter,
 		},
 	},
 	adapters = {
