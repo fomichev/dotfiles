@@ -216,7 +216,7 @@ local lsp_on_attach = function(client, bufnr)
 end
 
 require("lazy").setup({
-	"github/copilot.vim", -- :Copilot
+	-- "github/copilot.vim", -- :Copilot
 	"will133/vim-dirdiff",
 	"tinted-theming/base16-vim",
 	{
