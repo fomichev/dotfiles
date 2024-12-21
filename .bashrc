@@ -35,6 +35,7 @@ fi
 
 export SYSTEMD_EDITOR=$EDITOR
 export BROWSER=w3m
+export OPENAI_API_KEY=x
 
 try_source ~/.bash_aliases
 

@@ -215,8 +215,13 @@ local lsp_on_attach = function(client, bufnr)
 	end
 end
 
+vim.g.copilot_filetypes = {
+	["*"] = false,
+	text = true,
+	mail = true,
+}
+
 require("lazy").setup({
-	-- "github/copilot.vim", -- :Copilot
 	"will133/vim-dirdiff",
 	"tinted-theming/base16-vim",
 	{
@@ -396,10 +401,10 @@ require("lazy").setup({
 	"hrsh7th/cmp-nvim-lsp", -- completions from language server
 	"hrsh7th/cmp-buffer", -- completions from buffer content
 	"hrsh7th/cmp-path", -- completions for filesystem paths
-	{
-		"tzachar/cmp-ai",
-		dependencies = "nvim-lua/plenary.nvim",
-	},
+--	{
+--		"tzachar/cmp-ai",
+--		dependencies = "nvim-lua/plenary.nvim",
+--	},
 	{
 		"hrsh7th/nvim-cmp",
 		event = "InsertEnter",
@@ -418,6 +423,93 @@ require("lazy").setup({
 		event = "VeryLazy",
 		opts = {},
 	},
+	"github/copilot.vim",
+--	{
+--		'milanglacier/minuet-ai.nvim',
+--		dependencies = { "nvim-lua/plenary.nvim" },
+--		config = function()
+--			require('minuet').setup {
+--				--provider = 'openai_fim_compatible',
+--				provider = 'openai_compatible',
+--				provider_options = {
+--					openai_compatible = {
+--						model = 'llama3.2:1b-text-q4_0',
+--						--system = "Complete the following text",
+--						--few_shots = "Complete the following text",
+--						end_point = 'http://localhost:11434/v1/chat/completions',
+--						api_key = 'OPENAI_API_KEY',
+--						name = 'minuet',
+--						stream = true,
+--						optional = {
+--							max_tokens = 256,
+--							stop = { '\n\n' },
+--							--stop = nil,
+--							--max_tokens = nil,
+--						},
+--					},
+--					openai_fim_compatible = {
+--						model = 'qwen2.5-coder:1.5b',
+--						end_point = 'http://localhost:11434/v1/completions',
+--						api_key = 'OPENAI_API_KEY',
+--						name = 'minuet',
+--						stream = true,
+--						optional = {
+--							max_tokens = 256,
+--							stop = { '\n\n' },
+--							--stop = nil,
+--							--max_tokens = nil,
+--						},
+--					},
+--				},
+--				virtualtext = {
+--					auto_trigger_ft = {'c', 'markdown', 'mail', 'text'},
+--					keymap = {
+--						accept = '<A-A>',
+--						accept_line = '<A-a>',
+--						-- Cycle to prev completion item, or manually invoke completion
+--						prev = '<A-[>',
+--						-- Cycle to next completion item, or manually invoke completion
+--						next = '<A-]>',
+--						dismiss = '<A-e>',
+--					},
+--				},
+--			}
+--		end,
+--	},
+--	{
+--		"huggingface/llm.nvim",
+--		opts = {
+--			backend = "ollama",
+--			--model = "qwen2.5-coder:1.5b-base",
+--			--model = "qwen2.5-coder:7b",
+--			model = "starcoder2",
+--			url = "http://localhost:11434",
+--			lsp = {
+--				cmd_env = { LLM_LOG_LEVEL = "DEBUG" }
+--			},
+--			request_body = {
+--				temperature = 0.2,
+--				top_p = 0.95,
+--				num_predict = 100,
+--			},
+--			fim = {
+--				enabled = true,
+--			},
+----			fim = {
+----				enabled = true,
+----				prefix = "<PRE>",
+----				suffix = "<SUF>",
+----				middle = "<MID>",
+----			},
+----			fim = {
+----				enabled = true,
+----				prefix = "<fim_prefix>",
+----				suffix = "<fim_suffix>",
+----				middle = "<fim_middle>",
+----			},
+--
+--		},
+--	},
 })
 
 -- local cmp_ai = require("cmp_ai.config")
@@ -426,8 +518,8 @@ require("lazy").setup({
 -- 	provider = "Ollama",
 -- 	provider_options = {
 -- 		-- {{- if .Suffix }}<|fim_prefix|>{{ .Prompt }}<|fim_suffix|>{{ .Suffix }}<|fim_middle|>{{ else ... }}
--- 		model = "qwen2.5-coder:7b",
--- 		--model = "qwen2.5-coder:1.5b",
+---             model = "qwen2.5-coder:7b",
+---             --model = "qwen2.5-coder:1.5b",
 -- 		prompt = function(lines_before, lines_after)
 -- 			return lines_before
 -- 		end,
@@ -504,9 +596,9 @@ require("codecompanion").setup({
 })
 
 require('lualine').setup({
-	options = {
-		theme = 'base16',
-	},
+--	options = {
+--		theme = 'base16',
+--	},
 	sections = {
 		lualine_a = {
 			'mode',
@@ -569,6 +661,7 @@ cmp.setup({
 		{ name = "nvim_lsp" },
 		{ name = "buffer" },
 		{ name = "path" },
+		--{ name = 'cmp_ai' },
 	},
 })
 
