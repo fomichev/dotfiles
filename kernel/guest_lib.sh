@@ -577,13 +577,15 @@ tcpx_loopback() {
 	#local addr_prefix=::ffff:
 	#local addr=fc00::1
 
+	local client="-c $addr"
+
 	cat /dev/urandom | tr -dc '[:print:]' | head -c 1M > random_file.txt
 	#cat /dev/urandom | tr -dc '[:print:]' | head -c 128K > random_file.txt
 	#echo -e "hello\nworld" > random_file.txt
 
 	ip addr add $addr dev $dev
 	ip link set $dev up
-	cat random_file.txt | ./tools/testing/selftests/drivers/net/hw/ncdevmem -L -f $dev -s $addr_prefix$addr -p 5201 > random_file2.txt
+	cat random_file.txt | ./tools/testing/selftests/drivers/net/hw/ncdevmem -L -f $dev $client -s $addr_prefix$addr -p 5201 > random_file2.txt
 	local got=$(cat random_file2.txt | sha256sum -)
 	local want=$(cat random_file.txt | sha256sum -)
 	echo "['$got' vs '$want']"
