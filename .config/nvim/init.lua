@@ -228,9 +228,32 @@ require("lazy").setup({
 	"will133/vim-dirdiff",
 	"tinted-theming/base16-vim",
 	{
+		'saghen/blink.cmp',
+		version = '*',
+
+		opts = {
+			keymap = { preset = 'default' },
+			appearance = {
+				use_nvim_cmp_as_default = true,
+				nerd_font_variant = 'mono',
+			},
+			sources = {
+				default = { 'lsp', 'path', 'snippets', 'buffer' },
+			},
+			completion = {
+				documentation = {
+					auto_show = true,
+					auto_show_delay_ms = 500,
+				},
+			},
+		},
+		opts_extend = { "sources.default" },
+	},
+	{
 		"neovim/nvim-lspconfig",
+		dependencies = { 'saghen/blink.cmp' },
 		config = function ()
-			local capabilities = require("cmp_nvim_lsp").default_capabilities()
+			local capabilities = require('blink.cmp').get_lsp_capabilities()
 
 			require"lspconfig".clangd.setup{
 				capabilities = capabilities,
@@ -348,7 +371,6 @@ require("lazy").setup({
 		dependencies = {
 			"nvim-lua/plenary.nvim",
 			"nvim-treesitter/nvim-treesitter",
-			"hrsh7th/nvim-cmp",
 			{
 				"stevearc/dressing.nvim",
 				opts = {},
@@ -400,13 +422,6 @@ require("lazy").setup({
 				},
 			})
 		end,
-	},
-	"hrsh7th/cmp-nvim-lsp", -- completions from language server
-	"hrsh7th/cmp-buffer", -- completions from buffer content
-	"hrsh7th/cmp-path", -- completions for filesystem paths
-	{
-		"hrsh7th/nvim-cmp",
-		event = "InsertEnter",
 	},
 	{
 		'nvim-lualine/lualine.nvim',
@@ -522,29 +537,6 @@ require('lualine').setup({
 })
 
 require('codecompanion-lualine')
-
-local cmp = require('cmp')
-cmp.setup({
-	snippet = {
-		expand = function(args)
-			vim.snippet.expand(args.body)
-		end,
-	},
-	window = {},
-	mapping = cmp.mapping.preset.insert({
-		['<C-Space>'] = cmp.mapping(
-			cmp.mapping.complete({}),
-			{ 'i' }
-		),
-		['<C-b>'] = cmp.mapping.scroll_docs(-4),
-		['<C-f>'] = cmp.mapping.scroll_docs(4),
-	}),
-	sources = {
-		{ name = "nvim_lsp" },
-		{ name = "buffer" },
-		{ name = "path" },
-	},
-})
 
 -- Load base16 color scheme
 local current_theme_name = os.getenv('BASE16_THEME')

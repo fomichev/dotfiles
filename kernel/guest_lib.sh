@@ -571,7 +571,7 @@ bpftool_prog() {
 }
 
 
-tcpx_loopback() {
+__tcpx_loopback() {
 	local dev=eth0
 	local addr=192.168.1.4
 	#local addr_prefix=::ffff:
@@ -585,7 +585,7 @@ tcpx_loopback() {
 
 	ip addr add $addr dev $dev
 	ip link set $dev up
-	cat random_file.txt | ./tools/testing/selftests/drivers/net/hw/ncdevmem -L -f $dev $client -s $addr_prefix$addr -p 5201 > random_file2.txt
+	cat random_file.txt | ./tools/testing/selftests/drivers/net/hw/ncdevmem -L -f $dev $client -s $addr_prefix$addr -p 5201 "$@" > random_file2.txt
 	local got=$(cat random_file2.txt | sha256sum -)
 	local want=$(cat random_file.txt | sha256sum -)
 	echo "['$got' vs '$want']"
@@ -593,6 +593,14 @@ tcpx_loopback() {
 		echo "FAIL!"
 		exit 1
 	fi
+}
+
+tcpx_loopback() {
+	__tcpx_loopback
+}
+
+tcpx_loopback_chunked() {
+	__tcpx_loopback -b 2039
 }
 
 tcpx_selftest() {
