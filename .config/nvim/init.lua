@@ -239,6 +239,7 @@ require("lazy").setup({
 			},
 			sources = {
 				default = { 'lsp', 'path', 'snippets', 'buffer' },
+				cmdline = {},
 			},
 			completion = {
 				documentation = {
