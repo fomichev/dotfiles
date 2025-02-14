@@ -552,6 +552,21 @@ netdev_sim() {
 	ethtool -g eth0
 }
 
+all_net() {
+	make -C tools/testing/selftests TARGETS=net run_tests
+	#make -C tools/testing/selftests TARGETS=net/forwarding run_tests
+
+	#make -C tools/testing/selftests TARGETS=drivers/net run_tests
+	#make -C tools/testing/selftests TARGETS=drivers/net/bonding run_tests
+	#make -C tools/testing/selftests TARGETS=drivers/net/dsa run_tests
+	#make -C tools/testing/selftests TARGETS=drivers/net/netdevsim run_tests
+	#make -C tools/testing/selftests TARGETS=drivers/net/team run_tests
+}
+
+all_bpf() {
+	make -C tools/testing/selftests TARGETS=bpf run_tests
+}
+
 ynl_cli() {
 	ip6tables -I OUTPUT -o lo -p sctp --sport 10123 -j LOG
 	ip6tables -A OUTPUT -o lo -p sctp --sport 10123 -j DROP
