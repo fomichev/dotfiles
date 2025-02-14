@@ -5,6 +5,14 @@
 MYDIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}" )" &>/dev/null && pwd)
 source $MYDIR/../host_lib.sh
 
+GET_MAINTAINER=true
+while getopts "M" opt; do
+	case $opt in
+		M) GET_MAINTAINER=false ;;
+	esac
+done
+shift $((OPTIND -1))
+
 to() { ARGS+=" --to=$@"; }
 cc() { ARGS+=" --cc=$@"; }
 ignore_all() {
@@ -124,7 +132,9 @@ try_to_send_to() {
 			;;
 	esac
 
-	extra_maintainers
+	if $GET_MAINTAINER; then
+		extra_maintainers
+	fi
 
 	git_send --validate --dry-run
 
