@@ -16,7 +16,9 @@ fi
 #MODEL=deepseek-coder-v2:16b   # https://ollama.com/library/deepseek-coder-v2
 #MODEL=codestral:22b           # https://ollama.com/library/codestral
 MODEL=qwen2.5:32b              # https://ollama.com/library/qwen2.5:32b
+#MODEL=deepseek-r1:32b         # https://ollama.com/library/deepseek-r1:32b
 #MODEL=qwen2.5-coder:7b        # https://ollama.com/library/qwen2.5-coder:7b
+#MODEL=qwen2.5-coder:32b       # https://ollama.com/library/qwen2.5-coder:32b
 #MODEL=gemma2:27b              # https://ollama.com/library/gemma2:27b
 
 while getopts "im:s" opt; do
