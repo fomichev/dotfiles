@@ -75,7 +75,7 @@ def have_top_message(mbox, id2path, id):
 
         path = id2path[id]
         if flagged(path, 'F'):
-            return true
+            return True
 
         d = mbox[path]
         if 'In-Reply-To' not in d:
@@ -98,16 +98,6 @@ def flag_to_me(new, me):
                 else:
                     print(f'skip flaged {path}')
 
-def filter_out_flagged(mbox):
-    ret = {}
-
-    for key, val in mbox.items():
-        if flagged(key, 'F'):
-            continue
-        ret[key] = val
-
-    return ret
-
 def move_all(move, subdir, seen):
     for src in move:
         dst = os.path.join(args.archive, subdir, os.path.basename(src))
@@ -116,12 +106,12 @@ def move_all(move, subdir, seen):
             dst = path + 'S'
 
         print(f'{src} -> {dst}')
-        shutil.move(src, dst)
+        if not args.dry:
+            shutil.move(src, dst)
 
 flag_to_me(os.path.join(args.inbox, 'new'), args.me.split(','))
 
 inbox = parse_mbox(args.inbox)
-inbox = filter_out_flagged(inbox)
 
 id2path = {}
 
@@ -152,6 +142,5 @@ for path in move_new:
 for path in move_seen:
     print(f'move seen {path}: {inbox[path]["Subject"]}')
 
-if not args.dry:
-    move_all(move_new, 'new', False)
-    move_all(move_seen, 'cur', True)
+move_all(move_new, 'new', False)
+move_all(move_seen, 'cur', True)
