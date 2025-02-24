@@ -10,4 +10,4 @@ if grep -q "Change-Id:" ./*.patch; then
 	exit
 fi
 
-./scripts/checkpatch.pl --codespell "$@" ./*.patch
+./scripts/checkpatch.pl --max-line-length=80 --codespell "$@" ./*.patch
