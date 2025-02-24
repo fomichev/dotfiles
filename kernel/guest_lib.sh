@@ -10,6 +10,7 @@ fi
 TP_EXCLUDE=()
 TP_INCLUDE=()
 SELFTEST=()
+TARGETS=""
 CUSTOM=()
 
 UNDER_GDB=false
@@ -463,6 +464,10 @@ __run_all_tests() {
 	run_test_progs -t "$(echo ${TP_INCLUDE[@]} | tr ' ' ',')" || :
 	run_test_progs -b "$(echo ${TP_EXCLUDE[@]} | tr ' ' ',')" || :
 	run_test_progs -n "$TP_NUM" || :
+
+	if [[ ! -z "$TARGETS" ]]; then
+		make -C tools/testing/selftests TARGETS=$TARGETS run_tests
+	fi
 }
 
 testsuite_run() {
