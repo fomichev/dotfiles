@@ -20,7 +20,7 @@ set edit_headers = yes
 set abort_nosubject = no
 
 # ask for CCs
-set askcc = yes
+set askcc = no
 
 # be quiet please
 set beep = no
@@ -29,7 +29,6 @@ set beep = no
 set beep_new = yes
 
 # no help
-#set help = no
 set help = yes
 
 # don't make new messages old upon mutt exit
