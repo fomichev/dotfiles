@@ -2,4 +2,9 @@
 
 MYDIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}" )" &>/dev/null && pwd)
 
-(cd $MYDIR/.. && $EDITOR -p guest_script.sh guest_lib.sh host_lib.sh)
+local_lib=""
+if [ -e "$HOME/local/local_lib.sh" ]; then
+	local_lib="$HOME/local/local_lib.sh"
+fi
+
+(cd $MYDIR/.. && $EDITOR -p guest_script.sh guest_lib.sh $local_lib host_lib.sh)

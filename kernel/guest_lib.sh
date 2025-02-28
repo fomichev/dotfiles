@@ -7,6 +7,10 @@ if [ -z "$HOME" ]; then
 	exit 1
 fi
 
+if [ -e $HOME/local/local_lib.sh ]; then
+	source $HOME/local/local_lib.sh
+fi
+
 TP_EXCLUDE=()
 TP_INCLUDE=()
 SELFTEST=()
