@@ -3,6 +3,7 @@
 MYDIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}" )" &>/dev/null && pwd)
 source $MYDIR/../host_lib.sh
 
+echo "using $(kernel_vmlinux)"
 pahole -C "$@" $(kernel_vmlinux) 2>&1 \
 	| grep -v DW_TAG_label \
 	| grep -v die__process_unit
