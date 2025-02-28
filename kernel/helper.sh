@@ -1,6 +1,7 @@
 #!/bin/bash
 
 SWAP=false
+WAIT=30
 
 DEV=$DEV0
 GPU=$GPU0
@@ -9,9 +10,20 @@ PEER_IP=$PEER0_IP
 
 KSFT_DIR="drivers/net/hw"
 
-while getopts "0123456789r" opt; do
+while getopts "0123456789d:rw:" opt; do
 	case $opt in
+		w) WAIT=$OPTARG ;;
 		r) SWAP=true ;;
+		d)
+			v=DEV$OPTARG
+			DEV=${!v}
+			v=GPU$OPTARG
+			GPU=${!v}
+			v=HOST${OPTARG}_IP
+			HOST_IP=${!v}
+			v=PEER${OPTARG}_IP
+			PEER_IP=${!v}
+			;;
 		0) ;;
 		1)
 			DEV="$DEV1"
@@ -141,9 +153,9 @@ run_in_pane() {
 	echo "$client"
 
 	local name="run_$name$NAME_SUFFIX"
-	tmux new-window -n "$name" "ssh -t root@$HOST 'echo reset; $reset; echo run; $server; sleep 30'" &
+	tmux new-window -n "$name" "ssh -t root@$HOST 'echo reset; $reset; echo run; $server; sleep $WAIT'" &
 	sleep 5
-	tmux split-window -h -t $name "ssh -t root@$PEER 'echo reset; $reset; echo run; $client; sleep 30'"
+	tmux split-window -h -t $name "ssh -t root@$PEER 'echo reset; $reset; echo run; $client; sleep $WAIT'"
 	wait
 }
 
@@ -180,7 +192,7 @@ generate_spec() {
 	local peer_ips=()
 	local devs=()
 	local ethn=4
-	local bethn=4
+	local bethn=8
 
 	if [[ $ethn -gt 0 ]]; then
 		for i in `seq 0 $(( $ethn - 1 ))`; do
@@ -341,27 +353,38 @@ add_ssh_keys() {
 	echo "$peer_key" | ssh root@$HOST tee -a .ssh/authorized_keys
 }
 
-add_routes() {
+__add_routes() {
 	local via="fe80::face:b00c"
 	local pref="high"
+	local dev="$1"
+	local host_ip="$2"
+	local peer_ip="$3"
 
-	if [[ "$DEV" == beth* ]]; then
+	if [[ "$dev" == beth* ]]; then
 		local via="fe80::be:face:b00c"
 	fi
 
-	ssh root@$PEER "ip -6 route del $HOST_IP dev $DEV src $PEER_IP" || :
-	ssh root@$HOST "ip -6 route del $PEER_IP dev $DEV src $HOST_IP" || :
+	ssh root@$PEER "ip -6 route del $host_ip dev $dev src $peer_ip" || :
+	ssh root@$HOST "ip -6 route del $peer_ip dev $dev src $host_ip" || :
 
-	echo ssh root@$PEER "ip -6 route add $HOST_IP dev $DEV via $via src $PEER_IP $EXTRA_ROUTE pref $pref"
-	echo ssh root@$HOST "ip -6 route add $PEER_IP dev $DEV via $via src $HOST_IP $EXTRA_ROUTE pref $pref"
-	ssh root@$PEER "ip -6 route add $HOST_IP dev $DEV via $via src $PEER_IP $EXTRA_ROUTE pref $pref" || :
-	ssh root@$HOST "ip -6 route add $PEER_IP dev $DEV via $via src $HOST_IP $EXTRA_ROUTE pref $pref" || :
+	echo ssh root@$PEER "ip -6 route add $host_ip dev $dev via $via src $peer_ip $EXTRA_ROUTE pref $pref"
+	echo ssh root@$HOST "ip -6 route add $peer_ip dev $dev via $via src $host_ip $EXTRA_ROUTE pref $pref"
+	ssh root@$PEER "ip -6 route add $host_ip dev $dev via $via src $peer_ip $EXTRA_ROUTE pref $pref" || :
+	ssh root@$HOST "ip -6 route add $peer_ip dev $dev via $via src $host_ip $EXTRA_ROUTE pref $pref" || :
+}
+
+add_routes() {
+	want_no_args "$@"
+
+	#EXTRA_ROUTE="advmss $(( 4096 + 12 )) quickack 1 rto_min 5ms features tcp_usec_ts"
+	__add_routes $DEV $HOST_IP $PEER_IP
 }
 
 ksft_copy() {
 	want_no_args "$@"
 
-	pushd $LINUX
+	#pushd $LINUX
+	pushd $FBNUX
 	echo make
 	make \
 		-C tools/testing/selftests \
@@ -375,7 +398,8 @@ ksft_copy() {
 ksft_tcpx() {
 	want_no_args "$@"
 
-	pushd $LINUX
+	#pushd $LINUX
+	pushd $FBNUX
 
 	local cfg
 	cfg+="NETIF=${DEV}\n"
@@ -388,6 +412,24 @@ ksft_tcpx() {
 	ssh root@$HOST "export PATH=/bin:/usr/bin:/usr/sbin; cd ksft && ./run_kselftest.sh -t ${KSFT_DIR}:devmem.py"
 
 	popd
+}
+
+copy_tcp_rr() {
+	want_arg1 "$@"
+
+	pushd ~/src/neper
+	ssh root@${1} pkill tcp_rr || :
+	scp tcp_rr root@${1}:
+	popd
+}
+
+run_tcp_rr() {
+	want_no_args "$@"
+
+	local server="./tcp_rr -H ${HOST_IP} "
+	local client="./tcp_rr -H ${HOST_IP} -c"
+
+	run_in_pane tcp_rr ":" "$server" "$client"
 }
 
 build_kperf() {
@@ -409,13 +451,31 @@ copy_kperf() {
 	popd
 }
 
+run_kperf_rtt() {
+	want_no_args "$@"
+
+	local server="./server -a ${HOST_IP} --no-daemon"
+	local client="./server -a ${PEER_IP} --no-daemon & sleep 1; ./client --src ${PEER_IP} --dst ${HOST_IP} --req-size=0"
+	local reset="./server --kill"
+
+	run_in_pane kperf "$reset" "$server" "$client"
+}
+
 run_kperf() {
+	want_no_args "$@"
+	local n=1
+	local q=1
+
 	local args=""
-	args="$args --pin-off 1"
+	args="$args --pin-off $n"
+	args="$args --validate no"
 	#args="$args --msg-trunc"
-	args="$args --devmem-rx"
-	args="$args --msg-zerocopy"
-	#args="$args --udmabuf-size-mb=64"
+	#args="$args --msg-zerocopy"
+	args="$args --udmabuf-size-mb 2048 --devmem-rx --num-rx-queues $q"
+	args="$args --devmem-tx"
+	#if [[ $n -gt 1 ]]; then
+		args="$args -n $n"
+	#fi
 	args="$args $*"
 
 	#args="$args --tcp-cc=bbr"
@@ -424,9 +484,8 @@ run_kperf() {
 	#args="$args --max-pace=2000000000" # 15Gbps
 	#args="$args --time=10"
 	#args="$args --time=30"
+	#args="$args --time=60"
 	#args="$args --time=300"
-	#args="$args -n=8"
-	#args="$args -n=16"
 
 	#local server_args="--mrq"
 
@@ -562,4 +621,56 @@ run_bpftrace() {
 	set -- 2s
 
 	cat ~/src/dotfiles/kernel/bpftrace/${script}.bpftrace | ssh -t root@${host} "timeout -s INT $* bpftrace -"
+}
+
+xskrtt() {
+	pushd $HOME/src/xskrtt
+
+	make
+
+	add_routes
+	ssh root@${HOST} ethtool -C $DEV rx-usecs 0 rx-frames 0 tx-usecs 0 tx-frames 0
+	ssh root@${PEER} ethtool -C $DEV rx-usecs 0 rx-frames 0 tx-usecs 0 tx-frames 0
+
+	ssh root@${HOST} "echo 2 > /sys/class/net/$DEV/napi_defer_hard_irqs"
+	ssh root@${HOST} "echo 10000 > /sys/class/net/$DEV/gro_flush_timeout"
+	ssh root@${PEER} "echo 2 > /sys/class/net/$DEV/napi_defer_hard_irqs"
+	ssh root@${PEER} "echo 10000 > /sys/class/net/$DEV/gro_flush_timeout"
+
+	#ssh root@${HOST} "echo 0 > /sys/class/net/$DEV/napi_defer_hard_irqs"
+	#ssh root@${HOST} "echo 0 > /sys/class/net/$DEV/gro_flush_timeout"
+	#ssh root@${PEER} "echo 0 > /sys/class/net/$DEV/napi_defer_hard_irqs"
+	#ssh root@${PEER} "echo 0 > /sys/class/net/$DEV/gro_flush_timeout"
+
+	local opts="-a 93"
+	opts="$opts -f -i -S" # prefill headers, ignore csum, track scheduled time
+	opts="$opts -p"
+	opts="$opts -t"
+	#opts="$opts -w"
+
+	# echo 1 > /sys/kernel/debug/tracing/events/napi/napi_poll/enable
+	# echo "dev_name == \"eth1\"" > /sys/kernel/debug/tracing/events/napi/napi_poll/filter
+
+	#ssh root@${HOST} "socat -U - UDP6-LISTEN:7072,bind=[$HOST_IP]"
+	ssh root@${HOST} bpftool net detach xdp dev $DEV || :
+	ssh root@${HOST} pkill xskrtt || :
+	scp xskrtt root@${HOST}:
+	local host_smac=$(ssh root@$HOST ip -6 link show dev $DEV | grep 'link/ether' | awk '{ print $2 }')
+	local host_dmac=$(ssh root@$HOST ip -6 neigh show dev $DEV | grep b00c | awk '{print $3}')
+	local host_cmd="./xskrtt $opts $DEV $host_smac $host_dmac $HOST_IP $PEER_IP 7072 23"
+	#ssh -t root@${HOST} $host_cmd
+
+	#local peer_cmd="echo hihihihihhhihihihihihihih | ssh root@${PEER} 'socat -u - UDP6:[$HOST_IP]:7072,so-bindtodevice=$DEV'"
+	ssh root@${PEER} bpftool net detach xdp dev $DEV || :
+	ssh root@${PEER} pkill xskrtt || :
+	scp xskrtt root@${PEER}:
+	local peer_smac=$(ssh root@$PEER ip -6 link show dev $DEV | grep 'link/ether' | awk '{ print $2 }')
+	local peer_dmac=$(ssh root@$PEER ip -6 neigh show dev $DEV | grep b00c | awk '{print $3}')
+	local peer_cmd="./xskrtt $opts -c $DEV $peer_smac $peer_dmac $PEER_IP $HOST_IP 7072 23"
+	#ssh -t root@${PEER} $peer_cmd
+
+	echo $HOST $host_cmd
+	echo $PEER $peer_cmd
+
+	run_in_pane xskrtt "" "$host_cmd" "$peer_cmd"
 }
