@@ -55,6 +55,7 @@ bin/monarch-policies
 .config/enchant/
 .config/eog/
 .config/epiphany/
+.config/et/
 .config/evolution/
 .config/falkTX/
 .config/FreeCAD/
@@ -84,6 +85,7 @@ bin/monarch-policies
 .config/guix/
 .config/helix/runtime
 .config/hexchat/
+.config/htop/
 .config/ibus/
 .config/inkscape/
 .config/ipython/
