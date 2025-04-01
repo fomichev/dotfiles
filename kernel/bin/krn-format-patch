@@ -32,11 +32,20 @@ if [ ! -z "$SUFFIX" ]; then
 	prefix="$prefix $SUFFIX"
 fi
 
+cutoff() {
+	local sha=$(git log --oneline | head -n 500 | grep CUTOFF | awk '{print $1}')
+	if [[ -z "$sha" ]]; then
+		echo "HEAD"
+	else
+		echo "${sha}~"
+	fi
+}
+
 range="$*"
 if [[ -z "$range" ]]; then
 	# default: no arguments
 	since=$(remote_main_branch "$remote")
-	till="HEAD"
+	till=$(cutoff)
 	range="$since".."$till"
 else
 	if [[ ! "$*" =~ ^-[0-9]+$ ]]; then
@@ -94,7 +103,7 @@ if [ ! -z "$cover_letter" ]; then
 		exit 1
 	fi
 
-	sed -i -e "s/\*\*\* SUBJECT HERE \*\*\*/$cover_subj/" $p_path
+	sed -i -e "s@\*\*\* SUBJECT HERE \*\*\*@$cover_subj@" $p_path
 
 	echo "$cover_msg" | sed -i -e "/\*\*\* BLURB HERE \*\*\*/ r /dev/stdin" $p_path
 	sed -i -e "/\*\*\* BLURB HERE \*\*\*/ d" $p_path
