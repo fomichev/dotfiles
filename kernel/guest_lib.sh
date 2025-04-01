@@ -11,6 +11,36 @@ if [ -e $HOME/local/local_lib.sh ]; then
 	source $HOME/local/local_lib.sh
 fi
 
+##    netdevsim0 (down)
+##      ^   ^
+##   bond   netdevsim1.100@netdevsim1 allmulticast=on (down)
+##
+#echo 0 1 > /sys/bus/netdevsim/new_device
+#
+#dev_path=$(ls -d /sys/bus/netdevsim/devices/netdevsim0/net/*)
+#dev=$(echo $dev_path | rev | cut -d/ -f1 | rev)
+#
+#ip link set dev $dev name netdevsim0
+#ip link set dev netdevsim0 up
+#
+#ip link add link netdevsim0 name netdevsim0.100 type vlan id 100
+#ip link set dev netdevsim0.100 allmulticast on down
+#ip link add name bond1 type bond mode 802.3ad
+#ip link set dev netdevsim0 down
+#ip link set dev netdevsim0 master bond1
+#ip link set dev bond1 up
+#ip link show
+#
+##ip link add name dummy1 type dummy
+##ip link set dev dummy1 up
+##ip link add link dummy1 name dummy1.100 type vlan id 100
+##ip link set dev dummy1.100 allmulticast on down
+##ip link add name bond1 type bond mode 802.3ad
+##ip link set dev dummy1 down
+##ip link set dev dummy1 master bond1
+##ip link set dev bond1 up
+##ip link show
+
 TP_EXCLUDE=()
 TP_INCLUDE=()
 SELFTEST=()
@@ -31,8 +61,8 @@ BISECT_ERR=
 TP_BINARY=test_progs
 #TP_BINARY=test_progs-no_alu32
 TP_RUNS=1
-TP_FLAGS=""
-#TP_FLAGS="-v -v"
+#TP_FLAGS=""
+TP_FLAGS="-v -v"
 #TP_FLAGS="-j"
 TP_NUM=""
 #TP_NUM=62,98
@@ -64,6 +94,7 @@ export_settings() {
 	#export PATH=$HOME/tools/static:$PATH
 	export PATH=$HOME/opt/sysroot/bin:$PATH
 	export PATH=$HOME/opt/sysroot/sbin:$PATH
+	export PATH=$HOME/src/packetdrill/gtests/net/packetdrill:$PATH
 
 	# make sure config points to the right place
 	mount -t tmpfs -o size=10M tmpfs /boot
@@ -440,16 +471,19 @@ run_syzkaller_c() {
 
 create_netdevsim() {
 	local name="$1"
+	local id="$2"
 
-	echo 0 1 > /sys/bus/netdevsim/new_device
+	if [[ -e "$id" ]]; then
+		id=0
+	fi
 
-	dev_path=$(ls -d /sys/bus/netdevsim/devices/netdevsim0/net/*)
+	echo $id 1 > /sys/bus/netdevsim/new_device
+
+	dev_path=$(ls -d /sys/bus/netdevsim/devices/$name/net/*)
 	dev=$(echo $dev_path | rev | cut -d/ -f1 | rev)
 
-	/usr/local/google/home/sdf/src/iproute2_upstream/ip/ip link show dev eth1
-
-	ip link set dev $dev name netdevsim0
-	ip link set dev netdevsim0 up
+	ip link set dev $dev name $name
+	ip link set dev $name up
 }
 
 __run_all_tests() {
@@ -643,6 +677,19 @@ tcpx_selftest() {
 	ip addr add 192.168.1.4 dev $dev
 	ip link set $dev up
 	./devmem.py
+}
+
+netdevsim_movens() {
+	create_netdevsim netdevsim0 0
+	create_netdevsim netdevsim1 1
+	create_netdevsim netdevsim2 2
+
+	ip netns add ns
+	ip link set netdevsim0 netns ns
+	ip link set netdevsim1 netns ns
+
+	ip l
+	ip -n ns l
 }
 
 mrqcat_selftest() {
