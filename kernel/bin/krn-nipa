@@ -1,0 +1,54 @@
+#!/bin/bash
+
+set -e
+
+MR_PROPER=true
+
+while getopts "M" opt; do
+	case $opt in
+		M) MR_PROPER=false ;;
+	esac
+done
+shift $((OPTIND -1))
+
+build_and_test() {
+	local dir="$1"
+	local bin="$2"
+
+	if $MR_PROPER; then
+		krn-mrproper
+	fi
+
+	echo "running $dir $bin"
+
+	vng --build  \
+		--config tools/testing/selftests/$dir/config \
+		--config kernel/configs/debug.config
+
+	if [[ ! -z "$bin" ]]; then
+		set -- TEST_PROGS=$bin
+	fi
+
+	vng -v -r arch/x86/boot/bzImage \
+		--cwd $(pwd) \
+		--user root \
+		--cpus 4 -- \
+		make -C tools/testing/selftests \
+			TARGETS=$dir \
+			"$@" \
+			run_tests | tee -a $(pwd)/output
+}
+
+echo > $(pwd)/output
+
+if [[ $# -eq 0 ]]; then
+	set -- drivers/net/team drivers/net/bonding net drivers/net tc-testing
+	#set -- net:fib_tests.sh drivers/net/team:dev_addr_lists.sh
+fi
+
+for t in "$@"; do
+	dir=$(echo "$t" | awk -F: '{print $1}')
+	bin=$(echo "$t" | awk -F: '{print $2}')
+
+	build_and_test $dir $bin
+done
