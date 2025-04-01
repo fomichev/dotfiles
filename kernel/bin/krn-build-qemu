@@ -12,6 +12,7 @@ ARCH=${ARCH:-x86_64}
 RELEASE=${RELEASE:-$(kernel_release)}
 LLVM=${LLVM:-1}
 SILENT="-s"
+EXTRA_CONFIG=""
 
 CC="clang"
 if [ -e /usr/bin/ccache ]; then
@@ -25,8 +26,9 @@ if [ $ASAN -eq 1 ]; then
 	fi
 fi
 
-while getopts "S" opt; do
+while getopts "c:S" opt; do
 	case $opt in
+		c) EXTRA_CONFIG="$OPTARG" ;;
 		S) SILENT="" ;;
 	esac
 done
@@ -168,12 +170,15 @@ if [[ ! -e $KDIR/.config ]]; then
 	set_config CONFIG_MACSEC # macsec_offload
 	set_config CONFIG_NET_DSA
 	set_config CONFIG_NET_DSA_LOOP
-	set_config CONFIG_DEBUG_NET_SMALL_RTNL
+	set_config CONFIG_DEBUG_NET_SMALL_RTNL n
 
 	set_config CONFIG_UDMABUF
 	set_config CONFIG_FBNIC n
 	set_config CONFIG_STMMAC_ETH # for CONFIG_PHYLINK
 	set_config CONFIG_BNXT
+
+	#set_config CONFIG_PREEMPT
+	#set_config CONFIG_DEBUG_PREEMPT
 
 	cat $KDIR/tools/testing/selftests/bpf/config >> $KDIR/.config
 
@@ -188,6 +193,13 @@ if [[ ! -e $KDIR/.config ]]; then
 	set_config CONFIG_PCCARD n
 	set_config CONFIG_BACKLIGHT_CLASS_DEVICE n
 	set_config CONFIG_HID_SUPPORT n
+
+	if [ ! -z "$EXTRA_CONFIG" ]; then
+		for entry in $(grep CONFIG_ $EXTRA_CONFIG | awk -F= '{print $1}'); do
+
+			set_config $entry
+		done
+	fi
 
 	set -x
 	make $SILENT -j$(nproc) CC="$CC" LLVM=$LLVM ARCH=$ARCH olddefconfig
