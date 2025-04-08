@@ -219,10 +219,10 @@ end
 --vim.g.copilot_proxy_strict_ssl = false
 
 -- Only use copilot suggestions for public work
-vim.g.copilot_filetypes = {
-	["*"] = false,
-	mail = true,
-}
+--vim.g.copilot_filetypes = {
+--	["*"] = false,
+--	mail = true,
+--}
 
 require("lazy").setup({
 	"will133/vim-dirdiff",
@@ -438,7 +438,7 @@ require("lazy").setup({
 		event = "VeryLazy",
 		opts = {},
 	},
-	"github/copilot.vim",
+	-- "github/copilot.vim",
 })
 
 require("oil").setup({
@@ -514,10 +514,6 @@ require('lualine').setup({
 		lualine_c = { '%=', },
 		lualine_x = {},
 		lualine_y = {
-			{
-				'buffers',
-				mode = 4,
-			},
 			'filetype',
 			'progress',
 		},

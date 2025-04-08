@@ -71,7 +71,7 @@ maybe_add_to_cc() {
 }
 
 extra_maintainers() {
-	local maintainers="$(./scripts/get_maintainer.pl --remove-duplicates --email --git-min-percent 25 -- *.patch)"
+	local maintainers="$(./scripts/get_maintainer.pl --no-n --remove-duplicates --email --git-min-percent 25 -- *.patch)"
 
 	maybe_add_to_cc $(echo "$maintainers" | awk -F'(' '{print $1}' | grep -v '<')
 	maybe_add_to_cc $(echo "$maintainers" | awk -F'(' '{print $1}' | grep '<' | awk -F'<' '{print $2}' | tr -d '>')
