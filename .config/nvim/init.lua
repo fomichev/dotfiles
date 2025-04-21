@@ -595,6 +595,13 @@ wk.add({
 		desc = "Acked-by",
 	},
 	{
+		"<leader>i/",
+		function()
+			vim.api.nvim_put({'---'}, 'l', true, true)
+		end,
+		desc = "---",
+	},
+	{
 		"<leader>ir",
 		function()
 			vim.api.nvim_put({'Reviewed-by: Stanislav Fomichev <sdf@fomichev.me>'}, 'l', true, true)
