@@ -20,7 +20,7 @@ fi
 #MODEL=qwq:32b                 # https://ollama.com/library/qwq:32b
 #MODEL=deepseek-r1:32b         # https://ollama.com/library/deepseek-r1:32b
 #MODEL=qwen2.5-coder:32b       # https://ollama.com/library/qwen2.5-coder:32b
-MODEL=gemma3:27b               # https://ollama.com/library/gemma3:27b
+MODEL=gemma3:27b-it-qat        # https://ollama.com/library/gemma3:27b
 
 while getopts "im:s" opt; do
 	case $opt in
