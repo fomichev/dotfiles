@@ -29,4 +29,4 @@ EOF
 SCRIPT="$MYDIR/../guest_script.sh"
 
 ENVIRON_ARG="MYDIR='$MYDIR' HOME='$HOME'" \
-	~/bin/q $args -s "$script"
+	~/bin/q $args -s "$script" -c "hugepagesz=2M hugepages=64"

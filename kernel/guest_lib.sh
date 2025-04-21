@@ -636,6 +636,11 @@ __tcpx_loopback() {
 	#local addr=fc00::1
 
 	local client="-c $addr"
+	#local opts="-H2 -S$((128 * 1024 * 1024)) -T"
+	local opts="-H2 -S$((128 * 1024 * 1024))"
+
+	echo 256 > /sys/module/udmabuf/parameters/size_limit_mb
+	cat /sys/module/udmabuf/parameters/size_limit_mb
 
 	cat /dev/urandom | tr -dc '[:print:]' | head -c 1M > random_file.txt
 	#cat /dev/urandom | tr -dc '[:print:]' | head -c 128K > random_file.txt
@@ -643,7 +648,7 @@ __tcpx_loopback() {
 
 	ip addr add $addr dev $dev
 	ip link set $dev up
-	cat random_file.txt | ./tools/testing/selftests/drivers/net/hw/ncdevmem -L -f $dev $client -s $addr_prefix$addr -p 5201 "$@" > random_file2.txt
+	cat random_file.txt | ./tools/testing/selftests/drivers/net/hw/ncdevmem -L $opts -f $dev $client -s $addr_prefix$addr -p 5201 "$@" > random_file2.txt
 	local got=$(cat random_file2.txt | sha256sum -)
 	local want=$(cat random_file.txt | sha256sum -)
 	echo "['$got' vs '$want']"
