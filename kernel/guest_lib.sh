@@ -611,13 +611,15 @@ all_bpf() {
 }
 
 ynl_cli() {
-	ip6tables -I OUTPUT -o lo -p sctp --sport 10123 -j LOG
-	ip6tables -A OUTPUT -o lo -p sctp --sport 10123 -j DROP
-	$HOME/tmp/sctp_test --logtostderr
+	#ip6tables -I OUTPUT -o lo -p sctp --sport 10123 -j LOG
+	#ip6tables -A OUTPUT -o lo -p sctp --sport 10123 -j DROP
+	#$HOME/tmp/sctp_test --logtostderr
 	ip link add veth0 type veth peer name veth1
-	./tools/net/ynl/samples/netdev 12
-	cd tools/net/ynl/
-	./cli.py --spec $KDIR/Documentation/netlink/specs/netdev.yaml --dump dev-get --json='{"ifindex": 12}'
+	ip l
+	./tools/net/ynl/samples/ethtool 12
+	#cd tools/net/ynl/pyynl/
+	#./cli.py --spec $KDIR/Documentation/netlink/specs/netdev.yaml --dump dev-get --json='{"ifindex": 12}'
+	#./cli.py --spec $KDIR/Documentation/netlink/specs/ethtool.yaml --dump strset-get --json='{"header": {"dev-index": 12}, "stringsets": { "stringset": [{ "id": 1 }] } }'
 	testsuite_end
 }
 
