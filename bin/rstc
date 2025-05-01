@@ -40,6 +40,12 @@ docker_update() {
 
 	say 'update docker'
 	for d in $HOME/src/docker/*; do
+		if [ -e $d/skip ]; then
+			pushd $d
+			docker compose down || :
+			popd
+			continue
+		fi
 		pushd $d
 		docker compose pull -q
 		docker compose stop
