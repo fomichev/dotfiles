@@ -171,6 +171,7 @@ if [[ ! -e $KDIR/.config ]]; then
 	set_config CONFIG_NET_DSA
 	set_config CONFIG_NET_DSA_LOOP
 	set_config CONFIG_DEBUG_NET_SMALL_RTNL n
+	set_config CONFIG_NET_TEAM
 
 	set_config CONFIG_UDMABUF
 	set_config CONFIG_FBNIC n

@@ -699,6 +699,21 @@ netdevsim_movens() {
 	ip -n ns l
 }
 
+ip_route() {
+
+	local dev=eth0
+	ip addr add 192.168.1.1 dev $dev
+	ip link set $dev up
+	local ip=/home/sdf/src/iproute2/ip/ip
+
+	$ip route add 192.168.2.0/24 dev $dev features tcp_usec_ts ecn
+	$ip route add 192.168.3.0/24 dev $dev features tcp_usec_ts ecn quickack 1
+	$ip route add 192.168.4.0/24 dev $dev features ecn
+	$ip route add 192.168.5.0/24 dev $dev features ecn quickack 1
+	$ip route add 192.168.6.0/24 dev $dev features
+	ip route show dev $dev
+}
+
 mrqcat_selftest() {
 	#tc qdisc add dev lo root netem loss 10%
 	ip link set lo mtu 1500

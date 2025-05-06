@@ -79,6 +79,10 @@ extra_maintainers() {
 
 try_to_send_to() {
 	case $target in
+		iproute2)
+			to netdev@vger.kernel.org
+			cc dsahern@gmail.com
+			;;
 		net|net-next)
 			to_net
 			;;
