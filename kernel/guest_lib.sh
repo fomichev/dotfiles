@@ -85,7 +85,7 @@ UPSTREAM_KDIR=$HOME/src/linux
 export_settings() {
 	KDIR="$1"
 	ST_DIR="$KDIR/tools/testing/selftests"
-	SYZ_DIR=$HOME/go/src/github.com/google/syzkaller/bin/linux_amd64
+	SYZ_DIR="$HOME/src/syzkaller/bin/linux_amd64"
 
 	# for non-interactive (script) mode
 	export PATH=$HOME/local/bin:$UPSTREAM_KDIR/tools/bpf/bpftool:$UPSTREAM_KDIR/tools/perf:$PATH
@@ -639,7 +639,7 @@ __tcpx_loopback() {
 
 	local client="-c $addr"
 	#local opts="-H2 -S$((128 * 1024 * 1024)) -T"
-	local opts="-H2 -S$((128 * 1024 * 1024))"
+	#local opts="-H2 -S$((128 * 1024 * 1024))"
 
 	echo 256 > /sys/module/udmabuf/parameters/size_limit_mb
 	cat /sys/module/udmabuf/parameters/size_limit_mb
@@ -661,7 +661,8 @@ __tcpx_loopback() {
 }
 
 tcpx_loopback() {
-	__tcpx_loopback
+	#__tcpx_loopback
+	__tcpx_loopback -z 4093
 }
 
 tcpx_loopback_chunked() {
@@ -699,6 +700,62 @@ netdevsim_movens() {
 	ip -n ns l
 }
 
+netdevsim_team2() {
+	#create_netdevsim netdevsim0 0
+	#ip link add name team0 type team
+	#ip link set netdevsim0 down
+	#ip link set dev netdevsim0 master team0
+	#ip link set team0 up
+	#ethtool -K team0 large-receive-offload off
+	#ethtool --show-priv-flags team0
+
+
+	create_netdevsim netdevsim0 0
+	#ip link add link netdevsim0 name netdevsim0.100 type vlan id 100
+	#ip link set netdevsim0.100 up
+	#ethtool -K netdevsim0 large-receive-offload off
+	#ethtool -k netdevsim0 | grep large-receive-offload
+
+	ip link add name team0 type team
+
+	ip link set netdevsim0 down
+	ip link add link netdevsim0 address 00:00:00:00:00:01 netdevsim0.1 type macvlan
+	#ip link add link netdevsim0 address 00:00:00:00:00:02 netdevsim0.2 type macvlan
+
+	ip link set dev netdevsim0.1 master team0
+	ip link set netdevsim0 up
+	ip link set netdevsim0.1 up
+	ip link set team0 up
+
+	#ip link add link bond address 02:00:00:00:00:01 dev 
+
+	#ip addr add 192.168.1.3/32 dev team0
+	#ip addr add 192.168.1.4/32 dev team0
+
+	#ip addr add 192.168.1.1/32 dev netdevsim0
+	#ip addr add 192.168.1.2/32 dev netdevsim0
+
+	ip a
+
+}
+
+netdevsim_team() {
+	ip link add name dummy1 type dummy
+	ip link add name team0 type team
+	#ip link set team0 down
+	ip link set dev dummy1 master team0
+
+	ip link set dummy1 up
+	ip link set team0 up
+
+	#ip link add link team0 name team0.100 type vlan id 100
+	#ip link set dev team0.100 address 00:00:00:00:00:02
+	#ip link set team0.100 up
+
+
+	ip l
+}
+
 ip_route() {
 
 	local dev=eth0
@@ -710,7 +767,8 @@ ip_route() {
 	$ip route add 192.168.3.0/24 dev $dev features tcp_usec_ts ecn quickack 1
 	$ip route add 192.168.4.0/24 dev $dev features ecn
 	$ip route add 192.168.5.0/24 dev $dev features ecn quickack 1
-	$ip route add 192.168.6.0/24 dev $dev features
+	$ip route add 192.168.6.0/24 dev $dev features bork || :
+	$ip route add 192.168.7.0/24 dev $dev features || :
 	ip route show dev $dev
 }
 
