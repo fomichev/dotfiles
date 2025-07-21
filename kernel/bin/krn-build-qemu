@@ -146,6 +146,7 @@ if [[ ! -e $KDIR/.config ]]; then
 	set_config CONFIG_DEBUG_NET $y_dbx
 	set_config CONFIG_DEBUG_PAGEALLOC $y_dbx
 	set_config CONFIG_GDB_SCRIPTS $y_dbx
+	set_config CONFIG_DEBUG_KMEMLEAK $y_dbx
 
 	set_config CONFIG_MLX4_EN
 	set_config CONFIG_MLX5_CORE
@@ -194,6 +195,8 @@ if [[ ! -e $KDIR/.config ]]; then
 	set_config CONFIG_PCCARD n
 	set_config CONFIG_BACKLIGHT_CLASS_DEVICE n
 	set_config CONFIG_HID_SUPPORT n
+
+	set_config CONFIG_MACSEC
 
 	if [ ! -z "$EXTRA_CONFIG" ]; then
 		for entry in $(grep CONFIG_ $EXTRA_CONFIG | awk -F= '{print $1}'); do

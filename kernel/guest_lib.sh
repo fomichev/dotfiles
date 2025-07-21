@@ -797,3 +797,14 @@ kperf_loopback() {
 	sleep 1
 	$kperf/client --src localhost --dst localhost $args
 }
+
+# http://lore.kernel.org/netdev/686d55b4.050a0220.1ffab7.0014.GAE@google.com
+macseq_lock() {
+	IF=dummy0
+	ip link add link $IF macsec0 type macsec sci 3154 cipher gcm-aes-256 encrypt on encodingsa 0
+	ip link set dev macsec0 up
+	ip link add link macsec0 name macsec_vlan type vlan id 1
+	ip link set dev macsec_vlan address 00:11:22:33:44:88
+	ip link set dev macsec_vlan up
+
+}

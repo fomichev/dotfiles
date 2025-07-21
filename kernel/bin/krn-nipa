@@ -2,14 +2,53 @@
 
 set -e
 
-MR_PROPER=true
+MYDIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}" )" &>/dev/null && pwd)
 
-while getopts "M" opt; do
+MR_PROPER=true
+RUN=false
+MODE='-R'
+KMEMLEAK=false
+
+while getopts "MlLR" opt; do
 	case $opt in
 		M) MR_PROPER=false ;;
+		l) MODE='-L' ;;
+
+		# internal flags:
+		L) RUN=true; KMEMLEAK=true ;; 
+		R) RUN=true ;;
 	esac
 done
 shift $((OPTIND -1))
+
+if $RUN; then
+	dir=$1
+	shift
+
+	if $KMEMLEAK; then
+		#echo Y > /sys/module/kmemleak/parameters/verbose
+		echo clear > /sys/kernel/debug/kmemleak
+	fi
+
+	make -C tools/testing/selftests \
+		TARGETS=$dir \
+		"$@" \
+		run_tests
+
+	if $KMEMLEAK; then
+		sleep 6 # MSECS_MIN_AGE=5000
+
+		echo scan > /sys/kernel/debug/kmemleak
+		cat /sys/kernel/debug/kmemleak
+
+		echo scan > /sys/kernel/debug/kmemleak
+		cat /sys/kernel/debug/kmemleak
+	fi
+
+	exit 0
+fi
+
+source $MYDIR/../host_lib.sh
 
 build_and_test() {
 	local dir="$1"
@@ -21,28 +60,32 @@ build_and_test() {
 
 	echo "running $dir $bin"
 
+	#KDIR=$(pwd)
+	#export KBUILD_OUTPUT=$(pwd)/vng
+
 	vng --build  \
 		--config tools/testing/selftests/$dir/config \
 		--config kernel/configs/debug.config
 
+	clangd_generate
+
 	if [[ ! -z "$bin" ]]; then
 		set -- TEST_PROGS=$bin
 	fi
-
+	
+	#pushd $KBUILD_OUTPUT
 	vng -v -r arch/x86/boot/bzImage \
 		--cwd $(pwd) \
 		--user root \
 		--cpus 4 -- \
-		make -C tools/testing/selftests \
-			TARGETS=$dir \
-			"$@" \
-			run_tests | tee -a $(pwd)/output
+		$MYDIR/krn-nipa $MODE $dir "$@" | tee -a $(pwd)/output
+	#popd
 }
 
 echo > $(pwd)/output
 
 if [[ $# -eq 0 ]]; then
-	set -- drivers/net/team drivers/net/bonding net drivers/net tc-testing
+	set -- drivers/net/netdevsim drivers/net/team drivers/net/bonding net drivers/net tc-testing
 	#set -- net:fib_tests.sh drivers/net/team:dev_addr_lists.sh
 fi
 
