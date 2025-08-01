@@ -22,7 +22,7 @@
 /home/sdf/src/dotfiles/.local/share/keybase
 /home/sdf/src/dotfiles/.local/share/sonic-visualiser
 /home/sdf/src/dotfiles/.local/share/TelegramDesktop
-/home/sdf/src/dotfiles/.local/share/Steam/steamapps
+/home/sdf/src/dotfiles/.local/share/Steam
 /home/sdf/src/dotfiles/.vim/tmp
 /home/sdf/src/pmbootstrap
 /home/sdf/src/pmbootstrap_chroot
@@ -38,4 +38,4 @@
 /home/sdf/data/ollama/
 /home/sdf/data/nextcloud/www/data/sdf/files/audiobooks/
 /home/sdf/data/jellyfin/
-/home/sdf/E7F7-F179/
+/home/sdf/ba03c035-62cd-4b8a-b770-f185244dced4/
