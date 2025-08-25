@@ -36,6 +36,5 @@
 /home/sdf/.wine/
 /home/sdf/data/frigate/storage
 /home/sdf/data/ollama/
-/home/sdf/data/nextcloud/www/data/sdf/files/audiobooks/
-/home/sdf/data/jellyfin/
-/home/sdf/ba03c035-62cd-4b8a-b770-f185244dced4/
+/home/sdf/data/jellyfin/cache/
+/home/sdf/data/jellyfin/media/

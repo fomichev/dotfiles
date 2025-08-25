@@ -110,5 +110,8 @@ if [ ! -z "$cover_letter" ]; then
 fi
 
 if $check_patch; then
-	krn-checkpatch
+	krn-checkpatch || :
+
+	files=$(git show --pretty="" --name-only $range)
+	./scripts/kernel-doc -Wall -none $files
 fi
