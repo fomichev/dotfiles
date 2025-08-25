@@ -30,6 +30,11 @@ if $RUN; then
 		echo clear > /sys/kernel/debug/kmemleak
 	fi
 
+	echo make -C tools/testing/selftests \
+		TARGETS=$dir \
+		"$@" \
+		run_tests
+
 	make -C tools/testing/selftests \
 		TARGETS=$dir \
 		"$@" \
@@ -67,10 +72,14 @@ build_and_test() {
 		--config tools/testing/selftests/$dir/config \
 		--config kernel/configs/debug.config
 
+	if $MR_PROPER; then
+		make headers
+	fi
+
 	clangd_generate
 
 	if [[ ! -z "$bin" ]]; then
-		set -- TEST_PROGS=$bin
+		set -- TEST_PROGS=$bin TEST_GEN_PROGS='' TEST_GEN_FILES=''
 	fi
 	
 	#pushd $KBUILD_OUTPUT
