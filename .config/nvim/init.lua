@@ -459,7 +459,7 @@ require("oil").setup({
 	},
 })
 
-local adapter = "ollama"
+local adapter = "openai"
 
 require("codecompanion").setup({
 	strategies = {
@@ -475,6 +475,31 @@ require("codecompanion").setup({
 	},
 	adapters = {
 		http = {
+			openai = function()
+				return require("codecompanion.adapters").extend("openai", {
+					url = "http://localhost:8087/v1/chat/completions",
+					env = {
+						api_key = "x",
+					},
+					schema = {
+						model = {
+							default = "llama4-maverick-17b-128e-instruct",
+						},
+						max_tokens = {
+							default = nil,
+						},
+						temperature = {
+							default = 1,
+						},
+						top_p = {
+							default = 1,
+						},
+						frequency_penalty = {
+							default = 1,
+						},
+					},
+				})
+			end,
 			ollama = function()
 				local model = "llama3.1"
 				local handle = io.popen("ol -i")
