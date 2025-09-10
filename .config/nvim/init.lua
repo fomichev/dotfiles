@@ -229,9 +229,12 @@ require("lazy").setup({
 	"tinted-theming/base16-vim",
 	{
 		'saghen/blink.cmp',
-		version = '*',
+		version = '1.*',
 
 		opts = {
+			cmdline = {
+				sources = {},
+			},
 			keymap = { preset = 'default' },
 			appearance = {
 				use_nvim_cmp_as_default = true,
@@ -239,7 +242,6 @@ require("lazy").setup({
 			},
 			sources = {
 				default = { 'lsp', 'path', 'snippets', 'buffer' },
-				cmdline = {},
 			},
 			completion = {
 				documentation = {
@@ -472,33 +474,35 @@ require("codecompanion").setup({
 		},
 	},
 	adapters = {
-		ollama = function()
-			local model = "llama3.1"
-			local handle = io.popen("ol -i")
-			if handle then
-				model = handle:read("*a"):gsub("\n", "")
-				handle:close()
-			else
-				print("Failed to execute ol -i`" )
-			end
+		http = {
+			ollama = function()
+				local model = "llama3.1"
+				local handle = io.popen("ol -i")
+				if handle then
+					model = handle:read("*a"):gsub("\n", "")
+					handle:close()
+				else
+					print("Failed to execute ol -i`" )
+				end
 
-			return require("codecompanion.adapters").extend("ollama", {
-				env = {
-					url = "http://localhost:11434",
-				},
-				headers = {
-					["Content-Type"] = "application/json",
-				},
-				parameters = {
-					sync = true,
-				},
-				schema = {
-					model = {
-						default = model,
+				return require("codecompanion.adapters").extend("ollama", {
+					env = {
+						url = "http://localhost:11434",
 					},
-				},
-			})
-		end,
+					headers = {
+						["Content-Type"] = "application/json",
+					},
+					parameters = {
+						sync = true,
+					},
+					schema = {
+						model = {
+							default = model,
+						},
+					},
+				})
+			end,
+		},
 	},
 })
 
