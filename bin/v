@@ -22,17 +22,21 @@ under_hg() {
 if $(under_hg); then
 	export HGCOLORS=16
 
-	case "$1" in
+	cmd="$1"
+	shift
+
+	case "$cmd" in
 		init) hg citc $2; g4d $2 ;;
 		reset) echo "use uncommit"; exit 1 ;;
 		pr) exec sl pull --rebase -d master ;;
-		lp) exec hg log --patch ;;
+		lp) exec hg log --patch "$@" ;;
 		au) exec hg amend ;;
 		ri) exec hg histedit ;;
 		ra) exec hg resolve --mark --all ;;
 		rc) exec hg rebase --continue ;;
 		rl) exec hg resolve --list ;;
 		ec) exec hg evolve --continue ;;
+		submit) exec jf submit ;;
 		push) hg upload chain ;;
 		stash)
 			if [ "$2" = "pop" ]; then
@@ -42,9 +46,8 @@ if $(under_hg); then
 			fi
 			;;
 		stash) exec hg shelve ;;
+		*) exec hg "$cmd" "$@"
 	esac
-
-	exec hg "$@"
 fi
 
 exec git "$@"
