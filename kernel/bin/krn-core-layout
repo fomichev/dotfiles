@@ -160,9 +160,15 @@ def print_layout(sockets, cpuload_before, cpuload_after):
     now = datetime.datetime.now()
 
     ln = 0
+    first_socket = True
 
     for socket in sockets.keys():
-        print(f"SOCKET {socket} {now}")
+        if first_socket:
+            print(f"SOCKET {socket} {now}")
+        else:
+            print(f"SOCKET {socket}")
+
+        first_socket = False
 
         keys = list(sockets[socket].keys())
 
