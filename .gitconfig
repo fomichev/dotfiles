@@ -11,7 +11,7 @@
 	ca = commit --amend --allow-empty
 	ci = commit -s
 	co = checkout
-	cp = cherry-pick --allow-empty
+	cp = cherry-pick --allow-empty -x
 	cpx = cherry-pick -x
 	cpa = cherry-pick --abort
 	dc = diff --cached
@@ -88,5 +88,3 @@
 
 [include]
 	path = ~/local/.gitconfig
-[http "https://git.internal.tfbnw.net/"]
-	sslCert = /var/facebook/credentials/sdf/x509/sdf.pem
