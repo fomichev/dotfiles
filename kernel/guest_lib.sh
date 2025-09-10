@@ -419,7 +419,7 @@ run_syzkaller() {
 		return
 	fi
 
-	create_netdevsim netdevsim0
+	create_netdevsim netdevsim0 0
 
 	ip link
 
@@ -427,6 +427,7 @@ run_syzkaller() {
 	local procs=$(grep procs $1 | sed -e 's/.*procs\":\([0-9]*\).*/\1/')
 
 	echo syz_execprog $1 -threaded -collide -repeat=$repeat -procs=$procs &
+	cd /tmp
 	syz_execprog $1 -threaded -collide -repeat=$repeat -procs=$procs &
 	#set +x
 
@@ -439,30 +440,16 @@ run_syzkaller_c() {
 		return
 	fi
 
-	create_netdevsim netdevsim0
+	create_netdevsim netdevsim0 0
 
 	echo "build rep.c"
 	(cd $(dirname $1) && gcc $(basename $1) -lpthread)
 	echo "run rep.c"
 	dmesg -c
+	cd /tmp
 	$(dirname $1)/a.out &
 
 	sleep 3
-
-	ls /syzcgroup
-	ls /syzcgroup/unified
-	ls /syzcgroup/unified/syz0
-
-	local bpftool=/usr/local/google/home/sdf/tools/bpftool
-		$bpftool prog
-		id=$($bpftool prog | grep cgroup_skb | awk -F: '{print $1}')
-		$bpftool prog dump xlated id $id
-		$bpftool prog dump jited id $id
-		#$bpftool cgroup tree /syzcgroup/unified/szy0
-		$bpftool cgroup tree
-		$bpftool net
-    #$bpftool prog dump jited id $id
-
 
 	#set +x
 	die_on_panic_or_warning
