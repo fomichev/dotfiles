@@ -215,15 +215,6 @@ local lsp_on_attach = function(client, bufnr)
 	end
 end
 
---vim.g.copilot_proxy = 'http://localhost:11435'
---vim.g.copilot_proxy_strict_ssl = false
-
--- Only use copilot suggestions for public work
---vim.g.copilot_filetypes = {
---	["*"] = false,
---	mail = true,
---}
-
 require("lazy").setup({
 	"will133/vim-dirdiff",
 	"tinted-theming/base16-vim",
@@ -232,9 +223,7 @@ require("lazy").setup({
 		version = '1.*',
 
 		opts = {
-			cmdline = {
-				sources = {},
-			},
+			cmdline = { enabled = false },
 			keymap = { preset = 'default' },
 			appearance = {
 				use_nvim_cmp_as_default = true,
@@ -440,7 +429,6 @@ require("lazy").setup({
 		event = "VeryLazy",
 		opts = {},
 	},
-	-- "github/copilot.vim",
 })
 
 require("oil").setup({
