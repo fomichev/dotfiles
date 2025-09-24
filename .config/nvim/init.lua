@@ -247,42 +247,42 @@ require("lazy").setup({
 		config = function ()
 			local capabilities = require('blink.cmp').get_lsp_capabilities()
 
-			require"lspconfig".clangd.setup{
+			vim.lsp.config('clangd', {
 				capabilities = capabilities,
 				on_attach = lsp_on_attach,
-			}
+			})
 
 			-- rustup component add rust-analyzer
-			require"lspconfig".rust_analyzer.setup{
+			vim.lsp.config('rust_analyzer', {
 				capabilities = capabilities,
 				on_attach = lsp_on_attach,
 				cmd = { "rustup", "run", "stable", "rust-analyzer" },
-			}
+			})
 
 			-- pacman -S pyright
-			--require"lspconfig".pyright.setup{
+			--vim.lsp.config('pyright', {
 			--	capabilities = capabilities,
 			--	on_attach = lsp_on_attach,
-			--}
+			--})
 
 			-- pacman -S gopls
-			--require"lspconfig".golps.setup{
+			--vim.lsp.config('golps', {
 			--	capabilities = capabilities,
 			--	on_attach = lsp_on_attach,
-			--}
+			--})
 
 			-- pacman -S lua-language-server
-			--require"lspconfig".lua_ls.setup{
+			--vim.lsp.config('lua_ls', {
 			--	capabilities = capabilities,
 			--	on_attach = lsp_on_attach,
-			--}
+			--})
 
 			-- npm i -g bash-language-server
 			-- pacman -S bash-language-server
-			--require"lspconfig".bashls.setup{
+			--vim.lsp.config('bashls', {
 			--	capabilities = capabilities,
 			--	on_attach = lsp_on_attach,
-			--}
+			--})
 
 			-- Disable all diagnostics
 			vim.lsp.handlers["textDocument/publishDiagnostics"] = function() end
