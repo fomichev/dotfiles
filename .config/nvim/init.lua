@@ -215,6 +215,8 @@ local lsp_on_attach = function(client, bufnr)
 	end
 end
 
+local claude_toggle_key = "<M-,>" -- Alt+,
+
 require("lazy").setup({
 	"will133/vim-dirdiff",
 	"tinted-theming/base16-vim",
@@ -429,7 +431,37 @@ require("lazy").setup({
 		event = "VeryLazy",
 		opts = {},
 	},
+	{
+		"coder/claudecode.nvim",
+		dependencies = { "folke/snacks.nvim" },
+		opts = {
+			terminal = {
+				---@module "snacks"
+				---@type snacks.win.Config|{}
+				snacks_win_opts = {
+					position = "float",
+					width = 0.9,
+					height = 0.9,
+					keys = {
+						claude_hide = {
+							claude_toggle_key,
+							function(self)
+								self:hide()
+							end,
+							mode = "t",
+						},
+					},
+				},
+			},
+		},
+		config = true,
+		keys = {
+			{ claude_toggle_key, ":ClaudeCode<CR>" },
+		},
+	},
 })
+
+require("claudecode")
 
 require("oil").setup({
 	use_default_keymaps = false,
@@ -645,6 +677,12 @@ wk.add({
 			vim.api.nvim_put({'-----BEGIN COVER LETTER-----', '-----END COVER LETTER-----'}, 'l', true, true)
 		end,
 		desc = "BEGIN COVER LETTER",
+	},
+	{
+		"<leader>c",
+		":ClaudeCode --resume<CR>",
+		desc = "Claude Resume",
+		icon = "✨",
 	},
 })
 
