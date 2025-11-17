@@ -480,6 +480,9 @@ require("oil").setup({
 })
 
 local adapter = "openai"
+if vim.fn.system("ss -tl 'sport = 11434'"):match("LISTEN") then
+	adapter = "ollama"
+end
 
 require("codecompanion").setup({
 	strategies = {
@@ -521,31 +524,29 @@ require("codecompanion").setup({
 				})
 			end,
 			ollama = function()
-				local model = "llama3.1"
 				local handle = io.popen("ol -i")
 				if handle then
 					model = handle:read("*a"):gsub("\n", "")
 					handle:close()
+					return require("codecompanion.adapters").extend("ollama", {
+						env = {
+							url = "http://localhost:11434",
+						},
+						headers = {
+							["Content-Type"] = "application/json",
+						},
+						parameters = {
+							sync = true,
+						},
+						schema = {
+							model = {
+								default = model,
+							},
+						},
+					})
 				else
 					print("Failed to execute ol -i`" )
 				end
-
-				return require("codecompanion.adapters").extend("ollama", {
-					env = {
-						url = "http://localhost:11434",
-					},
-					headers = {
-						["Content-Type"] = "application/json",
-					},
-					parameters = {
-						sync = true,
-					},
-					schema = {
-						model = {
-							default = model,
-						},
-					},
-				})
 			end,
 		},
 	},
