@@ -6,11 +6,9 @@ if [ ! -e $BIN ]; then
 	BIN=/usr/bin/ollama
 fi
 
-# https://livecodebench.github.io/leaderboard.html
 # https://aider.chat/docs/leaderboards/
-# https://huggingface.co/spaces/bigcode/bigcode-models-leaderboard
-# https://evalplus.github.io/leaderboard.html
 # https://lmarena.ai/
+# https://llm-stats.com/
 
 #MODEL=llama3.1:8b             # https://ollama.com/library/llama3.1
 #MODEL=deepseek-coder-v2:16b   # https://ollama.com/library/deepseek-coder-v2

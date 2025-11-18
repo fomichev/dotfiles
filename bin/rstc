@@ -67,10 +67,10 @@ backup_email() {
 system_upgrade() {
 	say 'update system'
 	sudo /usr/bin/pacman --noconfirm -Sy archlinux-keyring
-	if [ -e /usr/bin/yay ]; then
+	if [ -e /usr/bin/paru ]; then
 		sudo /usr/bin/pacman --noconfirm -Syu
 	else
-		sudo /usr/bin/yay --noconfirm -Syu
+		sudo /usr/bin/paru --noconfirm -Syu
 	fi
 	local orphans="$(pacman -Qqtd)"
 	if [[ ! -z "$orphans" ]]; then
