@@ -153,9 +153,9 @@ run_in_pane() {
 	echo "$client"
 
 	local name="run_$name$NAME_SUFFIX"
-	tmux new-window -n "$name" "ssh -t root@$HOST 'echo reset; $reset; echo run; $server; sleep $WAIT'" &
+	tmux new-window -n "$name" "ssh -t root@$HOST 'echo reset; $reset; echo run on $HOST; $server; sleep $WAIT'" &
 	sleep 5
-	tmux split-window -h -t $name "ssh -t root@$PEER 'echo reset; $reset; echo run; $client; sleep $WAIT'"
+	tmux split-window -h -t $name "ssh -t root@$PEER 'echo reset; $reset; echo run on $PEER; $client; sleep $WAIT'"
 	wait
 }
 

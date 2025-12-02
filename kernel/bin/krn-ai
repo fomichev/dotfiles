@@ -1,0 +1,24 @@
+#!/bin/bash
+
+MYDIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}" )" &>/dev/null && pwd)
+source $MYDIR/../host_lib.sh
+
+DIR=$HOME/src/review-prompts
+
+if [[ ! -d "$DIR" ]]; then
+	pushd $(dirname $DIR)
+	git clone https://github.com/masoncl/review-prompts
+	popd
+else
+	pushd $DIR
+	git pull
+	popd
+fi
+
+PROMPT="review the top commit"
+
+if [[ ! -z "$*" ]]; then
+	PROMPT="$@"
+fi
+
+claude "Using the prompt $DIR/review/review-core.md and the review prompt directory $DIR/review, $PROMPT"
