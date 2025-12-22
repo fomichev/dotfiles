@@ -433,6 +433,8 @@ require("lazy").setup({
 	},
 })
 
+vim.lsp.enable({'clangd', 'rust_analyzer'})
+
 require("oil").setup({
 	use_default_keymaps = false,
 	keymaps = {
