@@ -14,6 +14,7 @@ config.window_decorations = 'INTEGRATED_BUTTONS'
 config.use_fancy_tab_bar = false
 config.disable_default_key_bindings = true
 
+config.color_scheme = 'Edge Dark (base16)'
 --config.color_scheme = 'Tokyo Night'
 --config.leader = { key = 'LeftAlt', timeout_milliseconds = 1000 }
 
@@ -34,7 +35,11 @@ wezterm.on('update-status', function(window, _)
     wezterm.hostname(),
   }
 
-  local bg = wezterm.color.parse('gray')
+  local colors = wezterm.color.get_default_colors()
+  local bg = colors.background
+  --local fg = wezterm.color.foreground
+
+  --local bg = wezterm.color.parse('grey')
   local fg = wezterm.color.parse('white')
 
   local gradient_to, gradient_from = bg, bg
@@ -54,7 +59,7 @@ wezterm.on('update-status', function(window, _)
     local is_first = i == 1
 
     if is_first then
-      table.insert(elements, { Background = { Color = 'none' } })
+      table.insert(elements, { Background = { Color = bg } })
     end
     table.insert(elements, { Foreground = { Color = gradient[i] } })
     table.insert(elements, { Text = SOLID_LEFT_ARROW })
