@@ -107,7 +107,9 @@ tail_journal() {
 do_notify() {
 	local message="restic: $(hostname) $*"
 
-	if command -v telegram-send &> /dev/null; then
+	if command -v matrix-commander-rs &> /dev/null; then
+		matrix-commander-rs --message "$message"
+	elif command -v telegram-send &> /dev/null; then
 		telegram-send "$message" || :
 	elif command -v notify-send &> /dev/null; then
 		notify-send "$message" || :
