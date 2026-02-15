@@ -19,7 +19,12 @@ fi
 #MODEL=deepseek-r1:32b         # https://ollama.com/library/deepseek-r1:32b
 #MODEL=qwen3-coder:30b         # https://ollama.com/library/qwen3-coder:30b
 #MODEL=qwen3:30b               # https://ollama.com/library/qwen3:30b
-MODEL=gemma3:27b-it-qat        # https://ollama.com/library/gemma3:27b
+#MODEL=gemma3:27b-it-qat       # https://ollama.com/library/gemma3:27b
+#MODEL=llama2-uncensored:7b    # https://ollama.com/library/llama2-uncensored
+#MODEL=dolphin-mixtral:8x7b    # https://ollama.com/library/dolphin-mixtral
+#MODEL=qwen3-next:80b          # https://ollama.com/library/qwen3-next
+#MODEL=gurubot/gpt-oss-derestricted:20b # https://ollama.com/gurubot/gpt-oss-derestricted
+MODEL=glm-4.7-flash:latest     # https://ollama.com/library/glm-4.7-flash
 
 while getopts "im:s" opt; do
 	case $opt in

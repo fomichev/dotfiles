@@ -109,9 +109,9 @@ do_notify() {
 		notify-send "$@" || :
 	elif command -v telegram-send &> /dev/null; then
 		telegram-send "$@" || :
+	else
+		$HOME/bin/systemd-email sdf@fomichev.me $SERVICE "$(hostname) backup $@" || :
 	fi
-
-	$HOME/bin/systemd-email sdf@fomichev.me $SERVICE "$(hostname) backup $@" || :
 }
 
 # Started without arguments.
