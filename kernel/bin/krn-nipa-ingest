@@ -1,0 +1,31 @@
+#!/bin/bash
+
+MYDIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}" )" &>/dev/null && pwd)
+source $MYDIR/../host_lib.sh
+
+cd $KDIR
+
+TMPDIR=$HOME/tmp/nipa-ingest
+BRANCH="$(get_branch)"
+
+cleanup() {
+	cd $KDIR
+	git checkout $BRANCH
+	rm -rf $TMPDIR
+}
+trap cleanup EXIT
+
+krn-mrproper
+krn-format-patch -n
+
+if [[ "$(ls *.patch)" = "*.patch" ]]; then
+	echo "no patches found, everything is committed?"
+	exit 1
+fi
+
+mkdir -p $TMPDIR
+mv *.patch $TMPDIR
+git checkout upstream/net-next/main # -b test
+
+cd ~/src/nipa
+./ingest_mdir.py --tree-name net-next --mdir $TMPDIR --tree $KDIR
