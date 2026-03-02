@@ -23,6 +23,7 @@ if [[ "$(ls *.patch)" = "*.patch" ]]; then
 	exit 1
 fi
 
+rm -rf $TMPDIR
 mkdir -p $TMPDIR
 mv *.patch $TMPDIR
 git checkout upstream/net-next/main # -b test

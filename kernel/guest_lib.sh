@@ -173,7 +173,8 @@ mount_cgroup2() {
 }
 
 poweroff() {
-	exit
+	#exit
+	echo b > /proc/sysrq-trigger
 	#echo o > /proc/sysrq-trigger
 }
 
@@ -654,6 +655,69 @@ tcpx_loopback() {
 
 tcpx_loopback_chunked() {
 	__tcpx_loopback -b 2039
+}
+
+team_set_rx_mode() {
+	set -x
+
+	# macvlan
+	# |
+	# bridge
+	# |
+	# dummy
+
+#	ip link add dummy1 type dummy
+#	ip link add bridge0 type bridge vlan_filtering 1
+#	ip link set bridge0 up
+#	ip link set dummy1 master bridge0
+#	ip link add link bridge0 name macv0 address 00:aa:bb:cc:dd:ee type macvlan mode bridge
+#	ip link set macv0 up
+
+	# macvlan
+	# |
+	# bridge
+	# |
+	# team
+	# |
+	# dummy
+
+	# macvlan_open
+	# dev_uc_add(bridge)
+	# netif_addr_lock_bh(bridge)
+	# __dev_set_rx_mode
+	# IFF_UNICAST_FLT:
+	#   ndo_set_rx_mode
+	#     bridge - no-op
+	# !IFF_UNICAST_FLT:
+	#   __dev_set_promiscuity
+	#   dev_change_rx_flags
+	#   ndo_change_rx_flags
+	#   br_dev_change_rx_flags
+	#   list_for_each_entry
+	#   br_port_set_promisc(team)
+
+	ip link add team0 type team
+	ip link add dummy1 type dummy
+	ip link set dummy1 master team0
+	ip link set team0 up
+	ip link add bridge0 type bridge vlan_filtering 1
+	ip link set bridge0 up
+	ip link set team0 master bridge0
+	ip link add link bridge0 name macv0 address 00:aa:bb:cc:dd:ee type macvlan mode bridge
+	ip link set macv0 up
+
+	# macvlan
+	# |
+	# team
+	# |
+	# dummy
+
+#	ip link add team0 type team
+#	ip link add dummy1 type dummy
+#	ip link set dummy1 master team0
+#	ip link set team0 up
+#	ip link add link team0 name macv0 address 00:aa:bb:cc:dd:ee type macvlan mode bridge
+#	ip link set macv0 up
 }
 
 tcpx_selftest() {

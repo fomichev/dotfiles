@@ -116,6 +116,7 @@ if [[ ! -e $KDIR/.config ]]; then
 	set_config CONFIG_TUN
 	set_config CONFIG_IPVLAN
 	set_config CONFIG_BRIDGE
+	set_config CONFIG_BRIDGE_VLAN_FILTERING
 	set_config CONFIG_MACVLAN
 	set_config CONFIG_MACVTAP
 	set_config CONFIG_VSOCKETS

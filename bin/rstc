@@ -96,6 +96,16 @@ system_cleanup() {
 	sudo /usr/bin/pacman --noconfirm -Scc || :
 }
 
+matrix_update() {
+	if [ ! -d ~/src/matrix-docker-ansible-deploy ]; then
+		return
+	fi
+
+	pushd ~/src/matrix-docker-ansible-deploy
+	./update.sh
+	popd
+}
+
 is_running() {
 	[[ $(systemctl --user is-active $SERVICE) == "active" ]]
 }
@@ -156,6 +166,7 @@ if [[ $# -eq 0 ]]; then
 		system_pacnew
 		system_cleanup
 	fi
+	matrix_update
 	do_notify "updated"
 	trap - EXIT
 	exit
