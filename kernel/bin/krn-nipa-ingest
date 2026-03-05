@@ -3,6 +3,14 @@
 MYDIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}" )" &>/dev/null && pwd)
 source $MYDIR/../host_lib.sh
 
+VENV=~/nipa-venv/bin/activate
+
+if [[ -e $VENV ]]; then
+	source ~/nipa-venv/bin/activate
+else
+	PATH=/usr/bin:$PATH
+fi
+
 cd $KDIR
 
 TMPDIR=$HOME/tmp/nipa-ingest
