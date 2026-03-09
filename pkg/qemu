@@ -5,4 +5,5 @@ src=(https://gitlab.com/qemu-project/qemu.git)
 configure_flags+=(
 		--enable-slirp
 		--enable-virtfs
+		--disable-docs
 )

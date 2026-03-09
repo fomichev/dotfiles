@@ -1,0 +1,11 @@
+#!/bin/bash
+
+MYDIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}" )" &>/dev/null && pwd)
+source $MYDIR/../host_lib.sh
+
+cd $KDIR
+
+mkdir -p $KDIR/.claude
+ln -fs ~/src/dotfiles/kernel/skills $KDIR/.claude/skills
+
+claude

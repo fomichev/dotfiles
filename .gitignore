@@ -1,3 +1,5 @@
+*.bin
+
 .vim/tmp/
 .vim/bundle/
 .vim/pack/
@@ -28,12 +30,6 @@ bin/kubeadm
 bin/monarch-policies
 kernel/bin/output
 
-.config/nvim/bundle
-.config/nvim/lazy-lock.json
-
-.config/tinted-theming/base16_shell_theme
-
-.config/.gsd-keyboard.settings-ported
 .config/anjuta/
 .config/anytype/
 .config/ardour5/
@@ -49,8 +45,10 @@ kernel/bin/output
 .config/compiz-1/
 .config/configstore/
 .config/dconf/
+.config/devfeature/
 .config/dleyna-renderer-service.conf
 .config/dleyna-server-service.conf
+.config/dotsync/
 .config/easyeffects/
 .config/Electron/
 .config/enchant/
@@ -59,9 +57,9 @@ kernel/bin/output
 .config/et/
 .config/evolution/
 .config/falkTX/
-.config/FreeCAD/
 .config/fish/
 .config/fontforge/
+.config/FreeCAD/
 .config/Ganache/
 .config/gcloud/
 .config/geary/
@@ -73,6 +71,7 @@ kernel/bin/output
 .config/gnome-games/
 .config/GNOME-xdg-terminals.list
 .config/gnote/
+.config/go/
 .config/goa-1.0/
 .config/goobuntu-backups/
 .config/goobuntu-indicator/
@@ -80,6 +79,7 @@ kernel/bin/output
 .config/google-chrome/
 .config/google-chrome-beta/
 .config/google-googletalkplugin/
+.config/.gsd-keyboard.settings-ported
 .config/gtk-2.0/
 .config/gtk-3.0/
 .config/guitarix/
@@ -107,9 +107,11 @@ kernel/bin/output
 .config/monitors.xml~
 .config/nautilus/
 .config/nemo/
+.config/nvim/bundle
+.config/nvim/lazy-lock.json
 .config/obsidian/
-.config/org.gnome.Dictionary/
 .config/OpenSCAD/
+.config/org.gnome.Dictionary/
 .config/pipewire/
 .config/pipewire-media-session/
 .config/pmbootstrap.cfg
@@ -125,6 +127,7 @@ kernel/bin/output
 .config/Rygel/
 .config/rygel.conf
 .config/SiYuan-Electron/
+.config/skip-rc-validation
 .config/software-center/
 .config/sonic-visualiser/
 .config/spotify/
@@ -134,6 +137,7 @@ kernel/bin/output
 .config/telegram-send.conf
 .config/Thunar/
 .config/tilem2/
+.config/tinted-theming/base16_shell_theme
 .config/totem/
 .config/Tracktion/
 .config/transmission/
@@ -150,7 +154,7 @@ kernel/bin/output
 .config/xbuild/
 .config/xdg-terminals.list
 .config/xfce4/
-.config/yay/
 .config/yabridgectl/
+.config/yay/
 .config/Yubico/
 .config/zoomus.conf
