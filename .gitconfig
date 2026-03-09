@@ -87,4 +87,4 @@
 	detachedHead = false
 
 [include]
-	path = ~/local/.gitconfig
+	path = ~/.local/.gitconfig
