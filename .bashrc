@@ -13,7 +13,6 @@ path_prepend ~/opt/sysroot/usr/sbin
 path_prepend ~/opt/sysroot/sbin
 path_prepend ~/opt/sysroot/bin
 path_prepend ~/opt/sysroot/go/bin
-path_prepend ~/local/bin
 path_prepend ~/.local/bin
 path_prepend ~/bin
 path_prepend ~/go/bin
@@ -23,7 +22,7 @@ path_prepend /usr/local/share/python
 
 path_append ~/src/dotfiles/kernel/bin
 
-export LD_LIBRARY_PATH=/usr/local/google/home/sdf/opt/sysroot/lib
+export LD_LIBRARY_PATH=$HOME/sdf/opt/sysroot/lib
 
 # }}}
 # Include aliases {{{
@@ -110,6 +109,6 @@ stty -ixon
 # }}}
 # Include local settings {{{
 
-try_source ~/local/.bashrc
+try_source ~/.local/.bashrc
 
 # }}}

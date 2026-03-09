@@ -7,8 +7,8 @@ if [ -z "$HOME" ]; then
 	exit 1
 fi
 
-if [ -e $HOME/local/local_lib.sh ]; then
-	source $HOME/local/local_lib.sh
+if [ -e $HOME/.local/local_lib.sh ]; then
+	source $HOME/.local/local_lib.sh
 fi
 
 ##    netdevsim0 (down)
@@ -88,7 +88,7 @@ export_settings() {
 	SYZ_DIR="$HOME/src/syzkaller/bin/linux_amd64"
 
 	# for non-interactive (script) mode
-	export PATH=$HOME/local/bin:$UPSTREAM_KDIR/tools/bpf/bpftool:$UPSTREAM_KDIR/tools/perf:$PATH
+	export PATH=$HOME/.local/bin:$UPSTREAM_KDIR/tools/bpf/bpftool:$UPSTREAM_KDIR/tools/perf:$PATH
 
 	export PATH=$UPSTREAM_KDIR/tools/bpf/bpftool:$PATH
 	#export PATH=$HOME/tools/static:$PATH
@@ -511,7 +511,7 @@ testsuite_run() {
 ##### custom tests #####
 
 bitcoin_miner() {
-	cd /usr/local/google/home/sdf/src/xdp-btc-miner
+	cd $HOME/sdf/src/xdp-btc-miner
 	./mine
 }
 
@@ -567,8 +567,8 @@ netdev_sim() {
 	./test_offload.py |& tee $KDIR/scratch.txt
 
 	echo 0 1 > /sys/bus/netdevsim/new_device
-	/usr/local/google/home/sdf/src/iproute2_upstream/ip/ip link show dev eth1
-	/usr/local/google/home/sdf/src/iproute2_upstream/ip/ip link set dev eth1 xdpgeneric obj /usr/local/google/home/sdf/src/linux/tools/testing/selftests/bpf/sample_ret0.bpf.o sec .text
+	$HOME/sdf/src/iproute2_upstream/ip/ip link show dev eth1
+	$HOME/sdf/src/iproute2_upstream/ip/ip link set dev eth1 xdpgeneric obj $HOME/sdf/src/linux/tools/testing/selftests/bpf/sample_ret0.bpf.o sec .text
 
 	echo 0 1 > /sys/bus/netdevsim/new_device
 	dev_path=$(ls -d /sys/bus/netdevsim/devices/netdevsim0/net/*)

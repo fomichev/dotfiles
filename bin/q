@@ -495,7 +495,7 @@ guest() {
 	touch /root/.bash_profile &>/dev/null
 
 	local rcfile=/tmp/.bashrc
-	export PATH=$HOME/local/bin:$PATH
+	export PATH=$HOME/.local/bin:$PATH
 	if [[ -d "$DIR_KERNEL" ]]; then
 		export PATH="$DIR_KERNEL/tools/bpf/bpftool:$PATH"
 		export PATH="$DIR_KERNEL/tools/perf:$PATH"
@@ -505,7 +505,7 @@ guest() {
 	cat << EOF > $rcfile
 export DIR_KERNEL="$DIR_KERNEL"
 
-export PATH=\$HOME/local/bin:\$PATH
+export PATH=\$HOME/.local/bin:\$PATH
 export PATH=\$DIR_KERNEL/tools/bpf/bpftool:\$PATH
 export PATH=\$DIR_KERNEL/tools/perf:\$PATH
 
