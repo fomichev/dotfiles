@@ -4,7 +4,7 @@ export ET_NO_TELEMETRY=yes
 
 SESSION=${1:-$(tmux display-message -p '#S')}
 LOCAL_SOCK=$(tmux display-message -p '#{socket_path}')
-REMOTE_SOCK=/tmp/tmux-local.sock
+REMOTE_SOCK=~/.tmux-local.sock
 
 set_current_command() {
 	local host=$1; shift
@@ -15,11 +15,17 @@ set_current_command() {
 
 tunnel_tmux_socket() {
 	local ssh_host=$1
+	local ctl="/tmp/tmux-tunnel-$ssh_host"
+	# kill previous tunnel if any
+	ssh -o ControlPath="$ctl" -O exit "$ssh_host" 2>/dev/null || true
+	echo "Setting up tmux socket tunnel to $ssh_host (may require 2FA)..."
 	x2ssh "$ssh_host" \
 		-fN \
+		-o "ControlMaster yes" \
+		-o "ControlPath $ctl" \
 		-o "StreamLocalBindUnlink yes" \
-		-o "ExitOnForwardFailure yes" \
-		-R "$REMOTE_SOCK:$LOCAL_SOCK" 2>/dev/null || true
+		-R "$REMOTE_SOCK:$LOCAL_SOCK"
+	echo "Tunnel established."
 }
 
 case "$SESSION" in
