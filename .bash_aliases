@@ -27,6 +27,14 @@ gpg-export-ssh-agent() {
 	gpg-connect-agent updatestartuptty /bye
 }
 
+http-proxy() {
+	local proxy="http://fwdproxy:8080"
+	export HTTP_PROXY="$proxy"
+	export HTTPS_PROXY="$proxy"
+	export http_proxy="$proxy"
+	export https_proxy="$proxy"
+}
+
 [ -e /usr/share/bash-completion/completions/git ] && {
 	. /usr/share/bash-completion/completions/git
 
