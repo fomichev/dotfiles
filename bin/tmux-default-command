@@ -21,16 +21,9 @@ tunnel_tmux_socket() {
 	ssh -o ControlPath="$ctl" -O exit "$ssh_host" 2>/dev/null || true
 	echo "Setting up tmux socket tunnel to $ssh_host (may require 2FA)..."
 	x2ssh "$ssh_host" \
-		-fN \
-		-o "ControlMaster yes" \
-		-o "ControlPath $ctl" \
-		-R "$TUNNEL_PORT:$LOCAL_SOCK"
-	# start socat on the remote to bridge TCP to Unix socket
-	ssh -o ControlPath="$ctl" "$ssh_host" \
-		"rm -f $REMOTE_SOCK; socat UNIX-LISTEN:$REMOTE_SOCK,fork TCP:localhost:$TUNNEL_PORT &"
-	# write session name so remote tmux wrapper knows the default target
-	ssh -o ControlPath="$ctl" "$ssh_host" \
-		"echo $SESSION > \$HOME/.tmux-local-session"
+		-f \
+		-R "$TUNNEL_PORT:$LOCAL_SOCK" \
+		-- "rm -f $REMOTE_SOCK; socat UNIX-LISTEN:$REMOTE_SOCK,fork TCP:localhost:$TUNNEL_PORT & echo $SESSION > \$HOME/.tmux-local-session; sleep infinity"
 	echo "Tunnel established."
 }
 

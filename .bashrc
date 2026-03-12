@@ -124,7 +124,7 @@ if [ -S ~/.tmux-local.sock ]; then
 		tmux() {
 			case "$1" in
 			new-window|split-window|select-window|select-pane|send-keys|kill-window|kill-pane)
-				command tmux -t "$_tmux_session" "$@" ;;
+				command tmux "$1" -t "$_tmux_session" "${@:2}" ;;
 			*)
 				command tmux "$@" ;;
 			esac
