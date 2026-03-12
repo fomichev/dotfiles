@@ -2,21 +2,23 @@
 
 export ET_NO_TELEMETRY=yes
 
-SESSION=$(tmux display-message -p '#S')
+SESSION=${1:-$(tmux display-message -p '#S')}
 
 set_current_command() {
+	local host=$1; shift
+	tmux set-option -t $SESSION @host ":$host"
 	tmux set-option -t $SESSION default-command "$*"
 	tmux show-option -t $SESSION default-command
 }
 
 case "$SESSION" in
 "mini-arch")
-	set_current_command et 76.102.12.149
+	set_current_command mini-arch et 76.102.12.149
 	;;
 "mooncake")
-	set_current_command x2ssh -et devgpu003.lco1.facebook.com
+	set_current_command devgpu003 x2ssh -et devgpu003.lco1.facebook.com
 	;;
 "tcp_devmem")
-	set_current_command x2ssh -et devvm6216.cco0.facebook.com
+	set_current_command devvm6216 x2ssh -et devvm6216.cco0.facebook.com
 	;;
 esac
