@@ -3,6 +3,8 @@
 export ET_NO_TELEMETRY=yes
 
 SESSION=${1:-$(tmux display-message -p '#S')}
+LOCAL_SOCK=$(tmux display-message -p '#{socket_path}')
+REMOTE_SOCK=/tmp/tmux-local.sock
 
 set_current_command() {
 	local host=$1; shift
@@ -11,14 +13,25 @@ set_current_command() {
 	tmux show-option -t $SESSION default-command
 }
 
+tunnel_tmux_socket() {
+	local ssh_host=$1
+	x2ssh "$ssh_host" \
+		-fN \
+		-o "StreamLocalBindUnlink yes" \
+		-o "ExitOnForwardFailure yes" \
+		-R "$REMOTE_SOCK:$LOCAL_SOCK" 2>/dev/null || true
+}
+
 case "$SESSION" in
 "mini-arch")
 	set_current_command mini-arch et 76.102.12.149
 	;;
 "mooncake")
+	tunnel_tmux_socket devgpu003.lco1.facebook.com
 	set_current_command devgpu003 x2ssh -et devgpu003.lco1.facebook.com
 	;;
 "tcp_devmem")
+	tunnel_tmux_socket devvm6216.cco0.facebook.com
 	set_current_command devvm6216 x2ssh -et devvm6216.cco0.facebook.com
 	;;
 esac

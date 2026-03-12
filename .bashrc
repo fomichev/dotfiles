@@ -117,6 +117,10 @@ stty -ixon
 # }}}
 # Include local settings {{{
 
+if [ -S /tmp/tmux-local.sock ]; then
+	export TMUX="/tmp/tmux-local.sock,0,0"
+fi
+
 try_source ~/.local/.bashrc
 
 # }}}

@@ -15,7 +15,8 @@ else
 	popd
 fi
 
-PROMPT="review all unpushed commits"
+UNPUSHED=$(git log --format='%h' @{u}..HEAD 2>/dev/null)
+PROMPT="review all unpushed commits: $UNPUSHED"
 
 if [[ ! -z "$*" ]]; then
 	PROMPT="$@"
