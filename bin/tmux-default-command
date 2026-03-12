@@ -4,7 +4,8 @@ export ET_NO_TELEMETRY=yes
 
 SESSION=${1:-$(tmux display-message -p '#S')}
 LOCAL_SOCK=$(tmux display-message -p '#{socket_path}')
-REMOTE_SOCK=~/.tmux-local.sock
+TUNNEL_PORT=12987
+REMOTE_SOCK=\$HOME/.tmux-local.sock
 
 set_current_command() {
 	local host=$1; shift
@@ -23,8 +24,13 @@ tunnel_tmux_socket() {
 		-fN \
 		-o "ControlMaster yes" \
 		-o "ControlPath $ctl" \
-		-o "StreamLocalBindUnlink yes" \
-		-R "$REMOTE_SOCK:$LOCAL_SOCK"
+		-R "$TUNNEL_PORT:$LOCAL_SOCK"
+	# start socat on the remote to bridge TCP to Unix socket
+	ssh -o ControlPath="$ctl" "$ssh_host" \
+		"rm -f $REMOTE_SOCK; socat UNIX-LISTEN:$REMOTE_SOCK,fork TCP:localhost:$TUNNEL_PORT &"
+	# write session name so remote tmux wrapper knows the default target
+	ssh -o ControlPath="$ctl" "$ssh_host" \
+		"echo $SESSION > \$HOME/.tmux-local-session"
 	echo "Tunnel established."
 }
 

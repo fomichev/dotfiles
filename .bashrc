@@ -115,11 +115,25 @@ fi
 stty -ixon
 
 # }}}
-# Include local settings {{{
+# Tmux local forwarding {{{
 
 if [ -S ~/.tmux-local.sock ]; then
 	export TMUX="$HOME/.tmux-local.sock,0,0"
+	_tmux_session=$(cat ~/.tmux-local-session 2>/dev/null)
+	if [ -n "$_tmux_session" ]; then
+		tmux() {
+			case "$1" in
+			new-window|split-window|select-window|select-pane|send-keys|kill-window|kill-pane)
+				command tmux -t "$_tmux_session" "$@" ;;
+			*)
+				command tmux "$@" ;;
+			esac
+		}
+	fi
 fi
+
+# }}}
+# Include local settings {{{
 
 try_source ~/.local/.bashrc
 
