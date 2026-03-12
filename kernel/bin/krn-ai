@@ -15,10 +15,10 @@ else
 	popd
 fi
 
-PROMPT="review the top commit"
+PROMPT="review all unpushed commits"
 
 if [[ ! -z "$*" ]]; then
 	PROMPT="$@"
 fi
 
-claude "Using the prompt $DIR/review/review-core.md and the review prompt directory $DIR/review, $PROMPT"
+claude "Using the prompt $DIR/kernel/review-core.md and the review prompt directory $DIR/kernel, $PROMPT"
