@@ -1,5 +1,13 @@
 [ -z "$PS1" ] && return
 
+if [[ -e /etc/bashrc ]]; then
+source /etc/bashrc
+fi
+
+if [[ -e /usr/facebook/ops/rc/master.bashrc ]]; then
+source /usr/facebook/ops/rc/master.bashrc
+fi
+
 umask 027
 
 # Modify PATH {{{
