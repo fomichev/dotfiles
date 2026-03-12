@@ -6,7 +6,7 @@ MYDIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}" )" &>/dev/null && pwd)
 source $MYDIR/../host_lib.sh
 
 LLVM=${LLVM:-1}
-SILENT="-s"
+#SILENT="-s"
 
 while getopts "S" opt; do
 	case $opt in
@@ -38,3 +38,6 @@ fi
 
 FORCE_TARGETS=1 \
 $PREFIX make $SILENT -j$(nproc) -C tools/testing/selftests TARGETS="$*" LLVM=$LLVM USERCFLAGS="$cflags"
+
+#FORCE_TARGETS=1 \
+#$PREFIX make $SILENT -j$(nproc) -C tools/testing/selftests/bpf V=1 LLVM=$LLVM USERCFLAGS="$cflags"

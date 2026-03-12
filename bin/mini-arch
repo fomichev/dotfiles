@@ -4,4 +4,4 @@ if [ $# -eq 0 ]; then
 	set mini-arch.duckdns.org
 fi
 
-ET_NO_TELEMETRY=yes et -t 11434:11434 "$@"
+ET_NO_TELEMETRY=yes et "$@"
