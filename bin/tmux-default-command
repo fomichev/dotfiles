@@ -3,9 +3,6 @@
 export ET_NO_TELEMETRY=yes
 
 SESSION=${1:-$(tmux display-message -p '#S')}
-LOCAL_SOCK=$(tmux display-message -p '#{socket_path}')
-TUNNEL_PORT=12987
-REMOTE_SOCK=\$HOME/.tmux-local.sock
 
 set_current_command() {
 	local host=$1; shift
@@ -14,29 +11,14 @@ set_current_command() {
 	tmux show-option -t $SESSION default-command
 }
 
-tunnel_tmux_socket() {
-	local ssh_host=$1
-	local ctl="/tmp/tmux-tunnel-$ssh_host"
-	# kill previous tunnel if any
-	ssh -o ControlPath="$ctl" -O exit "$ssh_host" 2>/dev/null || true
-	echo "Setting up tmux socket tunnel to $ssh_host (may require 2FA)..."
-	x2ssh "$ssh_host" \
-		-f \
-		-R "$TUNNEL_PORT:$LOCAL_SOCK" \
-		-- "rm -f $REMOTE_SOCK; socat UNIX-LISTEN:$REMOTE_SOCK,fork TCP:localhost:$TUNNEL_PORT & echo $SESSION > \$HOME/.tmux-local-session; sleep infinity"
-	echo "Tunnel established."
-}
-
 case "$SESSION" in
 "mini-arch")
 	set_current_command mini-arch et 76.102.12.149
 	;;
 "mooncake")
-	tunnel_tmux_socket devgpu003.lco1.facebook.com
 	set_current_command devgpu003 x2ssh -et devgpu003.lco1.facebook.com
 	;;
 "tcp_devmem")
-	tunnel_tmux_socket devvm6216.cco0.facebook.com
 	set_current_command devvm6216 x2ssh -et devvm6216.cco0.facebook.com
 	;;
 esac
