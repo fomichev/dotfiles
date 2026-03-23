@@ -292,7 +292,6 @@ require("lazy").setup({
 	},
 	{
 		"nvim-telescope/telescope.nvim",
-		branch = "0.1.x",
 		dependencies = { "nvim-lua/plenary.nvim" },
 		config = function ()
 			local builtin = require("telescope.builtin")
@@ -398,24 +397,20 @@ require("lazy").setup({
 	{
 		"nvim-treesitter/nvim-treesitter",
 		build = ":TSUpdate",
-		config = function ()
-			local configs = require("nvim-treesitter.configs")
+		opts = {
+			ensure_installed = { "c", "vim", "rust", "go", "lua" },
+			sync_install = true,
+			auto_install = true,
 
-			configs.setup({
-				ensure_installed = { "c", "vim", "rust", "go", "lua" },
-				sync_install = true,
-				auto_install = true,
+			highlight = {
+				enable = true,
+				additional_vim_regex_highlighting = false,
+			},
 
-				highlight = {
-					enable = true,
-					additional_vim_regex_highlighting = false,
-				},
-
-				indent = {
-					enable = true,
-				},
-			})
-		end,
+			indent = {
+				enable = true,
+			},
+		},
 	},
 	{
 		'nvim-lualine/lualine.nvim',
