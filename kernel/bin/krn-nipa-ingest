@@ -38,8 +38,8 @@ git checkout upstream/net-next/main # -b test
 
 NO_BUILD+="--disable-test"
 NO_BUILD+=" patch/build_32bit"
-NO_BUILD+=" patch/build_allmodconfig_warn"
-NO_BUILD+=" patch/build_clang"
+#NO_BUILD+=" patch/build_allmodconfig_warn"
+#NO_BUILD+=" patch/build_clang"
 NO_BUILD+=" patch/build_clang_rust"
 
 cd ~/src/nipa
