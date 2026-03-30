@@ -30,6 +30,7 @@ bin/kubeadm
 bin/monarch-policies
 kernel/bin/output
 
+.config/alvr/
 .config/anjuta/
 .config/anytype/
 .config/ardour5/
@@ -41,6 +42,7 @@ kernel/bin/output
 .config/calibre/
 .config/ccache/
 .config/cef_user_data/
+.config/chromium/
 .config/cni/
 .config/compiz-1/
 .config/configstore/
@@ -64,7 +66,9 @@ kernel/bin/output
 .config/gcloud/
 .config/geary/
 .config/gedit/
+.config/ghidra/
 .config/GIMP/
+.config/github-copilot/
 .config/glinux/
 .config/gnome-builder/
 .config/gnome-control-center/
@@ -110,7 +114,11 @@ kernel/bin/output
 .config/nvim/bundle
 .config/nvim/lazy-lock.json
 .config/obsidian/
+.config/opencode/
+.config/OpenRGB/
 .config/OpenSCAD/
+.config/openvr/
+.config/openxr/
 .config/org.gnome.Dictionary/
 .config/pipewire/
 .config/pipewire-media-session/
@@ -119,6 +127,7 @@ kernel/bin/output
 .config/PrusaSlicer/
 .config/Psst/
 .config/pulse/
+.config/pupgui/
 .config/qmk/
 .config/QtProject.conf
 .config/rclone/
@@ -131,6 +140,7 @@ kernel/bin/output
 .config/software-center/
 .config/sonic-visualiser/
 .config/spotify/
+.config/steamtinkerlaunch/
 .config/syllogi/
 .config/systemd/user/default.target.wants/
 .config/systemd/user/sockets.target.wants/
@@ -142,10 +152,12 @@ kernel/bin/output
 .config/Tracktion/
 .config/transmission/
 .config/unity/
+.config/unity3d/
 .config/UoFiddler/
 .config/user-dirs.dirs
 .config/user-dirs.locale
 .config/user-share/
+.config/Valve/
 .config/VESC/
 .config/via-nativia/
 .config/vim/
