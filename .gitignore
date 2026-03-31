@@ -46,6 +46,7 @@ kernel/bin/output
 .config/cni/
 .config/compiz-1/
 .config/configstore/
+.config/connections.db
 .config/dconf/
 .config/devfeature/
 .config/dleyna-renderer-service.conf
@@ -57,6 +58,7 @@ kernel/bin/output
 .config/eog/
 .config/epiphany/
 .config/et/
+.config/evince/
 .config/evolution/
 .config/falkTX/
 .config/fish/
@@ -73,6 +75,7 @@ kernel/bin/output
 .config/gnome-builder/
 .config/gnome-control-center/
 .config/gnome-games/
+.config/gnome-initial-setup-done
 .config/GNOME-xdg-terminals.list
 .config/gnote/
 .config/go/
@@ -102,6 +105,7 @@ kernel/bin/output
 .config/LibreCAD/
 .config/libreoffice/
 .config/Logseq/
+.config/lrs.personalprint.manager/
 .config/lsp-plugins/
 .config/lutris/
 .config/menus/
@@ -111,6 +115,7 @@ kernel/bin/output
 .config/monitors.xml~
 .config/nautilus/
 .config/nemo/
+.config/NVIDIA\ Corporation/
 .config/nvim/bundle
 .config/nvim/lazy-lock.json
 .config/obsidian/
@@ -122,6 +127,7 @@ kernel/bin/output
 .config/org.gnome.Dictionary/
 .config/pipewire/
 .config/pipewire-media-session/
+.config/pkcs11/
 .config/pmbootstrap.cfg
 .config/Printrun/
 .config/PrusaSlicer/
@@ -162,12 +168,14 @@ kernel/bin/output
 .config/via-nativia/
 .config/vim/
 .config/vlc/
+.config/VS\ Code\ @\ FB/
 .config/wireshark/
 .config/xbuild/
 .config/xdg-terminals.list
 .config/xfce4/
 .config/yabridgectl/
 .config/yay/
+.config/yelp/
 .config/Yubico/
 .config/zoomus.conf
 

@@ -11,14 +11,23 @@ set_current_command() {
 	tmux show-option -t $SESSION default-command
 }
 
+shortname() {
+	echo "$*" | cut -d. -f1
+}
+
 case "$SESSION" in
 "mini-arch")
 	set_current_command mini-arch et 76.102.12.149
 	;;
 "mooncake")
-	set_current_command devgpu003 x2ssh -et devgpu003.lco1.facebook.com
+	#HOST=devgpu003.lco1.facebook.com
+	HOST=devvm17672.vll0.facebook.com
+	NAME=$(shortname $HOST)
+	set_current_command $NAME x2ssh -et $HOST
 	;;
 "tcp_devmem")
-	set_current_command devvm6216 x2ssh -et devvm6216.cco0.facebook.com
+	HOST=devvm7509.cco0.facebook.com
+	NAME=$(shortname $HOST)
+	set_current_command $NAME x2ssh -et $HOST
 	;;
 esac
