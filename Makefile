@@ -81,6 +81,22 @@ gnome:
 	gsettings set org.gnome.desktop.wm.keybindings switch-to-workspace-right "['<Super>l']"
 	gsettings set org.gnome.desktop.wm.keybindings switch-to-workspace-up "[]"
 	gsettings set org.gnome.desktop.wm.keybindings switch-to-workspace-down "[]"
+
+	gsettings set org.gnome.desktop.wm.keybindings minimize "[]"
+	gsettings set org.gnome.desktop.wm.keybindings maximize "[]"
+	gsettings set org.gnome.desktop.wm.keybindings unmaximize "[]"
+
+	gsettings set org.gnome.desktop.wm.keybindings toggle-fullscreen "[]"
+	gsettings set org.gnome.desktop.wm.keybindings toggle-maximized "['<Super>f']"
+
+	gsettings set org.gnome.desktop.wm.keybindings move-to-workspace-1 "['<Shift><Super>1']"
+	gsettings set org.gnome.desktop.wm.keybindings move-to-workspace-2 "['<Shift><Super>2']"
+	gsettings set org.gnome.desktop.wm.keybindings move-to-workspace-3 "['<Shift><Super>3']"
+	gsettings set org.gnome.desktop.wm.keybindings move-to-workspace-4 "['<Shift><Super>4']"
+
+	gsettings set org.gnome.desktop.wm.keybindings switch-windows-backward "['<Super>j']"
+	gsettings set org.gnome.desktop.wm.keybindings switch-windows "['<Super>k']"
+
 	gsettings set org.gnome.shell.keybindings switch-to-application-1 "[]"
 	gsettings set org.gnome.shell.keybindings switch-to-application-2 "[]"
 	gsettings set org.gnome.shell.keybindings switch-to-application-3 "[]"
@@ -95,6 +111,16 @@ gnome:
 	gsettings set org.gnome.desktop.wm.keybindings switch-to-workspace-3 "['<Super>3']"
 	gsettings set org.gnome.desktop.wm.keybindings switch-to-workspace-4 "['<Super>4']"
 	gsettings set org.gnome.desktop.wm.keybindings activate-window-menu "[]"
+
+	gsettings set org.gnome.mutter.keybindings toggle-tiled-left "['<Super>d']"
+	gsettings set org.gnome.mutter.keybindings toggle-tiled-right "['<Super>g']"
+
+	gsettings set org.gnome.shell.app-switcher current-workspace-only false
+
+gnome-dump:
+	gsettings list-recursively org.gnome.mutter.keybindings
+	gsettings list-recursively org.gnome.desktop.wm.keybindings
+	gsettings list-recursively org.gnome.shell.keybindings
 
 layout:
 	$(call Layout,sofle,sdf,keyboard/sofle.svg)

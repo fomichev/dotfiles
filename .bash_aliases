@@ -40,3 +40,7 @@ http-proxy() {
 
 	__git_complete v __git_main
 }
+
+alias sound=wiremix
+alias wifi=impala
+alias bluetooth=bluetui
