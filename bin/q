@@ -348,8 +348,9 @@ guest() {
 	fi
 	mount -n -t devtmpfs -o mode=0755,nosuid,noexec devtmpfs /dev
 
+	ln -sf /proc/self/fd /dev/fd
 	mkdir -p -m 0755 /dev/shm /dev/pts /dev/cgroup
-	mkdir -p -m 0755 /dev/cgroup/{cpu,cpuset} 2>/dev/null
+	mkdir -p -m 0755 /dev/cgroup/cpu 2>/dev/null
 	mount -n -t devpts -o gid=tty,mode=620,noexec,nosuid devpts /dev/pts
 	mount -n -t tmpfs -o mode=1777,nosuid,nodev tmpfs /dev/shm
 
@@ -462,7 +463,6 @@ guest() {
 
 	say setup cgroups
 	mount -t cgroup -o cpu,cpuacct none /dev/cgroup/cpu
-	mount -t cgroup -o cpuset none /dev/cgroup/cpuset
 	sysctl -q kernel.allow_bpf_attach_netcg=0 &>/dev/null
 	mount -t cgroup2 none /sys/fs/cgroup
 
