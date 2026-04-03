@@ -50,6 +50,8 @@ FWD_PORT=${FWD_PORT:-}
 NET_USER=${NET_USER:-true}
 NET_TAP=${NET_TAP:-false}
 NET_VHOST=${NET_VHOST:-false}
+FBNIC_FW=${FBNIC_FW:-$HOME/src/fbnic-mock-fw/mock_fw_upstream/mock_fw.py}
+FBNIC_SKT=${FBNIC_SKT:-/tmp/fbnic-ctrl-skt}
 # }}}
 
 usage() {
@@ -194,6 +196,18 @@ host() {
 			;;
 	esac
 
+	local NET_FBNIC=false
+	if [[ -e "$FBNIC_FW" ]] && ${QEMU_PATH}qemu-system-${qemu_flavor} -device help 2>&1 | grep -q '"fbnic"'; then
+		NET_FBNIC=true
+	fi
+
+	if $NET_FBNIC; then
+		net+=" -object memory-backend-memfd,id=fbnic-mem,size=${MEMORY}M,share=on"
+		net+=" -machine memory-backend=fbnic-mem"
+		net+=" -chardev socket,id=fbnic-fw,path=$FBNIC_SKT,server=off"
+		net+=" -device fbnic,bar4=fbnic-fw"
+	fi
+
 	local init
 	init+="mount -n -t tmpfs tmpfs /tmp"
 	init+=" && "
@@ -229,6 +243,18 @@ host() {
 	if [[ -z "$cpu" ]]; then
 		echo "unknown cpu for ${ARCH} arch"
 		exit 1
+	fi
+
+	if $NET_FBNIC; then
+		rm -f "$FBNIC_SKT"
+		/usr/bin/python3 "$FBNIC_FW" "$FBNIC_SKT" &
+		FBNIC_FW_PID=$!
+		# Wait for the socket to appear
+		for i in $(seq 1 50); do
+			[ -e "$FBNIC_SKT" ] && break
+			sleep 0.1
+		done
+		trap 'kill $FBNIC_FW_PID 2>/dev/null; rm -f "$FBNIC_SKT"' EXIT
 	fi
 
 	$QEMU_PREFIX ${QEMU_PATH}qemu-system-${qemu_flavor} \
