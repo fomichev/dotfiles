@@ -1,0 +1,17 @@
+#!/bin/bash
+
+src=(https://github.com/facebook/fbnic_qemu.git)
+
+export CFLAGS
+
+configure_flags+=(
+		--enable-slirp
+		--enable-virtfs
+		--disable-docs
+		--target-list=x86_64-softmmu
+		--extra-cflags=-Wno-error=discarded-qualifiers
+		--extra-cflags=-Wno-error=incompatible-pointer-types
+		--extra-cflags=-Wno-error=int-conversion
+		--extra-cflags=-Wno-error=deprecated-declarations
+		--disable-libnfs
+)
