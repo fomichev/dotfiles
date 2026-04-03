@@ -117,7 +117,7 @@ host() {
 
 	local net
 
-	if $NET_USER; then
+	if $NET_USER && ! $NET_FBNIC; then
 		net+=" -netdev user,id=virtual"
 
 		if $SSH; then
@@ -168,14 +168,6 @@ host() {
 		fs+=" -drive format=raw,file=$IMAGE"
 	fi
 
-	local accel
-	if [[ "${MY_ARCH}" = "${ARCH}" ]]; then
-		accel+=" -machine $QEMU_MACH"
-		accel+=" -enable-kvm"
-	fi
-
-	fixup host
-
 	local cpu
 	local qemu_flavor=$ARCH
 	case "${ARCH}" in
@@ -188,7 +180,6 @@ host() {
 			if [[ "${MY_ARCH}" = "${ARCH}" ]]; then
 				cpu="host"
 			else
-				accel+=" -machine virt"
 				cpu="max"
 			fi
 			qemu_flavor=aarch64
@@ -199,13 +190,26 @@ host() {
 	local NET_FBNIC=false
 	if [[ -e "$FBNIC_FW" ]] && ${QEMU_PATH}qemu-system-${qemu_flavor} -device help 2>&1 | grep -q '"fbnic"'; then
 		NET_FBNIC=true
+		QEMU_MACH="q35,$QEMU_MACH"
 	fi
 
+	local accel
+	if [[ "${MY_ARCH}" = "${ARCH}" ]]; then
+		accel+=" -machine $QEMU_MACH"
+		accel+=" -enable-kvm"
+	elif [[ "${ARCH}" = "arm64" ]]; then
+		accel+=" -machine virt"
+	fi
+
+	fixup host
+
 	if $NET_FBNIC; then
+		net+=" -net none"
 		net+=" -object memory-backend-memfd,id=fbnic-mem,size=${MEMORY}M,share=on"
-		net+=" -machine memory-backend=fbnic-mem"
+		net+=" -numa node,memdev=fbnic-mem"
 		net+=" -chardev socket,id=fbnic-fw,path=$FBNIC_SKT,server=off"
-		net+=" -device fbnic,bar4=fbnic-fw"
+		net+=" -device ioh3420,id=fbnic-root"
+		net+=" -device fbnic,bus=fbnic-root,bar4=fbnic-fw,mac=00:de:ad:be:ef:01"
 	fi
 
 	local init
@@ -247,7 +251,7 @@ host() {
 
 	if $NET_FBNIC; then
 		rm -f "$FBNIC_SKT"
-		/usr/bin/python3 "$FBNIC_FW" "$FBNIC_SKT" &
+		/usr/bin/python3 "$FBNIC_FW" "$FBNIC_SKT" &>/dev/null &
 		FBNIC_FW_PID=$!
 		# Wait for the socket to appear
 		for i in $(seq 1 50); do
