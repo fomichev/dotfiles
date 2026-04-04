@@ -97,12 +97,29 @@ system_cleanup() {
 }
 
 matrix_update() {
-	if [ ! -d ~/src/matrix-docker-ansible-deploy ]; then
+	local d=~/src/matrix-docker-ansible-deploy
+
+	if [ ! -d $d ]; then
 		return
 	fi
 
-	pushd ~/src/matrix-docker-ansible-deploy
+	pushd $d
 	./update.sh
+	popd
+}
+
+mastodon_update() {
+	local d=~/src/mastodon
+
+	if [ ! -d $d ]; then
+		return
+	fi
+
+	pushd $d
+	git pull --rebase
+	docker compose down
+	docker compose pull
+	docker compose up -d
 	popd
 }
 
@@ -167,6 +184,7 @@ if [[ $# -eq 0 ]]; then
 		system_cleanup
 	fi
 	matrix_update
+	mastodon_update
 	do_notify "updated"
 	trap - EXIT
 	exit
