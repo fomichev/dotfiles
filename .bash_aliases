@@ -28,11 +28,11 @@ gpg-export-ssh-agent() {
 }
 
 http-proxy() {
-	local proxy="http://fwdproxy:8080"
-	export HTTP_PROXY="$proxy"
-	export HTTPS_PROXY="$proxy"
-	export http_proxy="$proxy"
-	export https_proxy="$proxy"
+	if [[ $# -ne 0 ]];  then
+		eval ~/bin/http-proxy "$@"
+	fi
+
+	source ~/bin/http-proxy
 }
 
 [ -e /usr/share/bash-completion/completions/git ] && {
