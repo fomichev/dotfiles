@@ -176,6 +176,12 @@ if [[ ! -e $KDIR/.config ]]; then
 
 	set_config CONFIG_UDMABUF
 
+	# Rust
+	#set_config CONFIG_GENDWARFKSYMS
+	#set_config CONFIG_RUST
+	#set_config CONFIG_RUST_NET_DEV_ABSTRACTIONS
+	#set_config CONFIG_FBNIC_RS
+
 	# HW
 	set_config CONFIG_INET6_ESP_OFFLOAD # ipsec_offload
 	set_config CONFIG_FBNIC

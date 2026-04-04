@@ -115,8 +115,6 @@ fi
 stty -ixon
 
 # }}}
-# Include local settings {{{
 
 try_source ~/.local/.bashrc
-
-# }}}
+try_source ~/.cargo/env
