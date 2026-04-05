@@ -351,7 +351,17 @@ def cmd_reply(args):
             with open(file) as f:
                 p.communicate(f.read().encode("utf-8"))
 
+def sync_prompts(prompts_dir):
+    if not os.path.isdir(prompts_dir):
+        subprocess.check_call(['git', 'clone',
+            'https://github.com/masoncl/review-prompts',
+            prompts_dir])
+    else:
+        subprocess.check_call(['git', 'pull'], cwd=prompts_dir)
+
 def build_ai_prompt(args):
+    sync_prompts(args.prompts)
+
     reply_dir = os.path.join('.', 'reply')
     if not os.path.isdir(reply_dir):
         print('should be called from a review directory with reply/')
@@ -453,6 +463,29 @@ def cmd_turbo_feedback(args):
         print(f'--- running: {harness} ---')
         run_harness(harness, prompt, args.linux)
 
+def cmd_branch(args):
+    sync_prompts(args.prompts)
+
+    try:
+        unpushed = subprocess.check_output(
+            ['git', 'log', '--format=%h', '@{u}..HEAD'],
+            stderr=subprocess.DEVNULL
+        ).decode().strip()
+    except subprocess.CalledProcessError:
+        unpushed = ''
+
+    if args.prompt:
+        prompt_text = args.prompt
+    else:
+        commits = ' '.join(unpushed.splitlines())
+        prompt_text = f'review all unpushed commits: {commits}'
+
+    prompt = f'Using the prompt {args.prompts}/kernel/review-core.md and the review prompt directory {args.prompts}/kernel, {prompt_text}'
+
+    import shlex
+    cmd = shlex.split(args.harness) + [prompt]
+    os.execvp(cmd[0], cmd)
+
 parser = argparse.ArgumentParser(description="krn-review")
 parser.add_argument('--review', type=str, default='/home/sdf/review')
 parser.add_argument('--mail', type=str, default=os.path.expanduser('~/Mail'))
@@ -475,6 +508,12 @@ turbo_feedback = subparsers.add_parser("turbo-feedback")
 turbo_feedback.add_argument('--prompts', type=str, default='/home/sdf/src/review-prompts')
 turbo_feedback.add_argument('--linux', type=str, default='/home/sdf/src/linux')
 turbo_feedback.set_defaults(func=cmd_turbo_feedback)
+
+branch = subparsers.add_parser("branch")
+branch.add_argument('-p', '--prompt', type=str)
+branch.add_argument('--prompts', type=str, default='/home/sdf/src/review-prompts')
+branch.add_argument('--harness', type=str, default='claude --effort=max')
+branch.set_defaults(func=cmd_branch)
 
 reply = subparsers.add_parser("reply")
 reply.add_argument('--dry-run', action='store_true')
