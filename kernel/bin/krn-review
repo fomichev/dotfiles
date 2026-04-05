@@ -364,31 +364,70 @@ def build_ai_prompt(args):
         print('no reply templates found in reply/')
         return None
 
-    try:
-        unpushed = subprocess.check_output(
-            ['git', 'log', '--format=%h', '@{u}..HEAD'],
-            cwd=args.linux, stderr=subprocess.DEVNULL
-        ).decode().strip()
-    except subprocess.CalledProcessError:
-        unpushed = ''
+    # Detect if I'm the author
+    policy = email.policy.EmailPolicy(utf8=True)
+    root_path = os.path.join('.', '00_root')
+    with open(root_path) as f:
+        root_msg = email.message_from_file(f, policy=policy)
+    i_am_author = args.me in (root_msg['From'] or '')
 
     feedback = '\n'.join(f'- {os.path.abspath(os.path.join(reply_dir, f))}' for f in files)
-    unpushed = '\n'.join(f'- {c}' for c in unpushed.splitlines() if c)
-    return f"""Using the prompt {args.prompts}/kernel/review-core.md and the review prompt directory {args.prompts}/kernel, address the feedback for the following commits:
+
+    # List original patch files (from the root author, in the review dir root)
+    author = root_msg['From']
+    patches = []
+    for name in sorted(os.listdir('.')):
+        path = os.path.join('.', name)
+        if not os.path.isfile(path):
+            continue
+        try:
+            with open(path) as f:
+                msg = email.message_from_file(f, policy=policy)
+            if msg.get('From') == author:
+                patches.append(os.path.abspath(path))
+        except Exception:
+            continue
+    original_patches = '\n'.join(f'- {p}' for p in patches)
+
+    if i_am_author:
+        try:
+            unpushed = subprocess.check_output(
+                ['git', 'log', '--format=%h', '@{u}..HEAD'],
+                cwd=args.linux, stderr=subprocess.DEVNULL
+            ).decode().strip()
+        except subprocess.CalledProcessError:
+            unpushed = ''
+
+        unpushed = '\n'.join(f'- {c}' for c in unpushed.splitlines() if c)
+        return f"""Using the prompt {args.prompts}/kernel/review-core.md and the review prompt directory {args.prompts}/kernel, address the feedback for the following commits:
 {unpushed}
 
 The feedback is in the following files:
 {feedback}
 
-Each file is an email template for the reply.
+Each feedback file is an email template for the reply.
 Add inline comments that explain why each particular comment is valid or not.
 If there is already an inline comment, make sure it's correct and update if needed.
 Do not use any indentation for these inline comments, but leave an empty line above and below.
 If the feedback is valid, add new commit to address the feedback so I can squash that commit later (unless there is already a fix for that). Mark these commits as 'fixup!'.
-The subject of each feedback email file should references the respective commit, so it should be easy to pair commits to feedback files.
+The subject of each feedback email file references the respective commit, so it should be easy to pair commits to feedback files.
 
 Create a sub-agent to review each feedback file in parallel.
-Exit after competing the task, don't expect any follow ups from the user.
+"""
+    else:
+        return f"""Using the prompt {args.prompts}/kernel/review-core.md and the review prompt directory {args.prompts}/kernel, address the feedback for the following patches:
+{original_patches}
+
+The write feedback to the following files:
+{feedback}
+
+Each feedback file is an email template for the reply.
+Add inline comments if you think there are some problems in the patches.
+If there is already an inline comment, make sure it's correct and update if needed.
+Do not use any indentation for these inline comments, but leave an empty line above and below.
+The subject of each feedback email file references the respective patch, so it should be easy to pair commits to feedback files.
+
+Create a sub-agent to review each feedback file in parallel.
 """
 
 def run_harness(harness, prompt, linux_dir):
