@@ -91,6 +91,16 @@ def create_reply_templates(review_dir, my_from):
         except Exception:
             continue
 
+    # Single-patch mode: no cover letter, root is the only patch from the author
+    has_other_patches = any(
+        name != '00_root' and my_from in (msg.get('From') or '')
+        for name, msg in messages.items()
+    ) if i_am_author else any(
+        name != '00_root' and my_from not in (msg.get('From') or '')
+        for name, msg in messages.items()
+    )
+    skip_root = has_other_patches
+
     if i_am_author:
         # Find leaf messages: those whose Message-Id is not in any In-Reply-To
         replied_to = set()
@@ -100,7 +110,7 @@ def create_reply_templates(review_dir, my_from):
                 replied_to.add(irt.strip())
 
         for name, msg in messages.items():
-            if name == '00_root':
+            if name == '00_root' and skip_root:
                 continue
             # Only reply to leaf messages not from me
             if my_from in (msg.get('From') or ''):
@@ -117,7 +127,7 @@ def create_reply_templates(review_dir, my_from):
     else:
         # I'm the reviewer: create replies for all messages
         for name, msg in messages.items():
-            if name == '00_root':
+            if name == '00_root' and skip_root:
                 continue
             contents = create_reply(msg)
             print(f'reply template: {name}')
