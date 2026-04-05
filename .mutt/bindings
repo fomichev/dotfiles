@@ -35,6 +35,5 @@ bind index,pager B sidebar-toggle-visible
 # save attachments into home dir
 macro attach s <save-entry><bol>~/
 
-# review mailing list
-macro index,pager a "|krn-review -m- -a --tmux\n"
-macro index,pager p "|krn-review -m- -p --tmux\n"
+macro index,pager b "|krn-review begin --tmux\n"
+macro index p "<shell-escape>~/bin/http-proxy ~/bin/sync-email\n"

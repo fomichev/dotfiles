@@ -3,6 +3,8 @@
 MYDIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}" )" &>/dev/null && pwd)
 source $MYDIR/../host_lib.sh
 
+OPTS=--effort=max
+
 DIR=$HOME/src/review-prompts
 
 if [[ ! -d "$DIR" ]]; then
@@ -22,4 +24,4 @@ if [[ ! -z "$*" ]]; then
 	PROMPT="$@"
 fi
 
-claude "Using the prompt $DIR/kernel/review-core.md and the review prompt directory $DIR/kernel, $PROMPT"
+claude $OPTS "Using the prompt $DIR/kernel/review-core.md and the review prompt directory $DIR/kernel, $PROMPT"

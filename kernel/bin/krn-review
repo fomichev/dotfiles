@@ -1,21 +1,13 @@
 #!/usr/bin/python3
 
-# Apply and diff:
-# krn-review -a -m "/home/sdf/Mail/all/cur/d824c9d51d9ccdbf9e33f0f047d6a74b4a6032e2:2,S"
-# cd ~/src/linux
-# krn-review -d
-# git checkout upstream/bpf-next/master
-# git branch -D upstream/0/3/20240725-convert_dev_cgroup-v1-0-2c8cbd487c44@bootlin.com
-
-# Prepare reply email:
-# krn-review -p -m "/home/sdf/Mail/all/cur/d824c9d51d9ccdbf9e33f0f047d6a74b4a6032e2:2,S"
-#
-# $ cd ~/review/20240725-convert_dev_cgroup-v1-0-2c8cbd487c44\@bootlin.com/
-# krn-review -e
-# krn-review -r
+# WORKFLOW:
+# cat ~/Mail/all/cur/<hash>:2,S | krn-review start [--tmux]
+# cd ~/review/<dir>
+# edit reply/ files to add inline comments
+# manual replies or krn-review ai
+# krn-review reply [--dry]
 
 import argparse
-import atexit
 import email
 import email.policy
 import filecmp
@@ -26,210 +18,307 @@ import subprocess
 import shutil
 import sys
 
-def difftool():
-    git_log = subprocess.check_output(['git', 'log', '--oneline', '@{u}..']).decode("utf-8")
-    sha1s = [ x.split(' ')[0] for x in git_log.split('\n') ]
-    sha1s.reverse()
-    sha1s = list(filter(None, sha1s))
-
-    i = 1
-    for sha1 in sha1s:
-        subprocess.call('clear')
-        print(f'Patch {i} / {len(sha1s)}')
-        print()
-        subprocess.call(['git', 'show', '--stat', sha1])
-        subprocess.call(['git', 'difftool', sha1 + '~', sha1])
-        i += 1
-
-def apply(subj, message_id, linux, tmux):
-    match = re.search(r'\[PATCH (.*?)\]', subj)
-    subsys = ''
-    if match:
-        subsys = match.group(1).split()[0]
-
-    if subsys not in ['bpf', 'bpf-next', 'net', 'net-next']:
-        print(f'unknown subsystem, assuming bpf-next')
-        subsys = "bpf-next"
-
-    review_branch = f'upstream/{subsys}/{message_id}'
-    print(f'review {review_branch}')
-
-    os.chdir(args.linux)
-
-    if subprocess.call(['git', 'rev-parse', '--verify', review_branch]) == 0:
-        print(f'branch {review_branch} exists, doing nothing...')
-        return
-
-    if subprocess.call(['git', 'diff-index', '--quiet', 'HEAD', '--']) != 0:
-        print(f'the tree is dirty, doing nothing...')
-        return
-
-    print(f'Subject: {subj}')
-    print(f'Subsystem: {subsys}')
-    print(f'New branch: {review_branch}')
-
-    if subsys == 'net':
-        subsys_branch='net/main'
-    elif subsys == 'net-next':
-        subsys_branch='net-next/main'
-    if subsys == 'bpf':
-        subsys_branch='bpf/master'
-    elif subsys == 'bpf-next':
-        subsys_branch='bpf-next/master'
-    else:
-        print(f'unknown subsystem {subsys}, assuming bpf-next')
-        subsys_branch='bpf-next/master'
-
-    print(f'Subsystem branch: {subsys_branch}')
-
-    subprocess.check_call(['git', 'checkout', 'upstream/' + subsys_branch])
-    subprocess.check_call(['git', 'pull', '--rebase'])
-    subprocess.check_call(['git', 'checkout', '-b', review_branch])
-    subprocess.check_call(['git', 'branch', '--set-upstream-to=' + subsys_branch])
-    subprocess.check_call(['b4', 'shazam', message_id])
-
-    if tmux:
-        pane = 'D' + message_id
-        subprocess.check_call(['tmux', 'new-window', '-n', pane, f'cd {linux} && krn-review --cleanup -d; sleep 10'])
-
-def find_root_message_id(dir):
-    for name in os.listdir(dir):
-        path = os.path.join(dir, name)
-        if not os.path.isfile(path):
-            continue
-
-        with open(path) as file:
-            policy = email.policy.EmailPolicy(utf8=True)
-            msg = email.message_from_file(file, policy=policy)
-
-        if 'In-Reply-To' not in msg:
-            return re.sub(r'[<>]', '', msg['Message-Id']), msg['From']
-
-    raise Exception(f'could not find root message id in {dir}')
-
 def sanitize_subj(subj):
-    cols = subj.replace(": ", " ").split("]")
+    # Count and strip Re: prefixes
+    re_count = 0
+    s = subj
+    while s.lower().startswith('re: ') or s.lower().startswith('re:'):
+        re_count += 1
+        s = re.sub(r'^[Rr][Ee]:\s*', '', s)
+
+    cols = s.replace(": ", " ").split("]")
 
     name = cols[1].strip('. ')
-    match = re.search(r".*(\d+)/\d+", cols[0])
-    if match:
-        name = f"{match.group(1)} {name}"
+
+    match = re.search(r"(\d+)/\d+", cols[0])
+    num = match.group(1) if match else '0'
+    prefix = f"{int(num):02d}"
+    if re_count > 0:
+        prefix += f"_RE{re_count}"
 
     name = re.sub('\\[', '', name)
     name = re.sub('\\]', '', name)
     name = re.sub('[^0-9a-zA-Z]+', '_', name)
-    return name
+    return f"{prefix}_{name}"
 
 def create_reply(msg):
+    policy = email.policy.EmailPolicy(utf8=True)
     rsp = email.message.EmailMessage(policy=policy)
     rsp.add_header('To', msg['From'])
-    rsp.add_header('Cc', msg['Cc'])
+    if msg['Cc']:
+        rsp.add_header('Cc', msg['Cc'])
     rsp.add_header('In-Reply-To', msg['Message-Id'])
 
     subj = msg['Subject']
-
-    file = sanitize_subj(subj)
 
     if not subj.startswith('Re: '):
         subj = 'Re: ' + subj
 
     rsp.add_header('Subject', subj)
-    rsp.add_header('Content-Type', msg['Content-Type'])
+    rsp.add_header('Content-Type', msg.get('Content-Type', 'text/plain'))
 
     body = msg.get_body(preferencelist=['plain']).get_payload()
     lines = [ '> ' + x for x in body.splitlines() ]
     body = "\n".join(lines)
     rsp.set_payload(body)
 
-    return (file, rsp.as_string(policy=policy))
+    return rsp.as_string(policy=policy)
 
-def create_replies(new_dir, msg_dir, ref_dir, message_id, author):
-    for name in os.listdir(new_dir):
-        path = os.path.join(new_dir, name)
+def create_reply_templates(review_dir, my_from):
+    policy = email.policy.EmailPolicy(utf8=True)
+    reply_dir = os.path.join(review_dir, 'reply')
+    ref_dir = os.path.join(review_dir, 'ref')
+    os.makedirs(reply_dir, exist_ok=True)
+    os.makedirs(ref_dir, exist_ok=True)
 
+    # Read root to determine if I'm the author
+    root_path = os.path.join(review_dir, '00_root')
+    with open(root_path) as f:
+        root_msg = email.message_from_file(f, policy=policy)
+    author = root_msg['From']
+    i_am_author = my_from in author
+
+    # Parse all messages in the review dir
+    messages = {}  # name -> parsed msg
+    for name in sorted(os.listdir(review_dir)):
+        path = os.path.join(review_dir, name)
         if not os.path.isfile(path):
             continue
-
-        with open(path) as file:
-            policy = email.policy.EmailPolicy(utf8=True)
-            msg = email.message_from_file(file, policy=policy)
-
-        if message_id != msg['Message-Id'] and message_id != msg['In-Reply-To']:
-            continue
-        if author != msg['From']:
+        try:
+            with open(path) as f:
+                msg = email.message_from_file(f, policy=policy)
+            messages[name] = msg
+        except Exception:
             continue
 
-        reply_file, contents = create_reply(msg)
+    if i_am_author:
+        # Find leaf messages: those whose Message-Id is not in any In-Reply-To
+        replied_to = set()
+        for msg in messages.values():
+            irt = msg.get('In-Reply-To', '')
+            if irt:
+                replied_to.add(irt.strip())
 
-        print(f'create {reply_file}')
+        for name, msg in messages.items():
+            if name == '00_root':
+                continue
+            # Only reply to leaf messages not from me
+            if my_from in (msg.get('From') or ''):
+                continue
+            msgid = msg.get('Message-Id', '').strip()
+            if msgid in replied_to:
+                continue
+            contents = create_reply(msg)
+            print(f'reply template: {name}')
+            with open(os.path.join(reply_dir, name), 'w') as f:
+                f.write(contents)
+            with open(os.path.join(ref_dir, name), 'w') as f:
+                f.write(contents)
+    else:
+        # I'm the reviewer: create replies for all messages
+        for name, msg in messages.items():
+            if name == '00_root':
+                continue
+            contents = create_reply(msg)
+            print(f'reply template: {name}')
+            with open(os.path.join(reply_dir, name), 'w') as f:
+                f.write(contents)
+            with open(os.path.join(ref_dir, name), 'w') as f:
+                f.write(contents)
 
-        with open(os.path.join(ref_dir, reply_file), "w") as file:
-            file.write(contents)
+def get_msg(args):
+    policy = email.policy.EmailPolicy(utf8=True)
 
-        with open(os.path.join(msg_dir, reply_file), "w") as file:
-            file.write(contents)
+    if args.message == '-':
+        return email.message_from_file(sys.stdin, policy=policy)
+    else:
+        with open(args.message) as file:
+            return email.message_from_file(file, policy=policy)
 
-def prepare(linux, message_id, dir, tmux):
-    tmp_dir = os.path.join(dir, 'tmp')
+def scan_mail_files(mail_dir):
+    """Walk mail_dir recursively, yielding paths to files in cur/ and new/ subdirs."""
+    for root, dirs, files in os.walk(mail_dir):
+        basename = os.path.basename(root)
+        if basename not in ('cur', 'new'):
+            continue
+        for name in files:
+            yield os.path.join(root, name)
+
+def parse_message_ids(value):
+    if not value:
+        return []
+    return re.findall(r'<([^>]+)>', value)
+
+def index_message(msg, path, by_msgid, subj_map, refs_map, children):
+    msgid = msg.get('Message-Id', '')
+    msgid = re.sub(r'[<>]', '', msgid).strip()
+    if not msgid:
+        return
+
+    by_msgid[msgid] = path
+    subj_map[msgid] = msg.get('Subject', '')
+
+    related = set()
+    for ref in parse_message_ids(msg.get('References', '')):
+        related.add(ref)
+    for ref in parse_message_ids(msg.get('In-Reply-To', '')):
+        related.add(ref)
+
+    refs_map[msgid] = related
+    for ref in related:
+        children.setdefault(ref, set()).add(msgid)
+
+def recursive_copy(message_id, mail_dir, dest_dir, seed_msg=None):
+    """Find all emails belonging to the same thread as message_id and copy them to dest_dir.
+    seed_msg is the original piped-in message (may not be in the maildir yet).
+    Returns (copied_count, root_subject) or (0, None) if nothing found."""
+
+    by_msgid = {}   # msgid -> filepath
+    subj_map = {}   # msgid -> subject
+    refs_map = {}   # msgid -> set of related msgids
+    children = {}   # msgid -> set of msgids that reference it
+
+    policy = email.policy.EmailPolicy(utf8=True)
+
+    # Index the piped-in message so BFS has edges even if it's not in maildir
+    if seed_msg:
+        index_message(seed_msg, None, by_msgid, subj_map, refs_map, children)
+
+    for path in scan_mail_files(mail_dir):
+        try:
+            with open(path) as f:
+                msg = email.message_from_file(f, policy=policy)
+        except Exception:
+            continue
+
+        index_message(msg, path, by_msgid, subj_map, refs_map, children)
+
+    # BFS to find all thread members
+    thread = set()
+    queue = [message_id]
+    while queue:
+        mid = queue.pop()
+        if mid in thread:
+            continue
+        thread.add(mid)
+        for ref in refs_map.get(mid, set()):
+            queue.append(ref)
+        for child in children.get(mid, set()):
+            queue.append(child)
+
+    # Find root message (no In-Reply-To / References in the thread)
+    root_mid = None
+    root_subj = None
+    for mid in thread:
+        if mid in by_msgid and not refs_map.get(mid):
+            root_mid = mid
+            root_subj = subj_map.get(mid)
+            break
+    if root_subj is None:
+        root_mid = message_id
+        root_subj = subj_map.get(message_id, '')
+
+    # Copy matching files, renamed to sanitized subject
+    os.makedirs(dest_dir, exist_ok=True)
+
+    copied = 0
+    used_names = set()
+    for mid in thread:
+        if mid not in by_msgid or by_msgid[mid] is None:
+            continue
+        src = by_msgid[mid]
+        name = '00_root' if mid == root_mid else sanitize_subj(subj_map[mid])
+        base = name
+        seq = 2
+        while name in used_names:
+            name = f'{base}_{seq}'
+            seq += 1
+        used_names.add(name)
+        dst = os.path.join(dest_dir, name)
+        shutil.copy2(src, dst)
+        copied += 1
+
+    print(f'copied {copied} messages to {dest_dir}')
+    return copied, root_subj
+
+def find_by_message_id(mail_dir, message_id):
+    """Find the file in maildir matching the given message-id."""
+    policy = email.policy.EmailPolicy(utf8=True)
+    for path in scan_mail_files(mail_dir):
+        try:
+            with open(path) as f:
+                msg = email.message_from_file(f, policy=policy)
+        except Exception:
+            continue
+        msgid = re.sub(r'[<>]', '', msg.get('Message-Id', '')).strip()
+        if msgid == message_id:
+            return msg
+    return None
+
+def cmd_begin(args):
+    mail_dir = args.mail
+
+    if args.message == '-':
+        seed_msg = get_msg(args)
+    elif os.path.exists(args.message):
+        seed_msg = get_msg(args)
+    else:
+        # Treat -m value as a message-id
+        mid = re.sub(r'[<>]', '', args.message)
+        seed_msg = find_by_message_id(mail_dir, mid)
+        if not seed_msg:
+            print(f'message-id {mid} not found in {mail_dir}')
+            return
+
+    message_id = re.sub(r'[<>]', '', seed_msg['Message-Id'])
+
+    review_dir = args.review
+    tmp_dir = os.path.join(review_dir, 'tmp')
 
     if os.path.exists(tmp_dir):
         print(f'directory {tmp_dir} already exists, bailing out...')
         return
-    subprocess.check_call(['b4', 'mbox', '-M', message_id, '-n', tmp_dir])
 
-    message_id, author = find_root_message_id(os.path.join(tmp_dir, 'new'))
-
-    msg_dir = os.path.join(dir, message_id)
-    if os.path.exists(msg_dir):
+    copied, root_subj = recursive_copy(message_id, mail_dir, tmp_dir, seed_msg=seed_msg)
+    if copied == 0:
+        print(f'no messages found for {message_id}')
         shutil.rmtree(tmp_dir)
-        print(f'continue review series in {msg_dir}')
-    else:
-        shutil.move(tmp_dir, msg_dir)
+        return
 
-        ref_dir = os.path.join(msg_dir, 'ref')
-        if not os.path.exists(ref_dir):
-            os.mkdir(ref_dir)
+    final_name = sanitize_subj(root_subj)
+    final_dir = os.path.join(review_dir, final_name)
+    if os.path.exists(final_dir):
+        shutil.rmtree(tmp_dir)
+        print(f'review directory {final_dir} already exists')
+        return
 
-        new_dir = os.path.join(msg_dir, 'new')
-        create_replies(new_dir, msg_dir, ref_dir, f'<{message_id}>', author)
+    shutil.move(tmp_dir, final_dir)
+    create_reply_templates(final_dir, args.me)
+    print(f'created review in {final_dir}')
 
-        print(f'created review series in {msg_dir}')
+    if args.tmux:
+        subprocess.check_call(['tmux', 'new-window', '-n', final_name, '-c', final_dir])
 
-    if tmux:
-        pane = 'R' + message_id
-        subprocess.check_call(['tmux', 'new-window', '-n', pane, f'cd {msg_dir} && krn-review -er; sleep 1'])
+def cmd_reply(args):
+    reply_dir = os.path.join('.', 'reply')
+    ref_dir = os.path.join('.', 'ref')
 
-def edit():
-    cmd = ['nvim', '-p']
-
-    for name in os.listdir('.'):
-        path = os.path.join('.', name)
-        if not os.path.isfile(path):
-            continue
-
-        cmd.append(path)
-
-    subprocess.call(cmd)
-
-def reply(dry):
-    if not os.path.exists('cur') or not os.path.exists('ref'):
-        print('should be called from the directory with replies...')
+    if not os.path.exists(reply_dir) or not os.path.exists(ref_dir):
+        print('should be called from a review directory with reply/ and ref/')
         return
 
     differ = []
 
-    for name in os.listdir('.'):
-        path = os.path.join('.', name)
-        if not os.path.isfile(path):
+    for name in os.listdir(reply_dir):
+        reply_path = os.path.join(reply_dir, name)
+        ref_path = os.path.join(ref_dir, name)
+        if not os.path.isfile(reply_path):
             continue
-
-        ref_path = os.path.join('ref', name)
-        print("CMP", path, ref_path, filecmp.cmp(path, ref_path))
-        if not filecmp.cmp(path, ref_path):
-            differ.append(path)
+        if not os.path.exists(ref_path) or not filecmp.cmp(reply_path, ref_path):
+            differ.append(reply_path)
 
     if len(differ) == 0:
-        print('could not find any changes to send')
+        print('no modified replies to send')
         return
 
     print('will send the following replies:')
@@ -244,7 +333,7 @@ def reply(dry):
             break
 
     for file in differ:
-        if dry:
+        if args.dry_run:
             print(f"DRY: cat {file} | msmtp -t")
             continue
 
@@ -252,64 +341,95 @@ def reply(dry):
             with open(file) as f:
                 p.communicate(f.read().encode("utf-8"))
 
-def cleanup():
-    review_branch = subprocess.check_output(['git', 'rev-parse', '--abbrev-ref', 'HEAD']).decode("utf-8").strip()
+def build_ai_prompt(args):
+    reply_dir = os.path.join('.', 'reply')
+    if not os.path.isdir(reply_dir):
+        print('should be called from a review directory with reply/')
+        return None
 
-    cols = review_branch.split('/')
-    if cols[0] != 'upstream':
-        print(f'no idea how to cleanup {review_branch}')
+    files = sorted(f for f in os.listdir(reply_dir)
+                   if os.path.isfile(os.path.join(reply_dir, f)))
+
+    if not files:
+        print('no reply templates found in reply/')
+        return None
+
+    try:
+        unpushed = subprocess.check_output(
+            ['git', 'log', '--format=%h', '@{u}..HEAD'],
+            cwd=args.linux, stderr=subprocess.DEVNULL
+        ).decode().strip()
+    except subprocess.CalledProcessError:
+        unpushed = ''
+
+    feedback = '\n'.join(f'- {os.path.abspath(os.path.join(reply_dir, f))}' for f in files)
+    unpushed = '\n'.join(f'- {c}' for c in unpushed.splitlines() if c)
+    return f"""Using the prompt {args.prompts}/kernel/review-core.md and the review prompt directory {args.prompts}/kernel, address the feedback for the following commits:
+{unpushed}
+
+The feedback is in the following files:
+{feedback}
+
+Each file is an email template for the reply.
+Add inline comments that explain why each particular comment is valid or not.
+If there is already an inline comment, make sure it's correct and update if needed.
+Do not use any indentation for these inline comments, but leave an empty line above and below.
+If the feedback is valid, add new commit to address the feedback so I can squash that commit later (unless there is already a fix for that). Mark these commits as 'fixup!'.
+The subject of each feedback email file should references the respective commit, so it should be easy to pair commits to feedback files.
+
+Create a sub-agent to review each feedback file in parallel.
+Exit after competing the task, don't expect any follow ups from the user.
+"""
+
+def run_harness(harness, prompt, linux_dir):
+    import shlex
+    cmd = shlex.split(harness) + [prompt]
+    os.chdir(linux_dir)
+    return subprocess.call(cmd)
+
+def cmd_ai(args):
+    prompt = build_ai_prompt(args)
+    if not prompt:
         return
+    os.chdir(args.linux)
+    import shlex
+    cmd = shlex.split(args.harness) + [prompt]
+    os.execvp(cmd[0], cmd)
 
-    if cols[2] == 'main' or cols[2] == 'master':
+def cmd_turbo_ai(args):
+    prompt = build_ai_prompt(args)
+    if not prompt:
         return
+    for harness in ['claude --effort=max', 'codex', 'gemini']:
+        print(f'--- running: {harness} ---')
+        run_harness(harness, prompt, args.linux)
 
-    cols[2] = 'main'
-    if 'bpf' in cols[1]:
-        cols[2] = 'master'
-
-    subprocess.check_call(['git', 'checkout', '/'.join(cols)])
-    subprocess.check_call(['git', 'branch', '-D', review_branch])
-
-parser = argparse.ArgumentParser()
-parser.add_argument('--linux', type=str, default='/home/sdf/src/linux')
+parser = argparse.ArgumentParser(description="krn-review")
 parser.add_argument('--review', type=str, default='/home/sdf/review')
-parser.add_argument('--cleanup', action='store_true')
-parser.add_argument('-m', '--message', type=str, default='')
-parser.add_argument('-d', '--diff', action='store_true')
-parser.add_argument('-a', '--apply', action='store_true')
-parser.add_argument('-e', '--edit', action='store_true')
-parser.add_argument('-p', '--prepare', action='store_true')
-parser.add_argument('-r', '--reply', action='store_true')
-parser.add_argument('--tmux', action='store_true')
-parser.add_argument('--dry', action='store_true')
+parser.add_argument('--mail', type=str, default=os.path.expanduser('~/Mail'))
+parser.add_argument('--me', type=str, default='Stanislav Fomichev')
+
+subparsers = parser.add_subparsers(dest="command", required=True)
+
+begin = subparsers.add_parser("begin")
+begin.add_argument('-m', '--message', type=str, default='-')
+begin.add_argument('--tmux', action='store_true')
+begin.set_defaults(func=cmd_begin)
+
+ai = subparsers.add_parser("ai")
+ai.add_argument('--prompts', type=str, default='/home/sdf/src/review-prompts')
+ai.add_argument('--linux', type=str, default='/home/sdf/src/linux')
+ai.add_argument('--harness', type=str, default='claude --effort=max')
+ai.set_defaults(func=cmd_ai)
+
+turbo_ai = subparsers.add_parser("turbo-ai")
+turbo_ai.add_argument('--prompts', type=str, default='/home/sdf/src/review-prompts')
+turbo_ai.add_argument('--linux', type=str, default='/home/sdf/src/linux')
+turbo_ai.set_defaults(func=cmd_turbo_ai)
+
+reply = subparsers.add_parser("reply")
+reply.add_argument('--dry-run', action='store_true')
+reply.set_defaults(func=cmd_reply)
+
 args = parser.parse_args()
-
-if args.cleanup:
-    atexit.register(cleanup)
-
-if args.message:
-    policy = email.policy.EmailPolicy(utf8=True)
-
-    if args.message == '-':
-        msg = email.message_from_file(sys.stdin, policy=policy)
-    else:
-        with open(args.message) as file:
-            msg = email.message_from_file(file, policy=policy)
-
-if args.diff:
-    difftool()
-
-elif args.apply:
-    subj = msg['Subject']
-    message_id = re.sub(r'[<>]', '', msg['Message-Id'])
-    apply(subj, message_id, args.linux, args.tmux)
-
-if args.prepare:
-    message_id = re.sub(r'[<>]', '', msg['Message-Id'])
-    prepare(args.linux, message_id, args.review, args.tmux)
-
-if args.edit:
-    edit()
-
-if args.reply:
-    reply(args.dry)
+args.func(args)
