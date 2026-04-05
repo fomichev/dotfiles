@@ -4,7 +4,7 @@
 # cat ~/Mail/all/cur/<hash>:2,S | krn-review start [--tmux]
 # cd ~/review/<dir>
 # edit reply/ files to add inline comments
-# manual replies or krn-review ai
+# manual replies or krn-review feedback
 # krn-review reply [--dry]
 
 import argparse
@@ -387,7 +387,7 @@ def run_harness(harness, prompt, linux_dir):
     os.chdir(linux_dir)
     return subprocess.call(cmd)
 
-def cmd_ai(args):
+def cmd_feedback(args):
     prompt = build_ai_prompt(args)
     if not prompt:
         return
@@ -396,7 +396,7 @@ def cmd_ai(args):
     cmd = shlex.split(args.harness) + [prompt]
     os.execvp(cmd[0], cmd)
 
-def cmd_turbo_ai(args):
+def cmd_turbo_feedback(args):
     prompt = build_ai_prompt(args)
     if not prompt:
         return
@@ -416,16 +416,16 @@ begin.add_argument('-m', '--message', type=str, default='-')
 begin.add_argument('--tmux', action='store_true')
 begin.set_defaults(func=cmd_begin)
 
-ai = subparsers.add_parser("ai")
-ai.add_argument('--prompts', type=str, default='/home/sdf/src/review-prompts')
-ai.add_argument('--linux', type=str, default='/home/sdf/src/linux')
-ai.add_argument('--harness', type=str, default='claude --effort=max')
-ai.set_defaults(func=cmd_ai)
+feedback = subparsers.add_parser("feedback")
+feedback.add_argument('--prompts', type=str, default='/home/sdf/src/review-prompts')
+feedback.add_argument('--linux', type=str, default='/home/sdf/src/linux')
+feedback.add_argument('--harness', type=str, default='claude --effort=max')
+feedback.set_defaults(func=cmd_feedback)
 
-turbo_ai = subparsers.add_parser("turbo-ai")
-turbo_ai.add_argument('--prompts', type=str, default='/home/sdf/src/review-prompts')
-turbo_ai.add_argument('--linux', type=str, default='/home/sdf/src/linux')
-turbo_ai.set_defaults(func=cmd_turbo_ai)
+turbo_feedback = subparsers.add_parser("turbo-feedback")
+turbo_feedback.add_argument('--prompts', type=str, default='/home/sdf/src/review-prompts')
+turbo_feedback.add_argument('--linux', type=str, default='/home/sdf/src/linux')
+turbo_feedback.set_defaults(func=cmd_turbo_feedback)
 
 reply = subparsers.add_parser("reply")
 reply.add_argument('--dry-run', action='store_true')
