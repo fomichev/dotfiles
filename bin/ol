@@ -25,7 +25,9 @@ fi
 #MODEL=qwen3-next:80b          # https://ollama.com/library/qwen3-next
 #MODEL=gurubot/gpt-oss-derestricted:20b # https://ollama.com/gurubot/gpt-oss-derestricted
 #MODEL=glm-4.7-flash:q4_K_M    # https://ollama.com/library/glm-4.7-flash
-MODEL=qwen3-coder-next:q4_K_M  # https://ollama.com/library/qwen3-coder-next
+#MODEL=qwen3-coder-next:q4_K_M # https://ollama.com/library/qwen3-coder-next
+#MODEL=gemma4:31b              # https://ollama.com/library/gemma4
+MODEL=gemma4:26b               # https://ollama.com/library/gemma4
 
 while getopts "im:s" opt; do
 	case $opt in

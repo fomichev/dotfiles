@@ -47,8 +47,8 @@ docker_update() {
 			continue
 		fi
 		pushd $d
+		docker compose down
 		docker compose pull -q
-		docker compose stop
 		docker compose up -d
 		popd
 	done
@@ -108,19 +108,22 @@ matrix_update() {
 	popd
 }
 
-mastodon_update() {
-	local d=~/src/mastodon
+docker_update() {
+	for d in /home/sdf/src/docker/*; do
+		if [ -e $d/skip ]; then
+			pushd $d
+			docker compose down || :
+			popd
+			continue
+		fi
 
-	if [ ! -d $d ]; then
-		return
-	fi
-
-	pushd $d
-	git pull --rebase
-	docker compose down
-	docker compose pull
-	docker compose up -d
-	popd
+		pushd $d
+		docker compose down
+		docker compose pull
+		docker compose up -d
+		popd
+	done
+	docker system df
 }
 
 is_running() {
@@ -184,7 +187,7 @@ if [[ $# -eq 0 ]]; then
 		system_cleanup
 	fi
 	matrix_update
-	mastodon_update
+	docker_update
 	do_notify "updated"
 	trap - EXIT
 	exit
