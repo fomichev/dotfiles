@@ -438,6 +438,12 @@ Do not use any indentation for these inline comments, but leave an empty line ab
 The subject of each feedback email file references the respective patch, so it should be easy to pair commits to feedback files.
 
 Create a sub-agent to review each feedback file in parallel.
+
+Note that you don't have to treat every feedback item as something that needs to be addressed.
+Feel free to push back on the following suggestions:
+- holding some locks (rtnl) for too long
+- races with work stealing where work will be empty
+- corner cases that are very hard or impossible to hit
 """
 
 def run_harness(harness, prompt, linux_dir):
@@ -455,15 +461,17 @@ def cmd_feedback(args):
     cmd = shlex.split(args.harness) + [prompt]
     os.execvp(cmd[0], cmd)
 
+HARNESSES = ['claude --effort=max', 'codex', 'gemini']
+
 def cmd_turbo_feedback(args):
     prompt = build_ai_prompt(args)
     if not prompt:
         return
-    for harness in ['claude --effort=max', 'codex', 'gemini']:
+    for harness in args.harnesses:
         print(f'--- running: {harness} ---')
         run_harness(harness, prompt, args.linux)
 
-def cmd_branch(args):
+def build_branch_prompt(args):
     sync_prompts(args.prompts)
 
     try:
@@ -480,16 +488,25 @@ def cmd_branch(args):
         commits = ' '.join(unpushed.splitlines())
         prompt_text = f'review all unpushed commits: {commits}'
 
-    prompt = f'Using the prompt {args.prompts}/kernel/review-core.md and the review prompt directory {args.prompts}/kernel, {prompt_text}'
+    return f'Using the prompt {args.prompts}/kernel/review-core.md and the review prompt directory {args.prompts}/kernel, {prompt_text}'
 
+def cmd_branch(args):
+    prompt = build_branch_prompt(args)
     import shlex
     cmd = shlex.split(args.harness) + [prompt]
     os.execvp(cmd[0], cmd)
+
+def cmd_turbo_branch(args):
+    prompt = build_branch_prompt(args)
+    for harness in args.harnesses:
+        print(f'--- running: {harness} ---')
+        run_harness(harness, prompt, os.getcwd())
 
 parser = argparse.ArgumentParser(description="krn-review")
 parser.add_argument('--review', type=str, default='/home/sdf/review')
 parser.add_argument('--mail', type=str, default=os.path.expanduser('~/Mail'))
 parser.add_argument('--me', type=str, default='Stanislav Fomichev')
+parser.add_argument('--harnesses', type=str, nargs='+', default=HARNESSES)
 
 subparsers = parser.add_subparsers(dest="command", required=True)
 
@@ -501,7 +518,7 @@ begin.set_defaults(func=cmd_begin)
 feedback = subparsers.add_parser("feedback")
 feedback.add_argument('--prompts', type=str, default='/home/sdf/src/review-prompts')
 feedback.add_argument('--linux', type=str, default='/home/sdf/src/linux')
-feedback.add_argument('--harness', type=str, default='claude --effort=max')
+feedback.add_argument('--harness', type=str, default=HARNESSES[0])
 feedback.set_defaults(func=cmd_feedback)
 
 turbo_feedback = subparsers.add_parser("turbo-feedback")
@@ -512,8 +529,13 @@ turbo_feedback.set_defaults(func=cmd_turbo_feedback)
 branch = subparsers.add_parser("branch")
 branch.add_argument('-p', '--prompt', type=str)
 branch.add_argument('--prompts', type=str, default='/home/sdf/src/review-prompts')
-branch.add_argument('--harness', type=str, default='claude --effort=max')
+branch.add_argument('--harness', type=str, default=HARNESSES[0])
 branch.set_defaults(func=cmd_branch)
+
+turbo_branch = subparsers.add_parser("turbo-branch")
+turbo_branch.add_argument('-p', '--prompt', type=str)
+turbo_branch.add_argument('--prompts', type=str, default='/home/sdf/src/review-prompts')
+turbo_branch.set_defaults(func=cmd_turbo_branch)
 
 reply = subparsers.add_parser("reply")
 reply.add_argument('--dry-run', action='store_true')
