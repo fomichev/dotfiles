@@ -18,6 +18,13 @@ import subprocess
 import shutil
 import sys
 
+DIR_PROMPTS = '/home/sdf/src/review-prompts'
+DIR_LINUX = '/home/sdf/src/linux'
+DIR_REVIEW = '/home/sdf/review'
+DIR_MAIL = '/home/sdf/Mail'
+ME = 'Stanislav Fomichev'
+HARNESSES = ['claude --effort=max', 'codex', 'gemini']
+
 def sanitize_subj(subj):
     # Count and strip Re: prefixes
     re_count = 0
@@ -461,8 +468,6 @@ def cmd_feedback(args):
     cmd = shlex.split(args.harness) + [prompt]
     os.execvp(cmd[0], cmd)
 
-HARNESSES = ['claude --effort=max', 'codex', 'gemini']
-
 def cmd_turbo_feedback(args):
     prompt = build_ai_prompt(args)
     if not prompt:
@@ -503,9 +508,9 @@ def cmd_turbo_branch(args):
         run_harness(harness, prompt, os.getcwd())
 
 parser = argparse.ArgumentParser(description="krn-review")
-parser.add_argument('--review', type=str, default='/home/sdf/review')
-parser.add_argument('--mail', type=str, default=os.path.expanduser('~/Mail'))
-parser.add_argument('--me', type=str, default='Stanislav Fomichev')
+parser.add_argument('--review', type=str, default=DIR_REVIEW)
+parser.add_argument('--mail', type=str, default=os.path.expanduser(DIR_MAIL))
+parser.add_argument('--me', type=str, default=ME)
 parser.add_argument('--harnesses', type=str, nargs='+', default=HARNESSES)
 
 subparsers = parser.add_subparsers(dest="command", required=True)
@@ -516,25 +521,25 @@ begin.add_argument('--tmux', action='store_true')
 begin.set_defaults(func=cmd_begin)
 
 feedback = subparsers.add_parser("feedback")
-feedback.add_argument('--prompts', type=str, default='/home/sdf/src/review-prompts')
-feedback.add_argument('--linux', type=str, default='/home/sdf/src/linux')
+feedback.add_argument('--prompts', type=str, default=DIR_PROMPTS)
+feedback.add_argument('--linux', type=str, default=DIR_LINUX)
 feedback.add_argument('--harness', type=str, default=HARNESSES[0])
 feedback.set_defaults(func=cmd_feedback)
 
 turbo_feedback = subparsers.add_parser("turbo-feedback")
-turbo_feedback.add_argument('--prompts', type=str, default='/home/sdf/src/review-prompts')
-turbo_feedback.add_argument('--linux', type=str, default='/home/sdf/src/linux')
+turbo_feedback.add_argument('--prompts', type=str, default=DIR_PROMPTS)
+turbo_feedback.add_argument('--linux', type=str, default=DIR_LINUX)
 turbo_feedback.set_defaults(func=cmd_turbo_feedback)
 
 branch = subparsers.add_parser("branch")
 branch.add_argument('-p', '--prompt', type=str)
-branch.add_argument('--prompts', type=str, default='/home/sdf/src/review-prompts')
+branch.add_argument('--prompts', type=str, default=DIR_PROMPTS)
 branch.add_argument('--harness', type=str, default=HARNESSES[0])
 branch.set_defaults(func=cmd_branch)
 
 turbo_branch = subparsers.add_parser("turbo-branch")
 turbo_branch.add_argument('-p', '--prompt', type=str)
-turbo_branch.add_argument('--prompts', type=str, default='/home/sdf/src/review-prompts')
+turbo_branch.add_argument('--prompts', type=str, default=DIR_PROMPTS)
 turbo_branch.set_defaults(func=cmd_turbo_branch)
 
 reply = subparsers.add_parser("reply")
