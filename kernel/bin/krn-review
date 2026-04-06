@@ -350,8 +350,10 @@ def cmd_reply(args):
             break
 
     for file in differ:
+        prefix = "DRY: " if args.dry_run else ""
+        print(f"{prefix}cat {file} | msmtp -t")
+
         if args.dry_run:
-            print(f"DRY: cat {file} | msmtp -t")
             continue
 
         with subprocess.Popen(['msmtp', '-t'], stdin=subprocess.PIPE) as p:
