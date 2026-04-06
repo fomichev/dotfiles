@@ -9,7 +9,6 @@ alias ......='cd ../../../../.. && p'
 alias ls='ls --color=auto'
 alias l='ls -AF --group-directories-first';
 alias a='ls -lah'
-alias ta='tmux attach -d -t $(tmux list-sessions | head -n1 | cut -d: -f1)'
 alias j='jobs -l'
 alias info='info --vi-keys'
 alias _='sudo'
@@ -17,6 +16,14 @@ alias ip="ip -color=auto"
 
 d() { builtin cd "$@" &>/dev/null && echo "$(pwd):" | colorify && l; }
 complete -o filenames -o nospace -F _cd d
+
+ta() {
+	if [[ $# -ne 0 ]]; then
+		tmux attach -d -t "$@"
+	else
+		tmux attach -d -t $(tmux list-sessions | head -n1 | cut -d: -f1)
+	fi
+}
 
 gpg-export-ssh-agent() {
 	if ! systemctl is-active -q pcscd.service; then
