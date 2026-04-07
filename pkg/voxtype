@@ -1,0 +1,9 @@
+#!/bin/bash
+
+src=(https://github.com/peteonrails/voxtype.git)
+
+# dnf install alsa-lib-devel
+
+cargo_flags=(
+	--path .
+)
