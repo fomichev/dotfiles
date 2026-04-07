@@ -117,6 +117,27 @@ gnome:
 
 	gsettings set org.gnome.shell.app-switcher current-workspace-only false
 
+gnome-custom:
+	# https://extensions.gnome.org/extension/5021/activate-window-by-title/
+
+	gsettings set org.gnome.settings-daemon.plugins.media-keys custom-keybindings \
+		"['/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/focus-browser/', '/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/focus-obsidian/', '/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/focus-code/' ]"
+
+	dconf write /org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/focus-browser/name "'Focus browser'"
+	dconf write /org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/focus-browser/command \
+		"'gdbus call --session --dest org.gnome.Shell --object-path /de/lucaswerkmeister/ActivateWindowByTitle --method de.lucaswerkmeister.ActivateWindowByTitle.activateBySubstring Chrome'"
+	dconf write /org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/focus-browser/binding "'<Super>b'"
+
+	dconf write /org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/focus-obsidian/name "'Focus obsidian'"
+	dconf write /org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/focus-obsidian/command \
+		"'gdbus call --session --dest org.gnome.Shell --object-path /de/lucaswerkmeister/ActivateWindowByTitle --method de.lucaswerkmeister.ActivateWindowByTitle.activateBySubstring Obsidian'"
+	dconf write /org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/focus-obsidian/binding "'<Super>o'"
+
+	dconf write /org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/focus-code/name "'Focus code'"
+	dconf write /org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/focus-code/command \
+		"'gdbus call --session --dest org.gnome.Shell --object-path /de/lucaswerkmeister/ActivateWindowByTitle --method de.lucaswerkmeister.ActivateWindowByTitle.activateBySubstring Workspace'"
+	dconf write /org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/focus-code/binding "'<Super>o'"
+
 gnome-dump:
 	gsettings list-recursively org.gnome.mutter.keybindings
 	gsettings list-recursively org.gnome.desktop.wm.keybindings

@@ -2,7 +2,10 @@
 
 src=(https://github.com/peteonrails/voxtype.git)
 
+# dnf install wtype
 # dnf install alsa-lib-devel
+# voxtype --setup download
+# sudo usermod -aG input $USER
 
 cargo_flags=(
 	--path .
