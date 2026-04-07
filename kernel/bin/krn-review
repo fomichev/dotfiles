@@ -23,6 +23,7 @@ DIR_LINUX = '/home/sdf/src/linux'
 DIR_REVIEW = '/home/sdf/review'
 DIR_MAIL = '/home/sdf/Mail'
 ME = 'Stanislav Fomichev'
+ME_FROM = 'Stanislav Fomichev <sdf.kernel@gmail.com>'
 HARNESSES = ['claude --effort=max', 'codex', 'gemini']
 
 def sanitize_subj(subj):
@@ -48,9 +49,10 @@ def sanitize_subj(subj):
     name = re.sub('[^0-9a-zA-Z]+', '_', name)
     return f"{prefix}_{name}"
 
-def create_reply(msg):
+def create_reply(msg, my_from):
     policy = email.policy.EmailPolicy(utf8=True)
     rsp = email.message.EmailMessage(policy=policy)
+    rsp.add_header('From', my_from)
     rsp.add_header('To', msg['From'])
     if msg['Cc']:
         rsp.add_header('Cc', msg['Cc'])
@@ -71,7 +73,7 @@ def create_reply(msg):
 
     return rsp.as_string(policy=policy)
 
-def create_reply_templates(review_dir, my_from):
+def create_reply_templates(review_dir, my_name, my_from):
     policy = email.policy.EmailPolicy(utf8=True)
     reply_dir = os.path.join(review_dir, 'reply')
     ref_dir = os.path.join(review_dir, 'ref')
@@ -83,7 +85,7 @@ def create_reply_templates(review_dir, my_from):
     with open(root_path) as f:
         root_msg = email.message_from_file(f, policy=policy)
     author = root_msg['From']
-    i_am_author = my_from in author
+    i_am_author = my_name in author
 
     # Parse all messages in the review dir
     messages = {}  # name -> parsed msg
@@ -100,10 +102,10 @@ def create_reply_templates(review_dir, my_from):
 
     # Single-patch mode: no cover letter, root is the only patch from the author
     has_other_patches = any(
-        name != '00_root' and my_from in (msg.get('From') or '')
+        name != '00_root' and my_name in (msg.get('From') or '')
         for name, msg in messages.items()
     ) if i_am_author else any(
-        name != '00_root' and my_from not in (msg.get('From') or '')
+        name != '00_root' and my_name not in (msg.get('From') or '')
         for name, msg in messages.items()
     )
     skip_root = has_other_patches
@@ -120,12 +122,12 @@ def create_reply_templates(review_dir, my_from):
             if name == '00_root' and skip_root:
                 continue
             # Only reply to leaf messages not from me
-            if my_from in (msg.get('From') or ''):
+            if my_name in (msg.get('From') or ''):
                 continue
             msgid = msg.get('Message-Id', '').strip()
             if msgid in replied_to:
                 continue
-            contents = create_reply(msg)
+            contents = create_reply(msg, my_from)
             print(f'reply template: {name}')
             with open(os.path.join(reply_dir, name), 'w') as f:
                 f.write(contents)
@@ -136,7 +138,7 @@ def create_reply_templates(review_dir, my_from):
         for name, msg in messages.items():
             if name == '00_root' and skip_root:
                 continue
-            contents = create_reply(msg)
+            contents = create_reply(msg, my_from)
             print(f'reply template: {name}')
             with open(os.path.join(reply_dir, name), 'w') as f:
                 f.write(contents)
@@ -310,7 +312,7 @@ def cmd_begin(args):
         return
 
     shutil.move(tmp_dir, final_dir)
-    create_reply_templates(final_dir, args.me)
+    create_reply_templates(final_dir, args.me, args.me_from)
     print(f'created review in {final_dir}')
 
     if args.tmux:
@@ -428,6 +430,7 @@ Each feedback file is an email template for the reply.
 Add inline comments that explain why each particular comment is valid or not.
 If there is already an inline comment, make sure it's correct and update if needed.
 Do not use any indentation for these inline comments, but leave an empty line above and below.
+Do not modify the email headers (From, To, Cc, In-Reply-To, Subject, Content-Type).
 If the feedback is valid, add new commit to address the feedback so I can squash that commit later (unless there is already a fix for that). Mark these commits as 'fixup!'.
 The subject of each feedback email file references the respective commit, so it should be easy to pair commits to feedback files.
 
@@ -444,6 +447,7 @@ Each feedback file is an email template for the reply.
 Add inline comments if you think there are some problems in the patches.
 If there is already an inline comment, make sure it's correct and update if needed.
 Do not use any indentation for these inline comments, but leave an empty line above and below.
+Do not modify the email headers (From, To, Cc, In-Reply-To, Subject, Content-Type).
 The subject of each feedback email file references the respective patch, so it should be easy to pair commits to feedback files.
 
 Create a sub-agent to review each feedback file in parallel.
@@ -513,6 +517,7 @@ parser = argparse.ArgumentParser(description="krn-review")
 parser.add_argument('--review', type=str, default=DIR_REVIEW)
 parser.add_argument('--mail', type=str, default=os.path.expanduser(DIR_MAIL))
 parser.add_argument('--me', type=str, default=ME)
+parser.add_argument('--me-from', type=str, default=ME_FROM)
 parser.add_argument('--harnesses', type=str, nargs='+', default=HARNESSES)
 
 subparsers = parser.add_subparsers(dest="command", required=True)
