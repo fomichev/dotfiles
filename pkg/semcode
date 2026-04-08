@@ -1,0 +1,9 @@
+#!/bin/bash
+
+src=(https://github.com/facebookexperimental/semcode.git)
+
+# sudo dnf install gcc-c++ clang-devel protobuf-compiler protobuf-devel
+
+cargo_flags=(
+	--path .
+)

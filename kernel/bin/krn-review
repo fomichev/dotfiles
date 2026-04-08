@@ -24,24 +24,111 @@ DIR_REVIEW = '/home/sdf/review'
 DIR_MAIL = '/home/sdf/Mail'
 ME = 'Stanislav Fomichev'
 ME_FROM = 'Stanislav Fomichev <sdf.kernel@gmail.com>'
-HARNESSES = ['claude --effort=max', 'codex', 'gemini', 'opencode']
+SEMCODE_MCP_CONFIG = os.path.expanduser('~/.claude/semcode-mcp.json')
 
+def _register_semcode_claude(path):
+    import json
+    os.makedirs(os.path.dirname(SEMCODE_MCP_CONFIG), exist_ok=True)
+    config = {"mcpServers": {"semcode": {
+        "type": "stdio", "command": path, "args": [], "env": {},
+    }}}
+    with open(SEMCODE_MCP_CONFIG, 'w') as f:
+        json.dump(config, f, indent=2)
+
+def _claude_extra_args():
+    if os.path.exists(SEMCODE_MCP_CONFIG):
+        return [f'--mcp-config={SEMCODE_MCP_CONFIG}']
+    return []
+
+def _register_semcode_codex(path):
+    import json
+    config_path = os.path.expanduser('~/.codex/config.toml')
+    if not os.path.exists(config_path):
+        return
+    with open(config_path) as f:
+        content = f.read()
+    if 'mcp_servers.semcode' in content:
+        return
+    with open(config_path, 'a') as f:
+        f.write(f'\n[mcp_servers.semcode]\ncommand = "{path}"\nargs = []\n')
+
+def _register_semcode_gemini(path):
+    import json
+    config_path = os.path.expanduser('~/.gemini/settings.json')
+    config = {}
+    if os.path.exists(config_path):
+        with open(config_path) as f:
+            config = json.load(f)
+    config.setdefault('mcpServers', {})['semcode'] = {
+        "command": path, "args": [],
+    }
+    with open(config_path, 'w') as f:
+        json.dump(config, f, indent=2)
+
+def _register_semcode_opencode(path):
+    import json
+    config_path = os.path.expanduser('~/.config/opencode/opencode.json')
+    config = {}
+    os.makedirs(os.path.dirname(config_path), exist_ok=True)
+    if os.path.exists(config_path):
+        with open(config_path) as f:
+            config = json.load(f)
+    config.setdefault('mcp', {})['semcode'] = {
+        "command": path, "args": [], "enabled": True,
+    }
+    with open(config_path, 'w') as f:
+        json.dump(config, f, indent=2)
+
+class Harness:
+    def __init__(self, cmd, register_semcode=None, extra_args=None):
+        self.cmd = cmd
+        self.register_semcode = register_semcode
+        self._extra_args = extra_args or (lambda: [])
+
+    def __str__(self):
+        return self.cmd
+
+    def build_cmd(self, prompt):
+        import shlex
+        return shlex.split(self.cmd) + self._extra_args() + [prompt]
+
+    def run(self, prompt, linux_dir):
+        cmd = self.build_cmd(prompt)
+        os.chdir(linux_dir)
+        return subprocess.call(cmd)
+
+    def exec(self, prompt, linux_dir):
+        cmd = self.build_cmd(prompt)
+        os.chdir(linux_dir)
+        os.execvp(cmd[0], cmd)
+
+HARNESSES = [
+    Harness('claude --effort=max', _register_semcode_claude, _claude_extra_args),
+    Harness('codex', _register_semcode_codex),
+    Harness('gemini', _register_semcode_gemini),
+    Harness('opencode', _register_semcode_opencode),
+]
+
+def find_harness(name):
+    """Look up a Harness by command prefix."""
+    for h in HARNESSES:
+        if h.cmd == name or h.cmd.split()[0] == name:
+            return h
+    return Harness(name)
 
 def setup_semcode(linux_dir, harnesses):
-    """Set up semcode-mcp if available. Registers with the given harnesses."""
+    """Set up semcode-mcp if available. Registers with selected harnesses and indexes."""
     path = shutil.which('semcode-mcp')
     if not path:
         print('warning: semcode-mcp not found, skipping semantic code indexing')
         return
 
-    for harness in harnesses:
-        tool = harness.split()[0]
-        try:
-            subprocess.call([tool, 'mcp', 'add', 'semcode', path],
-                            stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-        except Exception:
-            pass
+    for h in harnesses:
+        if h.register_semcode:
+            print(f'registering semcode-mcp with {h.cmd.split()[0]}...')
+            h.register_semcode(path)
 
+    print(f'indexing {linux_dir} with semcode...')
     subprocess.check_call(['semcode-index', '-s', '.'], cwd=linux_dir)
 
 def sanitize_subj(subj):
@@ -210,6 +297,7 @@ def recursive_copy(message_id, mail_dir, dest_dir, seed_msg=None):
     seed_msg is the original piped-in message (may not be in the maildir yet).
     Returns (copied_count, root_subject) or (0, None) if nothing found."""
 
+    print(f'scanning {mail_dir} for thread {message_id}...')
     by_msgid = {}   # msgid -> filepath
     subj_map = {}   # msgid -> subject
     refs_map = {}   # msgid -> set of related msgids
@@ -382,10 +470,12 @@ def cmd_reply(args):
 
 def sync_prompts(prompts_dir):
     if not os.path.isdir(prompts_dir):
+        print(f'cloning review-prompts into {prompts_dir}...')
         subprocess.check_call(['git', 'clone',
             'https://github.com/masoncl/review-prompts',
             prompts_dir])
     else:
+        print(f'updating review-prompts...')
         subprocess.check_call(['git', 'pull'], cwd=prompts_dir)
 
 def build_ai_prompt(args):
@@ -477,30 +567,23 @@ Feel free to push back on the following suggestions:
 - corner cases that are very hard or impossible to hit
 """
 
-def run_harness(harness, prompt, linux_dir):
-    import shlex
-    cmd = shlex.split(harness) + [prompt]
-    os.chdir(linux_dir)
-    return subprocess.call(cmd)
-
 def cmd_feedback(args):
     prompt = build_ai_prompt(args)
     if not prompt:
         return
-    setup_semcode(args.linux, [args.harness])
-    os.chdir(args.linux)
-    import shlex
-    cmd = shlex.split(args.harness) + [prompt]
-    os.execvp(cmd[0], cmd)
+    h = find_harness(args.harness)
+    setup_semcode(args.linux, [h])
+    h.exec(prompt, args.linux)
 
 def cmd_turbo_feedback(args):
     prompt = build_ai_prompt(args)
     if not prompt:
         return
-    setup_semcode(args.linux, args.harnesses)
-    for harness in args.harnesses:
-        print(f'--- running: {harness} ---')
-        run_harness(harness, prompt, args.linux)
+    harnesses = [find_harness(name) for name in args.harnesses]
+    setup_semcode(args.linux, harnesses)
+    for h in harnesses:
+        print(f'--- running: {h} ---')
+        h.run(prompt, args.linux)
 
 def build_branch_prompt(args):
     sync_prompts(args.prompts)
@@ -523,17 +606,22 @@ def build_branch_prompt(args):
 
 def cmd_branch(args):
     prompt = build_branch_prompt(args)
-    setup_semcode(os.getcwd(), [args.harness])
-    import shlex
-    cmd = shlex.split(args.harness) + [prompt]
-    os.execvp(cmd[0], cmd)
+    h = find_harness(args.harness)
+    setup_semcode(os.getcwd(), [h])
+    h.exec(prompt, os.getcwd())
 
 def cmd_turbo_branch(args):
     prompt = build_branch_prompt(args)
-    setup_semcode(os.getcwd(), args.harnesses)
-    for harness in args.harnesses:
-        print(f'--- running: {harness} ---')
-        run_harness(harness, prompt, os.getcwd())
+    harnesses = [find_harness(name) for name in args.harnesses]
+    setup_semcode(os.getcwd(), harnesses)
+    for h in harnesses:
+        print(f'--- running: {h} ---')
+        h.run(prompt, os.getcwd())
+
+def cmd_test_mcp(args):
+    h = find_harness(args.harness)
+    setup_semcode(args.linux, [h])
+    h.exec('func kmalloc', args.linux)
 
 def cmd_clean(args):
     if args.name:
@@ -557,7 +645,7 @@ parser.add_argument('--review', type=str, default=DIR_REVIEW)
 parser.add_argument('--mail', type=str, default=os.path.expanduser(DIR_MAIL))
 parser.add_argument('--me', type=str, default=ME)
 parser.add_argument('--me-from', type=str, default=ME_FROM)
-parser.add_argument('--harnesses', type=str, nargs='+', default=HARNESSES)
+parser.add_argument('--harnesses', type=str, nargs='+', default=[h.cmd for h in HARNESSES])
 
 subparsers = parser.add_subparsers(dest="command", required=True)
 
@@ -569,7 +657,7 @@ begin.set_defaults(func=cmd_begin)
 feedback = subparsers.add_parser("feedback")
 feedback.add_argument('--prompts', type=str, default=DIR_PROMPTS)
 feedback.add_argument('--linux', type=str, default=DIR_LINUX)
-feedback.add_argument('--harness', type=str, default=HARNESSES[0])
+feedback.add_argument('--harness', type=str, default=HARNESSES[0].cmd)
 feedback.set_defaults(func=cmd_feedback)
 
 turbo_feedback = subparsers.add_parser("turbo-feedback")
@@ -580,13 +668,18 @@ turbo_feedback.set_defaults(func=cmd_turbo_feedback)
 branch = subparsers.add_parser("branch")
 branch.add_argument('-p', '--prompt', type=str)
 branch.add_argument('--prompts', type=str, default=DIR_PROMPTS)
-branch.add_argument('--harness', type=str, default=HARNESSES[0])
+branch.add_argument('--harness', type=str, default=HARNESSES[0].cmd)
 branch.set_defaults(func=cmd_branch)
 
 turbo_branch = subparsers.add_parser("turbo-branch")
 turbo_branch.add_argument('-p', '--prompt', type=str)
 turbo_branch.add_argument('--prompts', type=str, default=DIR_PROMPTS)
 turbo_branch.set_defaults(func=cmd_turbo_branch)
+
+test_mcp = subparsers.add_parser("test-mcp")
+test_mcp.add_argument('--linux', type=str, default=DIR_LINUX)
+test_mcp.add_argument('--harness', type=str, default=HARNESSES[0].cmd)
+test_mcp.set_defaults(func=cmd_test_mcp)
 
 clean = subparsers.add_parser("clean")
 clean.add_argument('name', type=str, nargs='?')
