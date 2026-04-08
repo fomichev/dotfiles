@@ -533,6 +533,23 @@ def cmd_turbo_branch(args):
         print(f'--- running: {harness} ---')
         run_harness(harness, prompt, os.getcwd(), semcode_args)
 
+def cmd_clean(args):
+    if args.name:
+        target = os.path.join(args.review, args.name)
+    else:
+        # Assume cwd is the review directory
+        target = os.getcwd()
+        if not os.path.exists(os.path.join(target, '00_root')):
+            print('not a review directory (no 00_root), pass name or run from review dir')
+            return
+
+    if not os.path.isdir(target):
+        print(f'{target} does not exist')
+        return
+
+    shutil.rmtree(target)
+    print(f'removed {target}')
+
 parser = argparse.ArgumentParser(description="krn-review")
 parser.add_argument('--review', type=str, default=DIR_REVIEW)
 parser.add_argument('--mail', type=str, default=os.path.expanduser(DIR_MAIL))
@@ -568,6 +585,10 @@ turbo_branch = subparsers.add_parser("turbo-branch")
 turbo_branch.add_argument('-p', '--prompt', type=str)
 turbo_branch.add_argument('--prompts', type=str, default=DIR_PROMPTS)
 turbo_branch.set_defaults(func=cmd_turbo_branch)
+
+clean = subparsers.add_parser("clean")
+clean.add_argument('name', type=str, nargs='?')
+clean.set_defaults(func=lambda args: cmd_clean(args))
 
 reply = subparsers.add_parser("reply")
 reply.add_argument('--dry-run', action='store_true')
