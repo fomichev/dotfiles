@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 
 # WORKFLOW:
-# cat ~/Mail/all/cur/<hash>:2,S | krn-review start [--tmux]
+# cat ~/Mail/all/cur/<hash>:2,S | krn-review begin [--tmux]
 # cd ~/review/<dir>
 # edit reply/ files to add inline comments
 # manual replies or krn-review feedback
@@ -25,6 +25,22 @@ DIR_MAIL = '/home/sdf/Mail'
 ME = 'Stanislav Fomichev'
 ME_FROM = 'Stanislav Fomichev <sdf.kernel@gmail.com>'
 HARNESSES = ['claude --effort=max', 'codex', 'gemini']
+SEMCODE_MCP_CONFIG = os.path.expanduser('~/semcode-mcp-config.json')
+
+def setup_semcode(linux_dir):
+    """Set up semcode-mcp if available. Returns extra harness args or empty list."""
+    path = shutil.which('semcode-mcp')
+    if not path:
+        print('warning: semcode-mcp not found, skipping semantic code indexing')
+        return []
+
+    import json
+    config = {"mcpServers": {"semcode": {"command": path}}}
+    with open(SEMCODE_MCP_CONFIG, 'w') as f:
+        json.dump(config, f)
+
+    subprocess.check_call(['semcode-index', '-s', '.'], cwd=linux_dir)
+    return [f'--mcp-config={SEMCODE_MCP_CONFIG}']
 
 def sanitize_subj(subj):
     # Count and strip Re: prefixes
@@ -459,9 +475,9 @@ Feel free to push back on the following suggestions:
 - corner cases that are very hard or impossible to hit
 """
 
-def run_harness(harness, prompt, linux_dir):
+def run_harness(harness, prompt, linux_dir, extra_args=[]):
     import shlex
-    cmd = shlex.split(harness) + [prompt]
+    cmd = shlex.split(harness) + extra_args + [prompt]
     os.chdir(linux_dir)
     return subprocess.call(cmd)
 
@@ -469,18 +485,20 @@ def cmd_feedback(args):
     prompt = build_ai_prompt(args)
     if not prompt:
         return
+    semcode_args = setup_semcode(args.linux)
     os.chdir(args.linux)
     import shlex
-    cmd = shlex.split(args.harness) + [prompt]
+    cmd = shlex.split(args.harness) + semcode_args + [prompt]
     os.execvp(cmd[0], cmd)
 
 def cmd_turbo_feedback(args):
     prompt = build_ai_prompt(args)
     if not prompt:
         return
+    semcode_args = setup_semcode(args.linux)
     for harness in args.harnesses:
         print(f'--- running: {harness} ---')
-        run_harness(harness, prompt, args.linux)
+        run_harness(harness, prompt, args.linux, semcode_args)
 
 def build_branch_prompt(args):
     sync_prompts(args.prompts)
@@ -503,15 +521,17 @@ def build_branch_prompt(args):
 
 def cmd_branch(args):
     prompt = build_branch_prompt(args)
+    semcode_args = setup_semcode(os.getcwd())
     import shlex
-    cmd = shlex.split(args.harness) + [prompt]
+    cmd = shlex.split(args.harness) + semcode_args + [prompt]
     os.execvp(cmd[0], cmd)
 
 def cmd_turbo_branch(args):
     prompt = build_branch_prompt(args)
+    semcode_args = setup_semcode(os.getcwd())
     for harness in args.harnesses:
         print(f'--- running: {harness} ---')
-        run_harness(harness, prompt, os.getcwd())
+        run_harness(harness, prompt, os.getcwd(), semcode_args)
 
 parser = argparse.ArgumentParser(description="krn-review")
 parser.add_argument('--review', type=str, default=DIR_REVIEW)
