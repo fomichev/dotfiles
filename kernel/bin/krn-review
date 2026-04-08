@@ -73,24 +73,28 @@ def _register_semcode_opencode(path):
     if os.path.exists(config_path):
         with open(config_path) as f:
             config = json.load(f)
+    config.setdefault('$schema', 'https://opencode.ai/config.json')
     config.setdefault('mcp', {})['semcode'] = {
-        "command": path, "args": [], "enabled": True,
+        "type": "local",
+        "command": [path],
+        "enabled": True,
     }
     with open(config_path, 'w') as f:
         json.dump(config, f, indent=2)
 
 class Harness:
-    def __init__(self, cmd, register_semcode=None, extra_args=None):
+    def __init__(self, cmd, register_semcode=None, extra_args=None, prompt_args=None):
         self.cmd = cmd
         self.register_semcode = register_semcode
         self._extra_args = extra_args or (lambda: [])
+        self._prompt_args = prompt_args or (lambda p: [p])
 
     def __str__(self):
         return self.cmd
 
     def build_cmd(self, prompt):
         import shlex
-        return shlex.split(self.cmd) + self._extra_args() + [prompt]
+        return shlex.split(self.cmd) + self._extra_args() + self._prompt_args(prompt)
 
     def run(self, prompt, linux_dir):
         cmd = self.build_cmd(prompt)
@@ -106,7 +110,7 @@ HARNESSES = [
     Harness('claude --effort=max', _register_semcode_claude, _claude_extra_args),
     Harness('codex', _register_semcode_codex),
     Harness('gemini', _register_semcode_gemini),
-    Harness('opencode', _register_semcode_opencode),
+    Harness('opencode', _register_semcode_opencode, prompt_args=lambda p: ['--prompt', p]),
 ]
 
 def find_harness(name):
