@@ -83,11 +83,12 @@ def _register_semcode_opencode(path):
         json.dump(config, f, indent=2)
 
 class Harness:
-    def __init__(self, cmd, register_semcode=None, extra_args=None, prompt_args=None):
+    def __init__(self, cmd, register_semcode=None, extra_args=None, prompt_args=None, enabled=True):
         self.cmd = cmd
         self.register_semcode = register_semcode
         self._extra_args = extra_args or (lambda: [])
         self._prompt_args = prompt_args or (lambda p: [p])
+        self.enabled = enabled
 
     def __str__(self):
         return self.cmd
@@ -110,7 +111,7 @@ HARNESSES = [
     Harness('claude --effort=max', _register_semcode_claude, _claude_extra_args),
     Harness('codex', _register_semcode_codex),
     Harness('gemini', _register_semcode_gemini),
-    Harness('opencode', _register_semcode_opencode, prompt_args=lambda p: ['--prompt', p]),
+    Harness('opencode', _register_semcode_opencode, prompt_args=lambda p: ['--prompt', p], enabled=False),
 ]
 
 def find_harness(name):
@@ -119,6 +120,10 @@ def find_harness(name):
         if h.cmd == name or h.cmd.split()[0] == name:
             return h
     return Harness(name)
+
+HARNESS_LIST = ', '.join(
+    f'{h.cmd.split()[0]}{"" if h.enabled else " (disabled)"}' for h in HARNESSES
+)
 
 def setup_semcode(linux_dir, harnesses):
     """Set up semcode-mcp if available. Registers with selected harnesses and indexes."""
@@ -644,12 +649,16 @@ def cmd_clean(args):
     shutil.rmtree(target)
     print(f'removed {target}')
 
-parser = argparse.ArgumentParser(description="krn-review")
+parser = argparse.ArgumentParser(
+    description=f"krn-review - kernel patch review tool\n\nAvailable harnesses: {HARNESS_LIST}",
+    formatter_class=argparse.RawDescriptionHelpFormatter,
+)
 parser.add_argument('--review', type=str, default=DIR_REVIEW)
 parser.add_argument('--mail', type=str, default=os.path.expanduser(DIR_MAIL))
 parser.add_argument('--me', type=str, default=ME)
 parser.add_argument('--me-from', type=str, default=ME_FROM)
-parser.add_argument('--harnesses', type=str, nargs='+', default=[h.cmd for h in HARNESSES])
+parser.add_argument('--harnesses', type=str, nargs='+',
+                    default=[h.cmd for h in HARNESSES if h.enabled])
 
 subparsers = parser.add_subparsers(dest="command", required=True)
 
