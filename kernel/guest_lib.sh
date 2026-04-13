@@ -657,6 +657,44 @@ tcpx_loopback_chunked() {
 	__tcpx_loopback -b 2039
 }
 
+tcpx_devmem_fbnic() {
+	local eth0drv=$(ethtool -i eth0 | grep driver | awk '{print $2}')
+	local eth1drv=$(ethtool -i eth1 | grep driver | awk '{print $2}')
+
+	if [[ ! "$eth0drv" = "virtio_net" ]]; then
+		echo "unexpected eth0 driver $eth0drv"
+		exit 1
+	fi
+
+	if [[ ! "$eth1drv" = "fbnic" ]]; then
+		echo "unexpected eth1 driver $eth1drv"
+		exit 1
+	fi
+
+	ip netns add ns-remote
+	ip link set dev eth0 netns ns-remote
+
+	ip                  link set dev eth1 up
+	ip -netns ns-remote link set dev eth0 up
+
+	ip                  addr add dev eth1 192.0.3.1/24
+	ip -netns ns-remote addr add dev eth0 192.0.3.2/24
+
+	ip                  addr add dev eth1 2001:db8:1::1/64 nodad
+	ip -netns ns-remote addr add dev eth0 2001:db8:1::2/64 nodad
+
+	sysctl -w net.ipv6.conf.eth1.keep_addr_on_down=1
+
+	export REMOTE_TYPE=netns
+	export REMOTE_ARGS=ns-remote
+	export NETIF=eth1
+	export LOCAL_V6=2001:db8:1::1
+	export REMOTE_V6=2001:db8:1::2
+	export LOCAL_PREFIX_V6=2001:db8:2::0/64
+
+	./tools/testing/selftests/drivers/net/hw/devmem.py
+}
+
 team_set_rx_mode() {
 	set -x
 
@@ -858,4 +896,9 @@ macseq_lock() {
 	ip link set dev macsec_vlan address 00:11:22:33:44:88
 	ip link set dev macsec_vlan up
 
+}
+
+netkit() {
+	ip link add nk1 type netkit
+	#dmesg
 }
