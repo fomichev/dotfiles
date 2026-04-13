@@ -117,7 +117,28 @@ host() {
 
 	local net
 
-	if $NET_USER && ! $NET_FBNIC; then
+	local qemu_flavor=$ARCH
+	[[ "${ARCH}" = "arm64" ]] && qemu_flavor=aarch64
+
+	local NET_FBNIC=false
+	if [[ -e "$FBNIC_FW" ]] && ${QEMU_PATH}qemu-system-${qemu_flavor} -device help 2>&1 | grep -q '"fbnic"'; then
+		NET_FBNIC=true
+		QEMU_MACH="q35,$QEMU_MACH"
+	fi
+
+	if $NET_FBNIC; then
+		# virtio-net + fbnic on hub 0 for L2 connectivity
+		net+=" -device virtio-net-pci,netdev=virtio-hub"
+		net+=" -netdev hubport,id=virtio-hub,hubid=0"
+		net+=" -netdev hubport,id=fbnic-hub,hubid=0"
+
+		# fbnic device
+		net+=" -object memory-backend-memfd,id=fbnic-mem,size=${MEMORY}M,share=on"
+		net+=" -numa node,memdev=fbnic-mem"
+		net+=" -chardev socket,id=fbnic-fw,path=$FBNIC_SKT,server=off"
+		net+=" -device ioh3420,id=fbnic-root"
+		net+=" -device fbnic,bus=fbnic-root,bar4=fbnic-fw,mac=00:de:ad:be:ef:01,netdev=fbnic-hub"
+	elif $NET_USER; then
 		net+=" -netdev user,id=virtual"
 
 		if $SSH; then
@@ -132,7 +153,7 @@ host() {
 		net+=" -device virtio-net-pci,netdev=virtual"
 	fi
 
-	if $NET_TAP; then
+	if $NET_TAP && ! $NET_FBNIC; then
 		local dev="qtap1"
 		if $TAP_MQ; then
 			dev="qtap0"
@@ -169,7 +190,6 @@ host() {
 	fi
 
 	local cpu
-	local qemu_flavor=$ARCH
 	case "${ARCH}" in
 		x86_64)
 			if [[ "${MY_ARCH}" = "${ARCH}" ]]; then
@@ -187,12 +207,6 @@ host() {
 			;;
 	esac
 
-	local NET_FBNIC=false
-	if [[ -e "$FBNIC_FW" ]] && ${QEMU_PATH}qemu-system-${qemu_flavor} -device help 2>&1 | grep -q '"fbnic"'; then
-		NET_FBNIC=true
-		QEMU_MACH="q35,$QEMU_MACH"
-	fi
-
 	local accel
 	if [[ "${MY_ARCH}" = "${ARCH}" ]]; then
 		accel+=" -machine $QEMU_MACH"
@@ -202,15 +216,6 @@ host() {
 	fi
 
 	fixup host
-
-	if $NET_FBNIC; then
-		net+=" -net none"
-		net+=" -object memory-backend-memfd,id=fbnic-mem,size=${MEMORY}M,share=on"
-		net+=" -numa node,memdev=fbnic-mem"
-		net+=" -chardev socket,id=fbnic-fw,path=$FBNIC_SKT,server=off"
-		net+=" -device ioh3420,id=fbnic-root"
-		net+=" -device fbnic,bus=fbnic-root,bar4=fbnic-fw,mac=00:de:ad:be:ef:01"
-	fi
 
 	local init
 	init+="mount -n -t tmpfs tmpfs /tmp"
