@@ -8,4 +8,4 @@ cd $KDIR
 mkdir -p $KDIR/.claude
 ln -fs ~/src/dotfiles/kernel/skills $KDIR/.claude/skills
 
-claude
+claude --effort max

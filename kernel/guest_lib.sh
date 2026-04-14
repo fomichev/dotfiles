@@ -44,6 +44,7 @@ fi
 TP_EXCLUDE=()
 TP_INCLUDE=()
 SELFTEST=()
+HW_SELFTEST=()
 TARGETS=""
 CUSTOM=()
 
@@ -494,6 +495,13 @@ __run_all_tests() {
 	if [[ ! -z "$TARGETS" ]]; then
 		make -C tools/testing/selftests TARGETS=$TARGETS run_tests
 	fi
+
+	if [[ ${#HW_SELFTEST[@]} -gt 0 ]]; then
+		hw_test_fbnic_setup
+		for bin in ${HW_SELFTEST[@]}; do
+			run_selftest drivers/net/hw/$(echo "$bin" | tr ':' ' ') || :
+		done
+	fi
 }
 
 testsuite_run() {
@@ -657,7 +665,7 @@ tcpx_loopback_chunked() {
 	__tcpx_loopback -b 2039
 }
 
-tcpx_devmem_fbnic() {
+hw_test_fbnic_setup() {
 	local eth0drv=$(ethtool -i eth0 | grep driver | awk '{print $2}')
 	local eth1drv=$(ethtool -i eth1 | grep driver | awk '{print $2}')
 
@@ -674,7 +682,11 @@ tcpx_devmem_fbnic() {
 	ip netns add ns-remote
 	ip link set dev eth0 netns ns-remote
 
-	ip                  link set dev eth1 up
+	ip link set dev eth1 up
+	for i in $(seq 1 50); do
+		[ "$(cat /sys/class/net/eth1/carrier 2>/dev/null)" = "1" ] && break
+		sleep 0.1
+	done
 	ip -netns ns-remote link set dev eth0 up
 
 	ip                  addr add dev eth1 192.0.3.1/24
@@ -685,14 +697,21 @@ tcpx_devmem_fbnic() {
 
 	sysctl -w net.ipv6.conf.eth1.keep_addr_on_down=1
 
+	# Route for the netkit guest subnet (LOCAL_PREFIX_V6) via the local address
+	ip -netns ns-remote -6 route add 2001:db8:2::/64 via 2001:db8:1::1
+
 	export REMOTE_TYPE=netns
 	export REMOTE_ARGS=ns-remote
 	export NETIF=eth1
+	export LOCAL_V4=192.0.3.1
+	export REMOTE_V4=192.0.3.2
 	export LOCAL_V6=2001:db8:1::1
 	export REMOTE_V6=2001:db8:1::2
 	export LOCAL_PREFIX_V6=2001:db8:2::0/64
+}
 
-	./tools/testing/selftests/drivers/net/hw/devmem.py
+tcpx_devmem_fbnic() {
+	HW_SELFTEST+=(devmem.py)
 }
 
 team_set_rx_mode() {
