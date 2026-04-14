@@ -145,6 +145,7 @@ if [[ ! -e $KDIR/.config ]]; then
 	set_config CONFIG_DYNAMIC_DEBUG $y_dbx
 	set_config CONFIG_PROVE_RCU $y_dbx
 	set_config CONFIG_DEBUG_NET $y_dbx
+	set_config CONFIG_NET_DEV_REFCNT_TRACKER $y_dbx
 	set_config CONFIG_DEBUG_PAGEALLOC $y_dbx
 	set_config CONFIG_GDB_SCRIPTS $y_dbx
 	set_config CONFIG_DEBUG_KMEMLEAK $y_dbx
