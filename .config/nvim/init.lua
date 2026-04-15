@@ -147,6 +147,14 @@ vim.keymap.set("n", "<C-n>", ":silent cnext<CR>")
 -- No LSP info on the side
 vim.o.signcolumn = "no"
 
+-- Don't conceal any characters in markdown
+vim.api.nvim_create_autocmd("FileType", {
+  pattern = "markdown",
+  callback = function()
+    vim.opt_local.conceallevel = 0
+  end,
+})
+
 local lsp_buffer_augroup = vim.api.nvim_create_augroup("lsp-buffer", {})
 
 local lsp_on_attach = function(client, bufnr)
