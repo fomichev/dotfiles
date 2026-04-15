@@ -179,6 +179,8 @@ kernel/bin/output
 .config/Yubico/
 .config/zoomus.conf
 
+kernel/bin/__pycache__/
+
 # myclaw
 .config/google_mux/
 .config/systemd/user/myclaw.service

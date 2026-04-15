@@ -6,6 +6,6 @@ source $MYDIR/../host_lib.sh
 cd $KDIR
 
 mkdir -p $KDIR/.claude
-ln -fs ~/src/dotfiles/kernel/skills $KDIR/.claude/skills
+ln -fsn ~/src/dotfiles/kernel/skills $KDIR/.claude/skills
 
 claude --effort max
