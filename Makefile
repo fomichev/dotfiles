@@ -149,3 +149,23 @@ layout:
 
 flash_kinesis:
 	(cd $(QMK) && qmk flash -kb kinesis/redux -km fomichev)
+
+setup_lei:
+	(cd ~/src && http-proxy git clone https://public-inbox.org/public-inbox.git)
+	test -f /usr/bin/apt && sudo apt install libdbd-sqlite3-perl libsearch-xapian-perl || :
+	test -f /usr/bin/pacman && sudo pacman -S perl-dbd-sqlite perl-search-xapian || :
+	test -f /usr/bin/dnf && sudo dnf install perl-DBD-SQLite perl-Search-Xapian || :
+	~/src/public-inbox/lei.sh q \
+		-I https://lore.kernel.org/all/ \
+		-o ~/Mail/all --dedupe=mid \
+		'(l:bpf.vger.kernel.org OR l:netdev.vger.kernel.org) AND rt:1.week.ago..'
+
+linux:
+	(cd ~/src && http-proxy git clone https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git)
+	(cd ~/src/linux && git remote add bpf-next https://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf-next.git)
+	(cd ~/src/linux && git remote add github git@github.com:fomichev/linux-private.git)
+	(cd ~/src/linux && git remote add github-public git@github.com:fomichev/linux.git)
+	(cd ~/src/linux && git remote add linux-next https://git.kernel.org/pub/scm/linux/kernel/git/next/linux-next.git)
+	(cd ~/src/linux && git remote add net https://git.kernel.org/pub/scm/linux/kernel/git/netdev/net.git)
+	(cd ~/src/linux && git remote add net-next https://git.kernel.org/pub/scm/linux/kernel/git/netdev/net-next.git)
+	(cd ~/src/linux && http-proxy git fetch -a)
