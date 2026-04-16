@@ -586,7 +586,8 @@ EOF
 
 	echo
 	say poweroff
-	echo o > /proc/sysrq-trigger
+	echo s > /proc/sysrq-trigger
+	echo b > /proc/sysrq-trigger
 }
 
 while getopts "2i:de:hgms:c:f:n:q" opt; do
