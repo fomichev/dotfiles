@@ -1,0 +1,45 @@
+#!/bin/bash
+
+set -e
+
+MYDIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}" )" &>/dev/null && pwd)
+
+FEATURE_NAME="$1"
+FEATURE_BRANCH="${2:-net-next}"
+FEATURE_PLAN="$3"
+
+if [ -z "$FEATURE_NAME" ]; then
+	echo "Usage: krn-feature <feature-name> [branch] [feature-plan.md]"
+	echo "  branch defaults to net-next"
+	exit 1
+fi
+
+LINUX_SRC=~/src/linux
+WORKTREE=~/src/linux-${FEATURE_NAME}
+BRANCH="upstream/${FEATURE_BRANCH}/${FEATURE_NAME}/1"
+
+if [ -n "$FEATURE_PLAN" ] && [ ! -e "$FEATURE_PLAN" ]; then
+	FEATURE_PLAN=~/src/kernel-scripts/Kernel/tasks/${FEATURE_PLAN}
+fi
+
+if [ -n "$FEATURE_PLAN" ] && [ ! -e "$FEATURE_PLAN" ]; then
+	echo "Plan file not found: $FEATURE_PLAN"
+	exit 1
+fi
+
+cd "$LINUX_SRC"
+git worktree add -b "$BRANCH" "$WORKTREE" "upstream/${FEATURE_BRANCH}/main"
+cd "$WORKTREE"
+
+mkdir -p "$WORKTREE/.claude"
+ln -fsn "$MYDIR/../skills" "$WORKTREE/.claude/skills"
+
+PROMPT="Build the kernel using /kernel-build-qemu skill, then run selftests using /kernel-selftest-qemu skill to establish a baseline."
+
+if [ -n "$FEATURE_PLAN" ]; then
+	PROMPT="$PROMPT Then read the plan from $FEATURE_PLAN, show me a summary, and ask whether I want to proceed with it."
+else
+	PROMPT="$PROMPT Then ask me what I'd like to work on."
+fi
+
+claude --effort max -p "$PROMPT"
