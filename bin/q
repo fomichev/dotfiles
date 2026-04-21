@@ -178,7 +178,7 @@ host() {
 
 	cmdline+=" $CMDLINE"
 	cmdline+=" rootfstype=9p"
-	cmdline+=" rootflags=version=9p2000.L,trans=virtio,access=any"
+	cmdline+=" rootflags=version=9p2000.L,trans=virtio,access=any,cache=none"
 	cmdline+=" ro"
 	cmdline+=" nokaslr"
 
@@ -369,7 +369,7 @@ guest() {
 		local mods_nr=$(echo "$mods" | wc -w)
 
 		say modules /lib/modules/$kver $mods_nr modules
-		mount -n -t 9p -o trans=virtio /dev/kernel "$DIR_KERNEL"
+		mount -n -t 9p -o trans=virtio,cache=none /dev/kernel "$DIR_KERNEL"
 		mount -n -t tmpfs tmpfs /lib/modules
 		mkdir "/lib/modules/$kver"
 		ln -s "$DIR_KERNEL" "/lib/modules/$kver/source"
@@ -586,7 +586,9 @@ EOF
 
 	echo
 	say poweroff
+	sync
 	echo s > /proc/sysrq-trigger
+	sleep 1
 	echo b > /proc/sysrq-trigger
 }
 
