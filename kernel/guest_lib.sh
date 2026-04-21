@@ -680,14 +680,25 @@ hw_test_fbnic_setup() {
 	fi
 
 	ip netns add ns-remote
-	ip link set dev eth0 netns ns-remote
+	for _retry in $(seq 1 5); do
+		ip link set dev eth0 netns ns-remote && break
+		echo "retrying ip link set netns ($_retry)..."
+		sleep 2
+	done
 
-	ip link set dev eth1 up
+	ip link set dev eth1 up mtu 4200
+	ip -netns ns-remote link set dev eth0 up mtu 4200
+	# MSS = 4096 + 12 (TCP timestamps) = 4108
+	# MTU = MSS + 40 (IPv6) + 20 (TCP) = 4168, rounded up to 4200
+	ip route replace 2001:db8:1::/64 dev eth1 advmss 4108
+	ip -netns ns-remote route replace 2001:db8:1::/64 dev eth0 advmss 4108
+	# Enable TCP timestamps
+	sysctl -w net.ipv4.tcp_timestamps=1
+	tc qdisc replace dev eth1 root fq
 	for i in $(seq 1 50); do
 		[ "$(cat /sys/class/net/eth1/carrier 2>/dev/null)" = "1" ] && break
 		sleep 0.1
 	done
-	ip -netns ns-remote link set dev eth0 up
 
 	ip                  addr add dev eth1 192.0.3.1/24
 	ip -netns ns-remote addr add dev eth0 192.0.3.2/24

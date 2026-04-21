@@ -33,7 +33,7 @@ if [ ! -z "$SUFFIX" ]; then
 fi
 
 cutoff() {
-	local sha=$(git log --oneline | head -n 500 | grep CUTOFF | awk '{print $1}')
+	local sha=$(git log --oneline | head -n 500 | grep -- '--CUTOFF--' | awk '{print $1}')
 	if [[ -z "$sha" ]]; then
 		echo "HEAD"
 	else
