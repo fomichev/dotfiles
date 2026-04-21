@@ -3,9 +3,11 @@
 MYDIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}" )" &>/dev/null && pwd)
 source $MYDIR/../host_lib.sh
 
-cd $KDIR
+TOPDIR=$(git rev-parse --show-toplevel)
 
-mkdir -p $KDIR/.claude
-ln -fsn ~/src/dotfiles/kernel/skills $KDIR/.claude/skills
+cd $TOPDIR
 
-claude --effort max
+mkdir -p $TOPDIR/.claude
+ln -fsn ~/src/dotfiles/kernel/skills $TOPDIR/.claude/skills
+
+claude --effort max "$@"
