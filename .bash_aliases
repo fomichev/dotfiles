@@ -50,4 +50,4 @@ http-proxy() {
 
 alias sound=wiremix
 alias wifi=impala
-alias bluetooth=bluetui
+alias bt=bluetui
