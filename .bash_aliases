@@ -8,7 +8,6 @@ alias ......='cd ../../../../.. && p'
 
 alias ls='ls --color=auto'
 alias l='ls -AF --group-directories-first';
-alias a='ls -lah'
 alias j='jobs -l'
 alias info='info --vi-keys'
 alias _='sudo'

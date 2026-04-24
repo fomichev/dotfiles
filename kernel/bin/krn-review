@@ -6,6 +6,7 @@
 # edit reply/ files to add inline comments
 # manual replies or krn-review feedback
 # krn-review reply [--dry]
+# krn-review harness [--path dir] [-- <harness-args>]
 
 import argparse
 import email
@@ -18,13 +19,34 @@ import subprocess
 import shutil
 import sys
 
+SCRIPT_DIR = os.path.dirname(os.path.realpath(__file__))
+DIR_KERNEL = os.path.dirname(SCRIPT_DIR)
 DIR_PROMPTS = '/home/sdf/src/review-prompts'
 DIR_LINUX = '/home/sdf/src/linux'
 DIR_REVIEW = '/home/sdf/review'
 DIR_MAIL = '/home/sdf/Mail'
+DIR_KERNEL_SKILLS = os.path.join(DIR_KERNEL, 'skills')
 ME = 'Stanislav Fomichev'
 ME_FROM = 'Stanislav Fomichev <sdf.kernel@gmail.com>'
 SEMCODE_MCP_CONFIG = os.path.expanduser('~/.claude/semcode-mcp.json')
+
+def _force_symlink(target, link_name):
+    os.makedirs(os.path.dirname(link_name), exist_ok=True)
+    if os.path.lexists(link_name):
+        if os.path.islink(link_name):
+            current_target = os.readlink(link_name)
+            current_path = os.path.realpath(os.path.join(os.path.dirname(link_name), current_target))
+            if current_target == target or current_path == os.path.realpath(target):
+                return
+        if os.path.isdir(link_name) and not os.path.islink(link_name):
+            print(f'warning: {link_name} exists and is not a symlink, leaving it untouched')
+            return
+        os.unlink(link_name)
+    os.symlink(target, link_name, target_is_directory=True)
+
+def _prepare_agent_workspace(work_dir):
+    _force_symlink(DIR_KERNEL_SKILLS, os.path.join(work_dir, '.claude', 'skills'))
+    _force_symlink(os.path.join(work_dir, '.claude'), os.path.join(work_dir, '.codex'))
 
 def _register_semcode_claude(path):
     import json
@@ -83,33 +105,44 @@ def _register_semcode_opencode(path):
         json.dump(config, f, indent=2)
 
 class Harness:
-    def __init__(self, cmd, register_semcode=None, extra_args=None, prompt_args=None, enabled=True):
+    def __init__(self, cmd, register_semcode=None, extra_args=None, prompt_args=None,
+                 prepare_workspace=None, enabled=True):
         self.cmd = cmd
         self.register_semcode = register_semcode
         self._extra_args = extra_args or (lambda: [])
         self._prompt_args = prompt_args or (lambda p: [p])
+        self._prepare_workspace = prepare_workspace or (lambda _: None)
         self.enabled = enabled
 
     def __str__(self):
         return self.cmd
 
-    def build_cmd(self, prompt):
+    def build_cmd(self, prompt=None, passthrough_args=None):
         import shlex
-        return shlex.split(self.cmd) + self._extra_args() + self._prompt_args(prompt)
+        cmd = shlex.split(self.cmd) + self._extra_args()
+        if passthrough_args is not None:
+            return cmd + passthrough_args
+        if prompt is None:
+            return cmd
+        return cmd + self._prompt_args(prompt)
 
-    def run(self, prompt, linux_dir):
-        cmd = self.build_cmd(prompt)
+    def run(self, prompt, linux_dir, passthrough_args=None):
+        cmd = self.build_cmd(prompt, passthrough_args)
+        self._prepare_workspace(linux_dir)
         os.chdir(linux_dir)
         return subprocess.call(cmd)
 
-    def exec(self, prompt, linux_dir):
-        cmd = self.build_cmd(prompt)
+    def exec(self, prompt, linux_dir, passthrough_args=None):
+        cmd = self.build_cmd(prompt, passthrough_args)
+        self._prepare_workspace(linux_dir)
         os.chdir(linux_dir)
         os.execvp(cmd[0], cmd)
 
 HARNESSES = [
-    Harness('claude --effort=max', _register_semcode_claude, _claude_extra_args),
-    Harness('codex', _register_semcode_codex),
+    Harness('claude --effort=max', _register_semcode_claude, _claude_extra_args,
+            prepare_workspace=_prepare_agent_workspace),
+    Harness('codex', _register_semcode_codex,
+            prepare_workspace=_prepare_agent_workspace),
     Harness('gemini', _register_semcode_gemini),
     Harness('opencode', _register_semcode_opencode, prompt_args=lambda p: ['--prompt', p], enabled=False),
 ]
@@ -139,6 +172,16 @@ def setup_semcode(linux_dir, harnesses):
 
     print(f'indexing {linux_dir} with semcode...')
     subprocess.check_call(['semcode-index', '-s', '.'], cwd=linux_dir)
+
+def resolve_git_root(path):
+    try:
+        return subprocess.check_output(
+            ['git', 'rev-parse', '--show-toplevel'],
+            cwd=path,
+            stderr=subprocess.DEVNULL,
+        ).decode().strip()
+    except (subprocess.CalledProcessError, FileNotFoundError):
+        return None
 
 def sanitize_subj(subj):
     # Count and strip Re: prefixes
@@ -632,6 +675,21 @@ def cmd_test_mcp(args):
     setup_semcode(args.linux, [h])
     h.exec('func kmalloc', args.linux)
 
+def cmd_harness(args):
+    h = find_harness(args.harness)
+    work_dir = resolve_git_root(args.path)
+    if not work_dir:
+        print(f'{args.path} is not inside a git repository')
+        return
+
+    _prepare_agent_workspace(work_dir)
+
+    harness_args = args.args
+    if harness_args and harness_args[0] == '--':
+        harness_args = harness_args[1:]
+
+    h.exec(None, work_dir, passthrough_args=harness_args)
+
 def cmd_clean(args):
     if args.name:
         target = os.path.join(args.review, args.name)
@@ -693,6 +751,12 @@ test_mcp = subparsers.add_parser("test-mcp")
 test_mcp.add_argument('--linux', type=str, default=DIR_LINUX)
 test_mcp.add_argument('--harness', type=str, default=HARNESSES[0].cmd)
 test_mcp.set_defaults(func=cmd_test_mcp)
+
+harness = subparsers.add_parser("harness")
+harness.add_argument('--path', type=str, default='.')
+harness.add_argument('--harness', type=str, default=HARNESSES[0].cmd)
+harness.add_argument('args', nargs=argparse.REMAINDER)
+harness.set_defaults(func=cmd_harness)
 
 clean = subparsers.add_parser("clean")
 clean.add_argument('name', type=str, nargs='?')

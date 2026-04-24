@@ -33,4 +33,4 @@ else
 	PROMPT="$PROMPT Then ask me what I'd like to work on."
 fi
 
-krn-claude "$PROMPT"
+krn-review harness "$PROMPT"
