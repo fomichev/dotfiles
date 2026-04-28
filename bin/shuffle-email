@@ -12,7 +12,7 @@ import sys
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--me', type=str, default='sdf@fomichev.me,stfomichev@gmail.com')
-parser.add_argument('--archive-seen', type=str, default='patchwork-bot+netdevbpf@kernel.org,lkp@intel.com')
+parser.add_argument('--archive-seen', type=str, default='patchwork-bot+netdevbpf@kernel.org,lkp@intel.com,sashiko-bot@kernel.org')
 parser.add_argument('--linux', type=str, default='/home/sdf/src/linux')
 parser.add_argument('--inbox', type=str, default='/home/sdf/Mail/all')
 parser.add_argument('--archive', type=str, default='/home/sdf/Mail/archive')
