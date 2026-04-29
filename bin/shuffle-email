@@ -3,6 +3,7 @@
 import argparse
 import email
 import email.policy
+import fnmatch
 import re
 import os
 import os.path
@@ -16,6 +17,10 @@ parser.add_argument('--archive-seen', type=str, default='patchwork-bot+netdevbpf
 parser.add_argument('--linux', type=str, default='/home/sdf/src/linux')
 parser.add_argument('--inbox', type=str, default='/home/sdf/Mail/all')
 parser.add_argument('--archive', type=str, default='/home/sdf/Mail/archive')
+parser.add_argument('--flag-maintainers', type=str, default='Stanislav Fomichev',
+                    help='match MAINTAINERS sections where M: or R: contains '
+                         'this name; flag unflagged patch emails touching '
+                         "maintained files. Empty disables.")
 parser.add_argument('--dry', default=False, action='store_true')
 
 args = parser.parse_args()
@@ -65,8 +70,34 @@ def parse_mbox(path):
     return cur | new
 
 def flagged(path, flag):
-    flags = path.split(',')[-1]
+    # Maildir convention: flags live after `:2,` (the "info" part).
+    # Files in /new/ (and freshly-delivered files generally) don't
+    # have a :2, suffix yet, so they have no flags by definition.
+    # Earlier this function did `path.split(',')[-1]` which silently
+    # fell back to the whole path when no `,` was present, then
+    # substring-matched against it — so a hostname like `devvm7509F`
+    # spuriously read as flagged-with-F (every file from devvm7509
+    # that we'd previously appended an F to via add_flag/the old
+    # `path + "F"` write would then short-circuit subsequent runs).
+    if ':2,' not in path:
+        return False
+    _, flags = path.rsplit(':2,', 1)
     return flag in flags
+
+
+def add_flag(path, flag):
+    """Return `path` with `flag` added to its maildir info suffix.
+    Constructs a valid maildir name (`<base>:2,<flags>`) so MUAs
+    actually recognize the flag. Was previously `path + flag`,
+    which produced names like `<base>devvm7509F` — not maildir-
+    valid, so mutt et al ignored them; and `flagged()` then
+    spuriously matched against the substring on subsequent runs.
+    """
+    if ':2,' in path:
+        base, existing = path.rsplit(':2,', 1)
+        new_flags = ''.join(sorted(set(existing) | {flag}))
+        return f"{base}:2,{new_flags}"
+    return f"{path}:2,{flag}"
 
 def have_top_message(mbox, id2path, id):
     while True:
@@ -85,13 +116,98 @@ def have_top_message(mbox, id2path, id):
 
     return False
 
+def parse_maintainers(linux_dir, name):
+    """Parse MAINTAINERS, return [(include_globs, exclude_globs)] for sections
+    whose M: or R: line contains `name`. Empty list iff MAINTAINERS missing
+    or `name` matches no sections."""
+    path = os.path.join(linux_dir, 'MAINTAINERS')
+    if not os.path.isfile(path):
+        print(f'maintainers: {path} not found, skipping')
+        return []
+
+    with open(path, 'r', encoding='utf-8', errors='replace') as f:
+        content = f.read()
+
+    sections = []
+    for raw in re.split(r'\n\n+', content):
+        m_or_r, f_globs, x_globs = [], [], []
+        for line in raw.split('\n'):
+            if line.startswith('M:') or line.startswith('R:'):
+                m_or_r.append(line[2:].strip())
+            elif line.startswith('F:'):
+                f_globs.append(line[2:].strip())
+            elif line.startswith('X:'):
+                x_globs.append(line[2:].strip())
+        if f_globs and any(name in entry for entry in m_or_r):
+            sections.append((f_globs, x_globs))
+    return sections
+
+
+def path_matches_glob(path, pattern):
+    """MAINTAINERS-style match. Trailing `/` = directory prefix (recursive);
+    else fnmatch."""
+    if pattern.endswith('/'):
+        return path.startswith(pattern)
+    return fnmatch.fnmatch(path, pattern)
+
+
+def matches_maintainer_section(touched, sections):
+    for include_globs, exclude_globs in sections:
+        for path in touched:
+            for inc in include_globs:
+                if path_matches_glob(path, inc):
+                    if not any(path_matches_glob(path, x) for x in exclude_globs):
+                        return True
+    return False
+
+
+def extract_touched_files(mail_path):
+    """Return list of paths from `diff --git a/<path> b/<path>` lines in the
+    mail body. Quiet on parse errors (returns [])."""
+    files = []
+    try:
+        with open(mail_path, 'r', encoding='utf-8', errors='replace') as f:
+            for line in f:
+                m = re.match(r'^diff --git a/(\S+) b/\S+', line)
+                if m:
+                    files.append(m.group(1))
+    except Exception:
+        pass
+    return files
+
+
+def is_patch_subject(subject):
+    return re.search(r'\bPATCH\b', subject) is not None
+
+
+def flag_by_maintainers(mbox, sections):
+    if not sections:
+        return
+    flagged_count = 0
+    for path, d in mbox.items():
+        if flagged(path, 'F'):
+            continue
+        if not is_patch_subject(d.get('Subject', '')):
+            continue
+        touched = extract_touched_files(path)
+        if not touched:
+            continue
+        if matches_maintainer_section(touched, sections):
+            dst = add_flag(path, 'F')
+            if not args.dry:
+                shutil.move(path, dst)
+            print(f'maintainers flag {path} -> {dst} ({d["Subject"]})')
+            flagged_count += 1
+    print(f'maintainers: flagged {flagged_count} email(s)')
+
+
 def flag_to_me(new, me):
     mbox = parse_dir(new)
     for path in mbox:
         for email in me:
             if email in mbox[path]['To']:
                 if not flagged(path, 'F'):
-                    dst = path + "F"
+                    dst = add_flag(path, "F")
                     if not args.dry:
                         shutil.move(path, dst)
                     print(f'flag {path} -> {dst}')
@@ -103,7 +219,13 @@ def move_all(move, subdir, seen):
         dst = os.path.join(args.archive, subdir, os.path.basename(src))
 
         if seen and not flagged(dst, 'S'):
-            dst = path + 'S'
+            # Was `dst = path + 'S'`: `path` was undefined (loop var
+            # is `src`; `path` from outer-scope leaked from the
+            # `for path in inbox:` loop), and `path + 'S'` produced
+            # a non-maildir filename mutt wouldn't recognize as Seen.
+            # add_flag() produces a valid `<base>:2,<flags+S>` name
+            # against the archive destination we just built.
+            dst = add_flag(dst, 'S')
 
         print(f'{src} -> {dst}')
         if not args.dry:
@@ -112,6 +234,14 @@ def move_all(move, subdir, seen):
 flag_to_me(os.path.join(args.inbox, 'new'), args.me.split(','))
 
 inbox = parse_mbox(args.inbox)
+
+if args.flag_maintainers:
+    sections = parse_maintainers(args.linux, args.flag_maintainers)
+    flag_by_maintainers(inbox, sections)
+    # Re-parse: flag_by_maintainers may have renamed files (added F flag),
+    # so the inbox dict + Message-Id paths below need fresh values for the
+    # archive/threading logic to pick them up correctly.
+    inbox = parse_mbox(args.inbox)
 
 id2path = {}
 
