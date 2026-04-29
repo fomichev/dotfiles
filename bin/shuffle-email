@@ -266,11 +266,22 @@ for path in inbox:
         else:
             move_seen.append(path)
 
-for path in move_new:
-    print(f'move new {path}: {inbox[path]["Subject"]}')
+# Split move_new: replies to threads we never F-flagged are noise — auto-seen
+# them so they don't pile up unread in archive/new/. Roots of brand-new
+# untracked threads stay unseen so a fresh conversation we weren't on can
+# still catch the eye in mutt.
+move_new_roots = [p for p in move_new if 'In-Reply-To' not in inbox[p]]
+move_new_replies = [p for p in move_new if 'In-Reply-To' in inbox[p]]
+
+for path in move_new_roots:
+    print(f'move new (root) {path}: {inbox[path]["Subject"]}')
+
+for path in move_new_replies:
+    print(f'move new (reply, auto-seen) {path}: {inbox[path]["Subject"]}')
 
 for path in move_seen:
     print(f'move seen {path}: {inbox[path]["Subject"]}')
 
-move_all(move_new, 'new', False)
+move_all(move_new_roots, 'new', False)
+move_all(move_new_replies, 'cur', True)
 move_all(move_seen, 'cur', True)
