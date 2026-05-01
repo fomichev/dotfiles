@@ -15,3 +15,5 @@ clipboard-paste-bracketed-safe = true
 
 keybind = ctrl+shift+c=copy_to_clipboard
 keybind = ctrl+shift+v=paste_from_clipboard
+keybind = ctrl+shift+m=toggle_maximize
+keybind = ctrl+shift+d=toggle_window_decorations
