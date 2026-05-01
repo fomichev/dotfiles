@@ -232,6 +232,10 @@ __build_cargo() {
 	(cd "$S" && cargo install ${cargo_flags[@]} --locked --root "$PREFIX")
 }
 
+__build_zig() {
+	(cd "$S" && zig build -p $PREFIX ${zig_flags[@]} -Doptimize=ReleaseFast)
+}
+
 __build_autoconf() {
 	[ -x "$S/autogen.sh" ] && (cd "$S" && ./autogen.sh) || :
 	[ -e "$S/configure.ac" -a ! -e "$S/configure" ] && (cd "$S" && autoreconf -fi) || :
@@ -256,7 +260,10 @@ __src_path() {
 build() {
 	local src="$(__src_path)"
 
-	if [ -f "$src/CMakeLists.txt" ]; then
+	if [ -f "$src/build.zig" ]; then
+		say "zig"
+		__build_zig "$src"
+	elif [ -f "$src/CMakeLists.txt" ]; then
 		say "cmake"
 		__build_cmake "$src"
 	elif [ -f "$src/Cargo.toml" ]; then

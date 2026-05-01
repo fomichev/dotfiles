@@ -1,0 +1,9 @@
+#!/bin/bash
+
+# needs deps, see https://ghostty.org/docs/install/build
+
+src=(https://github.com/ghostty-org/ghostty.git)
+
+zig_flags=(
+	-Dapp-runtime=gtk
+)
