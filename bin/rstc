@@ -108,24 +108,6 @@ matrix_update() {
 	popd
 }
 
-docker_update() {
-	for d in /home/sdf/src/docker/*; do
-		if [ -e $d/skip ]; then
-			pushd $d
-			docker compose down || :
-			popd
-			continue
-		fi
-
-		pushd $d
-		docker compose down
-		docker compose pull
-		docker compose up -d
-		popd
-	done
-	docker system df
-}
-
 is_running() {
 	[[ $(systemctl --user is-active $SERVICE) == "active" ]]
 }
@@ -148,6 +130,21 @@ do_notify() {
 	fi
 }
 
+backup() {
+	do_notify "started backup"
+	do_rstc \
+		"$@" \
+		--verbose=2 \
+		--exclude-file $HOME/src/dotfiles/.restic-exclude \
+		backup $HOME
+
+	do_rstc unlock
+	do_rstc snapshots
+	do_rstc forget --keep-within 95d --prune
+	do_rstc stats
+	do_notify "finished backup"
+}
+
 # Started without arguments.
 if [[ $# -eq 0 ]]; then
 	# Started manually via shell, start systemd service instead.
@@ -166,19 +163,7 @@ if [[ $# -eq 0 ]]; then
 	# Otherwise, run default actions.
 	trap failure EXIT
 
-	do_notify "started"
-
-	do_rstc \
-		$ARGS \
-		--verbose=2 \
-		--exclude-file $HOME/src/dotfiles/.restic-exclude \
-		backup $HOME
-
-	do_rstc unlock
-	do_rstc snapshots
-	do_rstc forget --keep-within 95d --prune
-	do_rstc stats
-	do_notify "finished"
+	backup
 	docker_update
 	backup_email
 	if [ -e /usr/bin/pacman ]; then
@@ -187,7 +172,6 @@ if [[ $# -eq 0 ]]; then
 		system_cleanup
 	fi
 	matrix_update
-	docker_update
 	do_notify "updated"
 	trap - EXIT
 	exit
