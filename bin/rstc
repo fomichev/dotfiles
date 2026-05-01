@@ -117,6 +117,8 @@ tail_journal() {
 }
 
 do_notify() {
+	return # turn off notifications
+
 	local message="restic: $(hostname) $*"
 
 	if command -v matrix-commander-rs &> /dev/null; then
