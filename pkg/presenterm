@@ -1,0 +1,7 @@
+#!/bin/bash
+
+src=(https://github.com/mfontanini/presenterm.git)
+
+cargo_flags=(
+	--path .
+)
