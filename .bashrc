@@ -17,11 +17,10 @@ path_prepend() { [ -e $1 ] && { export PATH=$1:$PATH; }; }
 try_source() { [ -r $1 ] && { . $1; }; }
 
 path_prepend ~/.cargo/bin
-path_prepend ~/opt/sysroot/usr/sbin
-path_prepend ~/opt/sysroot/sbin
-path_prepend ~/opt/sysroot/bin
-path_prepend ~/opt/sysroot/go/bin
-path_prepend ~/.local/bin
+path_prepend ~/{.local,opt/sysroot}/usr/sbin
+path_prepend ~/{.local,opt/sysroot}/sbin
+path_prepend ~/{.local,opt/sysroot}/bin
+path_prepend ~/{.local,opt/sysroot}/go/bin
 path_prepend ~/bin
 path_prepend ~/go/bin
 
@@ -30,7 +29,7 @@ path_prepend /usr/local/share/python
 
 path_append ~/src/dotfiles/kernel/bin
 
-export LD_LIBRARY_PATH=$HOME/sdf/opt/sysroot/lib
+export LD_LIBRARY_PATH=$HOME/sdf/.local/lib:$HOME/sdf/opt/sysroot/lib
 
 # }}}
 # Include aliases {{{

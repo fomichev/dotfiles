@@ -8,7 +8,7 @@ __usage() {
 	exit 1
 }
 
-BASEDIR="$HOME/opt"
+BASEDIR="$HOME/.local"
 while getopts "b:" opt; do
 	case $opt in
 		b) BASEDIR="$OPTARG" ;;
